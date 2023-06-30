@@ -41,14 +41,24 @@ try {
 header('Content-Type: application/json; charset=utf-8');
 
 try {
-    $method = strtoupper($_SERVER['REQUEST_METHOD']);
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '/';
 
-    if ($method === 'POST') {
-        add_entry($database, $config);
-    } elseif ($method === 'DELETE') {
-        delete_entry($database, $config);
+    if($request_uri === '/') {
+        $method = strtoupper($_SERVER['REQUEST_METHOD']);
+
+        if ($method === 'POST') {
+            add_entry($database, $config);
+        } elseif ($method === 'DELETE') {
+            delete_entry($database, $config);
+        } else {
+            output_entries($database, $config);
+        }
+    } elseif($request_uri === '/app') {
+        include_once './app.php';
+
+        exit;
     } else {
-        output_entries($database, $config);
+        output_data('Not found.', $config, 404);
     }
 } catch(Exception $ex) {
     output_data($ex, $config, 500);
