@@ -1,4 +1,5 @@
 #include <fcgi_stdio.h>
+#include "sqlite3.h"
 
 int main(void) {
     while (FCGI_Accept() >= 0) {
