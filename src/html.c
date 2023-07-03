@@ -1,8 +1,16 @@
+#include <fcgi_stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 // Function to escape special characters in a string for HTML
-char* escape_html(const char* input) {
+char* zaerl_escape_html(const char* input) {
     size_t len = strlen(input);
     size_t escaped_len = len * 6 + 1;
     char* escaped = malloc(len);
@@ -58,4 +66,20 @@ char* escape_html(const char* input) {
     escaped[j] = '\0';
 
     return escaped;
+}
+
+int zaerl_content_type(const char* content_type) {
+    return FCGI_printf("Content-type: %s\r\n\r\n", content_type);
+}
+
+unsigned long zaerl_process_id(void) {
+#ifdef _WIN32
+    return (unsigned long)GetCurrentProcessId();
+#elif __linux__ || __APPLE__
+    return (unsigned long)getpid();
+#endif
+}
+
+int zaerl_environ(void) {
+    return FCGI_printf("<!--pid: %lu-->\n", zaerl_process_id());
 }
