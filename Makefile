@@ -15,7 +15,7 @@ SRCS = $(wildcard $(SRCDIR)/*.c)
 OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 
 # Define the final executable name
-TARGET = $(BINDIR)/j6251
+TARGET = $(BINDIR)/zaerl
 
 all: $(TARGET)
 
@@ -33,13 +33,13 @@ clean:
 
 .PHONY: all clean
 
-#TARGET = j6251
+#TARGET = zaerl
 
-#$(TARGET): j6251.o
-#	$(CC) $(CFLAGS) -o $(TARGET) j6251.o -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS)
+#$(TARGET): zaerl.o
+#	$(CC) $(CFLAGS) -o $(TARGET) zaerl.o -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS)
 
-#j6251.o: src/j6251.c
-#	$(CC) $(CFLAGS) -c -I$(FCGI_INCLUDE_PATH) src/j6251.c
+#zaerl.o: src/zaerl.c
+#	$(CC) $(CFLAGS) -c -I$(FCGI_INCLUDE_PATH) src/zaerl.c
 
 #sqlite3.o: src/sqlite3.c
 #	$(CC) $(CFLAGS) -c src/sqlite3.c

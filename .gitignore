@@ -51,5 +51,5 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-j6251.db
-j6251
+zaerl.db
+zaerl
