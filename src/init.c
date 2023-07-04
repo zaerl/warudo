@@ -68,7 +68,6 @@ int zaerl_accept_connection(zaerl *config) {
     config->request_method = ZAERL_REQUEST_UNKNOWN;
     config->script_name = NULL;
     config->query_string = NULL;
-    const char* request_method = NULL;
 
     int accepted = FCGX_Accept_r(&config->request);
 
@@ -76,22 +75,13 @@ int zaerl_accept_connection(zaerl *config) {
         return accepted;
     }
 
-    char** envp = config->request.envp;
+    const char* script_name = FCGX_GetParam("SCRIPT_NAME", config->request.envp);
+    const char* query_string = FCGX_GetParam("QUERY_STRING", config->request.envp);
+    const char* request_method = FCGX_GetParam("REQUEST_METHOD", config->request.envp);
 
-    for(; *envp != NULL; envp++) {
-        // FCGX_FPrintF(config->request.out, "%s\n", *envp);
-        if(strncmp(*envp, "SCRIPT_NAME=", 12) == 0) {
-            config->script_name = *envp + 12;
-        } else if(strncmp(*envp, "QUERY_STRING=", 13) == 0) {
-            config->query_string = *envp + 13;
-        } else if(strncmp(*envp, "REQUEST_METHOD=", 15) == 0) {
-            request_method = *envp + 15;
-        }
-    }
-
-    if(config->script_name != NULL && strcmp(config->script_name, "/") == 0) {
+    if(script_name != NULL && strcmp(script_name, "/") == 0) {
         config->page = ZAERL_PAGE_ROOT;
-    } else if(config->script_name != NULL && strcmp(config->script_name, "/app") == 0) {
+    } else if(script_name != NULL && strcmp(script_name, "/app") == 0) {
         config->page = ZAERL_PAGE_APP;
     } else {
         config->page = ZAERL_PAGE_NOT_FOUND;
@@ -106,6 +96,9 @@ int zaerl_accept_connection(zaerl *config) {
             config->request_method = ZAERL_REQUEST_UNKNOWN;
         }
     }
+
+    config->script_name = script_name;
+    config->query_string = query_string;
 
     return accepted;
 }

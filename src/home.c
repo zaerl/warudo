@@ -14,7 +14,7 @@ static void print_env(const char *label, char **envp, zaerl *config) {
         FCGX_FPrintF(config->request.out, "%s\n", *envp);
     }
 
-    FCGX_FPrintF(config->request.out, "</pre><p>\n");
+    FCGX_FPrintF(config->request.out, "</pre>\n");
 }
 
 int zaerl_page_home(zaerl* config, unsigned long count) {
@@ -29,8 +29,9 @@ int zaerl_page_home(zaerl* config, unsigned long count) {
 
     FCGX_FPrintF(config->request.out, "<html>\n"
         "<head><title>Zaerl</title></head>\n"
-        "<body></body>\n");
-    zaerl_environ(config);
+        "<body>\n");
     print_env("Environ", config->request.envp, config);
-    FCGX_FPrintF(config->request.out, "</html>\n");
+    zaerl_environ(config);
+
+    return FCGX_FPrintF(config->request.out, "</body></html>\n");
 }
