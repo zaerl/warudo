@@ -17,7 +17,10 @@ int zaerl_db_init(const char *filename, zaerl* config) {
         return 1;
     }
 
-    const char *sql = "CREATE TABLE IF NOT EXISTS entries(id INTEGER PRIMARY KEY AUTOINCREMENT);";
+    const char *sql = "CREATE TABLE IF NOT EXISTS entries(id INTEGER PRIMARY KEY AUTOINCREMENT);"
+        "PRAGMA journal_mode = WAL;"
+        "PRAGMA synchronous = NORMAL;"
+        "PRAGMA busy_timeout = 5000;";
     rc = sqlite3_exec(config->db, sql, 0, 0, &error_msg);
 
     if (rc != SQLITE_OK) {
