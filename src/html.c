@@ -5,9 +5,14 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <process.h>
 #else
 #include <unistd.h>
+
+extern char **environ;
 #endif
+
+#include "zaerl.h"
 
 // Function to escape special characters in a string for HTML
 char* zaerl_escape_html(const char* input) {
@@ -68,8 +73,8 @@ char* zaerl_escape_html(const char* input) {
     return escaped;
 }
 
-int zaerl_content_type(const char* content_type) {
-    return FCGI_printf("Content-type: %s\r\n\r\n", content_type);
+int zaerl_content_type(const char* content_type, zaerl *config) {
+    return FCGX_FPrintF(config->request.out, "Content-type: %s;charset=utf-8\r\n\r\n", content_type);
 }
 
 unsigned long zaerl_process_id(void) {
@@ -80,6 +85,17 @@ unsigned long zaerl_process_id(void) {
 #endif
 }
 
-int zaerl_environ(void) {
-    return FCGI_printf("<!--pid: %lu-->\n", zaerl_process_id());
+int zaerl_environ(zaerl* config) {
+    FCGX_FPrintF(config->request.out, "<!--db: %s-->\n", ZAERL_DB_FILE);
+    FCGX_FPrintF(config->request.out, "<!--config: %s-->\n", ZAERL_CONFIG_FILE);
+
+    return FCGX_FPrintF(config->request.out, "<!--pid: %lu-->\n", zaerl_process_id());
+}
+
+int page_not_found(zaerl* config) {
+    puts("404 request\n");
+
+    FCGX_PutS("Status: 404 Not Found\r\n", config->request.out);
+    zaerl_content_type("text/plain", config);
+    return FCGX_PutS("Unknown.", config->request.out);
 }
