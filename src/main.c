@@ -1,7 +1,7 @@
-#define NO_FCGI_DEFINES
+// #define NO_FCGI_DEFINES
 
 #include <fcgiapp.h>
-#include <fcgi_stdio.h>
+#include <stdio.h>
 #include "sqlite3.h"
 
 #include "config.h"

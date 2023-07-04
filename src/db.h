@@ -6,6 +6,6 @@
 int zaerl_db_init(const char *filename, zaerl* config);
 int zaerl_db_close(zaerl *config);
 
-int zaerl_add_entry(zaerl *db);
+int zaerl_add_entry(const char* json, zaerl *config);
 
 #endif /* ZAERL_DB_H */

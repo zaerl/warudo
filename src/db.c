@@ -63,7 +63,7 @@ int zaerl_load_columns(zaerl* config) {
     return 0;
 }
 
-int zaerl_add_entry(zaerl *config, const char* json) {
+int zaerl_add_entry(const char* json, zaerl *config) {
     const char* sql = "INSERT INTO entries(data) VALUES(?);";
     sqlite3_stmt* stmt;
 

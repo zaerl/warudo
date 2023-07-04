@@ -1,6 +1,8 @@
-#include <fcgi_stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <fcgiapp.h>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -84,6 +86,15 @@ int zaerl_not_allowed(const char* allowed, zaerl* config) {
     zaerl_content_type("text/plain", config);
 
     return FCGX_PutS("Not allowed.", config->request.out);
+}
+
+int zaerl_bad_request(const char* description, zaerl* config) {
+    puts("400 request\n");
+
+    FCGX_PutS("Status: 400 Bad Request\r\n", config->request.out);
+    zaerl_content_type("application/json", config);
+
+    return FCGX_FPrintF(config->request.out, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
 }
 
 unsigned long zaerl_process_id(void) {

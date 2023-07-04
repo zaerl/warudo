@@ -1,6 +1,8 @@
-#include <fcgi_stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
+#include <fcgiapp.h>
 
 #include "zaerl.h"
 #include "html.h"
