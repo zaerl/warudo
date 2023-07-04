@@ -77,6 +77,15 @@ int zaerl_content_type(const char* content_type, zaerl *config) {
     return FCGX_FPrintF(config->request.out, "Content-type: %s;charset=utf-8\r\n\r\n", content_type);
 }
 
+int zaerl_not_allowed(const char* allowed, zaerl* config) {
+    puts("405 request\n");
+
+    FCGX_FPrintF(config->request.out, "Status: 405 Method Not Allowed\r\nAllow: %s\r\n", allowed);
+    zaerl_content_type("text/plain", config);
+
+    return FCGX_PutS("Not allowed.", config->request.out);
+}
+
 unsigned long zaerl_process_id(void) {
 #ifdef _WIN32
     return (unsigned long)GetCurrentProcessId();
@@ -97,5 +106,6 @@ int zaerl_page_not_found(zaerl* config) {
 
     FCGX_PutS("Status: 404 Not Found\r\n", config->request.out);
     zaerl_content_type("text/plain", config);
+
     return FCGX_PutS("Unknown.", config->request.out);
 }

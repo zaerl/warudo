@@ -17,7 +17,7 @@ int zaerl_db_init(const char *filename, zaerl* config) {
         return 1;
     }
 
-    const char *sql = "CREATE TABLE IF NOT EXISTS entries(id INTEGER PRIMARY KEY AUTOINCREMENT);"
+    const char *sql = "CREATE TABLE IF NOT EXISTS entries(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
         "PRAGMA journal_mode = WAL;"
         "PRAGMA synchronous = NORMAL;"
         "PRAGMA busy_timeout = 5000;";
@@ -63,7 +63,26 @@ int zaerl_load_columns(zaerl* config) {
     return 0;
 }
 
-int zaerl_add_entry(zaerl *config) {
+int zaerl_add_entry(zaerl *config, const char* json) {
+    const char* sql = "INSERT INTO entries(data) VALUES(?);";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
+        sqlite3_finalize(stmt);
+
+        return 1;
+    }
+
+    sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC);
+
+    if(sqlite3_step(stmt) != SQLITE_DONE) {
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
+        sqlite3_finalize(stmt);
+
+        return 1;
+    }
+
     return 0;
 }
 
