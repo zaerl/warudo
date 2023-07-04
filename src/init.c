@@ -6,12 +6,14 @@
 
 #include "config.h"
 #include "zaerl.h"
+#include "db.h"
 
 int zaerl_init(const char *filename, zaerl **config) {
     zaerl *pdb;
     int res;
 
     pdb = malloc(sizeof(zaerl));
+    pdb->columns_count = 0;
 
     // Load database
     res = zaerl_db_init(filename, pdb);
@@ -113,8 +115,9 @@ int zaerl_close(zaerl *config) {
         return 0;
     }
 
-    sqlite3_close(config->db);
     FCGX_Free(&config->request, 1);
+    zaerl_db_close(config);
+
     free(config);
 
     return 0;

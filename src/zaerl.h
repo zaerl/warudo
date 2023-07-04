@@ -6,6 +6,7 @@
 #define ZAERL_DB_FILE "zaerl.db"
 #define ZAERL_CONFIG_FILE "zaerl.conf"
 #define ZAERL_SOCKET_PATH ":6251"
+#define ZAERL_MAX_COLUMNS 64
 
 #include <fcgiapp.h>
 #include "sqlite3.h"
@@ -18,6 +19,13 @@
 #define ZAERL_REQUEST_GET 1
 #define ZAERL_REQUEST_POST 2
 
+struct zaerl_column {
+    char* name;
+    char* type;
+};
+
+typedef struct zaerl_column zaerl_column;
+
 struct zaerl {
     sqlite3 *db;
     FCGX_Request request;
@@ -26,6 +34,8 @@ struct zaerl {
     int request_method;
     const char* script_name;
     const char* query_string;
+    zaerl_column columns[ZAERL_MAX_COLUMNS];
+    unsigned int columns_count;
 };
 
 typedef struct zaerl zaerl;
