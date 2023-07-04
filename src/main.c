@@ -37,12 +37,12 @@ int main(void) {
 
             continue;
         } else if(config->page == ZAERL_PAGE_ROOT) {
-            page_home(config, count);
+            zaerl_page_home(config, count);
             ++count;
 
             continue;
         } else {
-            page_not_found(config);
+            zaerl_page_not_found(config);
             ++count;
 
             continue;

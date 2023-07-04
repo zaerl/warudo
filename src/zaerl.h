@@ -34,7 +34,7 @@ int zaerl_init(const char *filename, zaerl **config);
 
 int zaerl_accept_connection(zaerl *config);
 
-int page_home(zaerl* config, unsigned long count);
+int zaerl_page_home(zaerl* config, unsigned long count);
 
 int page_app(zaerl* config, unsigned long count);
 

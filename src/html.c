@@ -92,7 +92,7 @@ int zaerl_environ(zaerl* config) {
     return FCGX_FPrintF(config->request.out, "<!--pid: %lu-->\n", zaerl_process_id());
 }
 
-int page_not_found(zaerl* config) {
+int zaerl_page_not_found(zaerl* config) {
     puts("404 request\n");
 
     FCGX_PutS("Status: 404 Not Found\r\n", config->request.out);

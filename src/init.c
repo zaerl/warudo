@@ -5,7 +5,7 @@
 #include <fcgiapp.h>
 
 #include "config.h"
-#include "db.h"
+#include "zaerl.h"
 
 int zaerl_init(const char *filename, zaerl **config) {
     zaerl *pdb;

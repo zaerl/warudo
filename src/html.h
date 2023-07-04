@@ -7,7 +7,7 @@ char* zaerl_escape_html(const char* input);
 
 int zaerl_content_type(const char* content_type, zaerl *config);
 
-int page_not_found(zaerl* config);
+int zaerl_page_not_found(zaerl* config);
 
 int zaerl_environ(zaerl *config);
 

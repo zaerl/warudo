@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "config.h"
-#include "db.h"
+#include "zaerl.h"
 
 int zaerl_db_init(const char *filename, zaerl* config) {
     // Load database
