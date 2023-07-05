@@ -64,8 +64,12 @@ int zaerl_load_columns(zaerl* config) {
 }
 
 int zaerl_add_entry(const char* json, zaerl *config) {
-    const char* sql = "INSERT INTO entries(data) VALUES(?);";
+    const char* sql = "INSERT INTO entries(data) VALUES(json(?));";
     sqlite3_stmt* stmt;
+
+    if(json == NULL) {
+        return 1;
+    }
 
     if (sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
@@ -74,7 +78,12 @@ int zaerl_add_entry(const char* json, zaerl *config) {
         return 1;
     }
 
-    sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC);
+    if(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC) != SQLITE_OK) {
+        fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
+        sqlite3_finalize(stmt);
+
+        return 1;
+    }
 
     if(sqlite3_step(stmt) != SQLITE_DONE) {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));

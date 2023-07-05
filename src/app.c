@@ -31,11 +31,19 @@ int page_app(zaerl* config, unsigned long count) {
             return 1;
         }
 
-        zaerl_add_entry("", config);
+        char *data = malloc(len + 1);
+
+        FCGX_GetStr(data, len, config->request.in);
+
+        if(zaerl_add_entry(data, config) != 0) {
+            zaerl_bad_request("Failed to add entry.", config);
+
+            return 1;
+        }
 
         FCGX_PutS("Status: 201 Created\r\n", config->request.out);
         zaerl_content_type("application/json", config);
-        FCGX_PutS("{\"status\":\"success\"}\n", config->request.out);
+        FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", sqlite3_last_insert_rowid(config->db));
 
         return 0;
     }
