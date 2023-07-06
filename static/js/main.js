@@ -1,0 +1,40 @@
+const ctx = document.getElementById('main');
+
+async function get_data() {
+  const params = new URLSearchParams({
+    limit: 2000
+  });
+  const response = await fetch('/app?' + params.toString());
+  const results = await response.json();
+
+  let methods = [];
+
+  for(let result of results) {
+    if(typeof methods[result.method] === 'undefined') {
+      methods[result.method] = 0;
+    }
+
+    ++methods[result.method];
+  }
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(methods),
+      datasets: [{
+        label: 'Methods',
+        data: Object.values(methods),
+        borderWidth: 1
+        }]
+      }, options: {
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    }
+  );
+}
+
+get_data();

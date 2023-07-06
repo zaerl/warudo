@@ -8,6 +8,7 @@
 #define ZAERL_SOCKET_PATH ":6251"
 #define ZAERL_MAX_COLUMNS 64
 #define ZAERL_LOG_LEVEL 1
+#define ZAERL_CHART_VERSION "4.3.0"
 
 #include <fcgiapp.h>
 #include "sqlite3.h"
