@@ -51,5 +51,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+bin/zaerl
 zaerl.db
-zaerl
+zaerl.db-shm
+zaerl.db-wal

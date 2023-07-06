@@ -40,6 +40,8 @@ struct zaerl {
 
 typedef struct zaerl zaerl;
 
+typedef void (*zaerl_output_results)(const char*, zaerl* config);
+
 int zaerl_init(const char *filename, zaerl **config);
 
 int zaerl_accept_connection(zaerl *config);

@@ -8,13 +8,22 @@
 #include "html.h"
 #include "db.h"
 
+void print_results(const char* data, zaerl* config) {
+    FCGX_PutS(data, config->request.out);
+}
+
 int page_app(zaerl* config, unsigned long count) {
+    zaerl_output_results out = print_results;
+
     if(config->request_method == ZAERL_REQUEST_GET) {
         FCGX_PutS("Status: 200 OK\r\n", config->request.out);
         zaerl_content_type("application/json", config);
 
         fprintf(stderr, "Accepted request %lu, cl: %s\n", count, FCGX_GetParam("CONTENT_LENGTH", config->request.envp));
-        FCGX_PutS("{\"status\":\"success\"}\n", config->request.out);
+        // FCGX_PutS("{\"status\":\"success\"}\n", config->request.out);
+        FCGX_PutS("[", config->request.out);
+        zaerl_get_entries(out, config);
+        FCGX_PutS("]", config->request.out);
 
         return 0;
     } else if(config->request_method == ZAERL_REQUEST_POST) {

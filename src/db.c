@@ -95,6 +95,27 @@ int zaerl_add_entry(const char* json, zaerl *config) {
     return 0;
 }
 
+int zaerl_get_entries(zaerl_output_results out, zaerl *config) {
+    const char *query = "SELECT data FROM entries;";
+    sqlite3_stmt *stmt;
+    int rc;
+
+    if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
+        sqlite3_finalize(stmt);
+
+        return 1;
+    }
+
+    while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        // Retrieve the result
+        const char *data = (const char*)sqlite3_column_text(stmt, 0);
+        out(data, config);
+    }
+
+    return 0;
+}
+
 int zaerl_db_close(zaerl *config) {
     if(!config) {
         return 0;
