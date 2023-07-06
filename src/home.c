@@ -19,7 +19,7 @@ static void print_env(const char *label, char **envp, zaerl *config) {
     FCGX_FPrintF(config->request.out, "</pre>\n");
 }
 
-int zaerl_page_home(zaerl* config, unsigned long count) {
+int zaerl_page_home(zaerl* config) {
     if(config->request_method != ZAERL_REQUEST_GET) {
         return zaerl_not_allowed("GET", config);
     }
@@ -27,13 +27,12 @@ int zaerl_page_home(zaerl* config, unsigned long count) {
     FCGX_PutS("Status: 200 OK\r\n", config->request.out);
     zaerl_content_type("text/html", config);
 
-    printf("Accepted request %lu\n", count);
-
     FCGX_FPrintF(config->request.out, "<html>\n"
         "<head><title>Zaerl</title></head>\n"
         "<body>\n");
     print_env("Environ", config->request.envp, config);
     zaerl_environ(config);
+    FCGX_FPrintF(config->request.out, "</body></html>\n");
 
-    return FCGX_FPrintF(config->request.out, "</body></html>\n");
+    return 0;
 }

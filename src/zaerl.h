@@ -7,6 +7,7 @@
 #define ZAERL_CONFIG_FILE "zaerl.conf"
 #define ZAERL_SOCKET_PATH ":6251"
 #define ZAERL_MAX_COLUMNS 64
+#define ZAERL_LOG_LEVEL 1
 
 #include <fcgiapp.h>
 #include "sqlite3.h"
@@ -36,6 +37,7 @@ struct zaerl {
     const char* query_string;
     zaerl_column columns[ZAERL_MAX_COLUMNS];
     unsigned int columns_count;
+    unsigned long long int requests_count;
 };
 
 typedef struct zaerl zaerl;
@@ -46,9 +48,9 @@ int zaerl_init(const char *filename, zaerl **config);
 
 int zaerl_accept_connection(zaerl *config);
 
-int zaerl_page_home(zaerl* config, unsigned long count);
+int zaerl_page_home(zaerl* config);
 
-int page_app(zaerl* config, unsigned long count);
+int page_app(zaerl* config);
 
 int zaerl_close(zaerl *config);
 

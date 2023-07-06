@@ -7,6 +7,7 @@ FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include
 SRCDIR = src
 OBJDIR = obj
 BINDIR = bin
+DBS = *.db *.db-shm *.db-wal
 
 # Get all .c files from src/ directory
 SRCS = $(wildcard $(SRCDIR)/*.c)
@@ -29,7 +30,7 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
 clean:
-	rm -rf $(OBJDIR) $(BINDIR)/*
+	rm -rf $(OBJDIR) $(BINDIR)/* ${DBS}
 
 .PHONY: all clean
 

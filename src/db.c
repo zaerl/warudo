@@ -96,9 +96,10 @@ int zaerl_add_entry(const char* json, zaerl *config) {
 }
 
 int zaerl_get_entries(zaerl_output_results out, zaerl *config) {
-    const char *query = "SELECT data FROM entries;";
+    const char *query = "SELECT data FROM entries LIMIT 100;";
     sqlite3_stmt *stmt;
     int rc;
+    int count = 0;
 
     if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
@@ -110,7 +111,13 @@ int zaerl_get_entries(zaerl_output_results out, zaerl *config) {
     while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         // Retrieve the result
         const char *data = (const char*)sqlite3_column_text(stmt, 0);
+
+        if(count != 0) {
+            out(",", config);
+        }
+
         out(data, config);
+        ++count;
     }
 
     return 0;

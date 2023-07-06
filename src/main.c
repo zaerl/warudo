@@ -19,7 +19,6 @@ extern char **environ;
 int main(void) {
     zaerl *config;
     int ret;
-    unsigned long count = 0;
 
     zaerl_read_config();
     ret = zaerl_init(ZAERL_DB_FILE, &config);
@@ -32,14 +31,20 @@ int main(void) {
 
     while(zaerl_accept_connection(config) >= 0) {
         if(config->page == ZAERL_PAGE_APP) {
-            page_app(config, count);
+            ret = page_app(config);
         } else if(config->page == ZAERL_PAGE_ROOT) {
-            zaerl_page_home(config, count);
+            ret = zaerl_page_home(config);
         } else {
-            zaerl_page_not_found(config);
+            ret = zaerl_page_not_found(config);
         }
 
-        ++count;
+        if(ret == 0) {
+            fprintf(stderr, "Accepted request %llu\n", config->requests_count);
+        } else {
+            fprintf(stderr, "Failed to accept request %llu. Code %d\n", config->requests_count, ret);
+        }
+
+        ++config->requests_count;
     }
 
     zaerl_close(config);

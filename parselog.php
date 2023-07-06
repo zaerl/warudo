@@ -7,7 +7,8 @@ if ($argc < 2) {
 
 // Get the log file path from the command line argument
 $path = $argv[1];
-$url = 'http://localhost:6251';
+// $url = 'http://localhost:6251';
+$url = 'http://localhost:6252/app';
 $curl = curl_init($url);
 curl_setopt($curl, CURLOPT_POST, true);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -22,7 +23,7 @@ if (!$file) {
 }
 
 $buffer = [];
-$limit = 100;
+$limit = 1;
 
 // Read the file line by line
 while (($line = fgets($file)) !== false) {
@@ -54,8 +55,6 @@ while (($line = fgets($file)) !== false) {
     if(count($buffer) === $limit) {
         post_data($buffer, $curl);
         $buffer = [];
-
-        continue;
     }
 }
 
@@ -64,9 +63,10 @@ if(count($buffer)) {
 }
 
 function post_data($buffer, $curl) {
-    $post = new stdClass();
-    $post->entries = $buffer;
-    $json = json_encode($post);
+    // $post = new stdClass();
+    // $post->entries = $buffer;
+    // $json = json_encode($post);
+    $json = json_encode($buffer[0]);
 
     // Set the request headers
     curl_setopt($curl, CURLOPT_HTTPHEADER, [

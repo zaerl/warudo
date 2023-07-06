@@ -55,3 +55,4 @@ bin/zaerl
 zaerl.db
 zaerl.db-shm
 zaerl.db-wal
+*.log

@@ -14,6 +14,7 @@ int zaerl_init(const char *filename, zaerl **config) {
 
     pdb = malloc(sizeof(zaerl));
     pdb->columns_count = 0;
+    pdb->requests_count = 0;
 
     // Load database
     res = zaerl_db_init(filename, pdb);
@@ -68,11 +69,12 @@ int zaerl_accept_connection(zaerl *config) {
     config->request_method = ZAERL_REQUEST_UNKNOWN;
     config->script_name = NULL;
     config->query_string = NULL;
+    ++config->requests_count;
 
     int accepted = FCGX_Accept_r(&config->request);
 
     if(accepted < 0) {
-        return accepted;
+        return 1;
     }
 
     const char* script_name = FCGX_GetParam("SCRIPT_NAME", config->request.envp);
@@ -100,7 +102,7 @@ int zaerl_accept_connection(zaerl *config) {
     config->script_name = script_name;
     config->query_string = query_string;
 
-    return accepted;
+    return 0;
 }
 
 int zaerl_close(zaerl *config) {
