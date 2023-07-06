@@ -104,7 +104,8 @@ int zaerl_get_entries(zaerl_output_results out, zaerl *config) {
     int has_search = config->query_key != NULL && config->query_value != NULL;
 
     if(has_search) {
-        query = "SELECT data FROM entries WHERE json_extract(data, ?) = ? LIMIT ?;";
+        // query = "SELECT data FROM entries WHERE json_extract(data, ?) = ? LIMIT ?;";
+        query = "SELECT data FROM entries WHERE data ->> ? = ? LIMIT ?;";
         limit_index = 3;
     } else {
         query = "SELECT data FROM entries LIMIT ?;";
