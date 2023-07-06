@@ -59,7 +59,42 @@ int zaerl_init(const char *filename, zaerl **config) {
     pdb->script_name = NULL;
     pdb->query_string = NULL;
 
+    // Query string
+    pdb->query_limit = 0;
+    pdb->query_key = NULL;
+    pdb->query_value = NULL;
+
     *config = pdb;
+
+    return 0;
+}
+
+int zaerl_parse_query_string(char* query_string, zaerl* config) {
+    if(query_string == NULL) {
+        return 1;
+    }
+
+    char* saveptr;
+    char* parameter = strtok_r(query_string, "&", &saveptr);
+
+    while(parameter != NULL) {
+        char *delimiter = strchr(parameter, '=');
+
+        if(delimiter != NULL) {
+            int delimiter_idx = delimiter - parameter;
+            int length_1 = delimiter_idx;
+            // int length_2 = strlen(parameter) - delimiter_idx - 1;
+            char* value = delimiter + 1;
+
+            if(value != NULL) {
+                ZA_GET_QUERY_INT_VALUE(parameter, limit, value, length_1)
+                else ZA_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
+                else ZA_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
+            }
+        }
+
+        parameter = strtok_r(NULL, "&", &saveptr);
+    }
 
     return 0;
 }
@@ -70,6 +105,11 @@ int zaerl_accept_connection(zaerl *config) {
     config->script_name = NULL;
     config->query_string = NULL;
     ++config->requests_count;
+
+    // Query string
+    ZA_FREE_QUERY_INT_VALUE(limit, ZAERL_DEFAULT_QUERY_LIMIT)
+    ZA_FREE_QUERY_STRING_VALUE(key)
+    ZA_FREE_QUERY_STRING_VALUE(value)
 
     int accepted = FCGX_Accept_r(&config->request);
 
@@ -97,6 +137,10 @@ int zaerl_accept_connection(zaerl *config) {
         } else {
             config->request_method = ZAERL_REQUEST_UNKNOWN;
         }
+    }
+
+    if(query_string != NULL) {
+        zaerl_parse_query_string((char*)query_string, config);
     }
 
     config->script_name = script_name;

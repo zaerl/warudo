@@ -96,13 +96,45 @@ int zaerl_add_entry(const char* json, zaerl *config) {
 }
 
 int zaerl_get_entries(zaerl_output_results out, zaerl *config) {
-    const char *query = "SELECT data FROM entries LIMIT 100;";
+    const char *query;
     sqlite3_stmt *stmt;
     int rc;
     int count = 0;
+    int limit_index = 1;
+    int has_search = config->query_key != NULL && config->query_value != NULL;
+
+    if(has_search) {
+        query = "SELECT data FROM entries WHERE json_extract(data, ?) = ? LIMIT ?;";
+        limit_index = 3;
+    } else {
+        query = "SELECT data FROM entries LIMIT ?;";
+    }
 
     if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
+        sqlite3_finalize(stmt);
+
+        return 1;
+    }
+
+    if(has_search) {
+        if(sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC) != SQLITE_OK) {
+            fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
+            sqlite3_finalize(stmt);
+
+            return 1;
+        }
+
+        if(sqlite3_bind_text(stmt, 2, config->query_value, strlen(config->query_value), SQLITE_STATIC) != SQLITE_OK) {
+            fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
+            sqlite3_finalize(stmt);
+
+            return 1;
+        }
+    }
+
+    if(sqlite3_bind_int(stmt, limit_index, config->query_limit) != SQLITE_OK) {
+        fprintf(stderr, "Failed to bind limit: %s\n", sqlite3_errmsg(config->db));
         sqlite3_finalize(stmt);
 
         return 1;
