@@ -37,4 +37,21 @@ async function get_data() {
   );
 }
 
-get_data();
+async function get_keys() {
+  const response = await fetch('/app/keys');
+  const results = await response.json();
+  const select = document.getElementById('main-keys');
+
+  for(const result of results) {
+    const el = document.createElement('option');
+    el.textContent = result.name;
+    el.value = result.name;
+    select.appendChild(el);
+  }
+}
+
+async function init() {
+  await Promise.all([get_data(), get_keys()]);
+}
+
+init();

@@ -173,7 +173,7 @@ int zaerl_get_keys(zaerl *config) {
         return 1;
     }
 
-    FCGX_PutS("{", config->request.out);
+    FCGX_PutS("[", config->request.out);
 
     while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         // Retrieve the result
@@ -192,7 +192,7 @@ int zaerl_get_keys(zaerl *config) {
         ++count;
     }
 
-    FCGX_PutS("}", config->request.out);
+    FCGX_PutS("]", config->request.out);
 
     return 0;
 }

@@ -37,6 +37,7 @@ int zaerl_page_home(zaerl* config) {
         "<link rel=\"stylesheet\" type=\"text/css\" href=\"static/css/main.css\">"
         "</head>"
         "<body>"
+        "<div><select id=\"main-keys\"></select></div>"
         "<div><canvas id=\"main\"></canvas></div>"
         "<script src=\"static/js/chart-" ZAERL_CHART_VERSION ".min.js\"></script>"
         "<script src=\"static/js/main.js\"></script>", config->request.out);
