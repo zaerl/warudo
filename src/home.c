@@ -24,7 +24,7 @@ int zaerl_page_home(zaerl* config) {
         return zaerl_not_allowed("GET", config);
     }
 
-    FCGX_PutS("Status: 200 OK\r\n", config->request.out);
+    /*FCGX_PutS("Status: 200 OK\r\n", config->request.out);
     zaerl_content_type("text/html", config);
 
     FCGX_PutS("<html>\n"
@@ -34,6 +34,7 @@ int zaerl_page_home(zaerl* config) {
         "<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/images/favicon-32x32.png\">"
         "<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/images/favicon-16x16.png\">"
         "<link rel=\"manifest\" href=\"/static/images/site.webmanifest\">"
+        "<link rel=\"stylesheet\" type=\"text/css\" href=\"static/css/skelet.min.css\">"
         "<link rel=\"stylesheet\" type=\"text/css\" href=\"static/css/main.css\">"
         "</head>"
         "<body>"
@@ -45,5 +46,8 @@ int zaerl_page_home(zaerl* config) {
     zaerl_environ(config);
     FCGX_PutS("</body></html>", config->request.out);
 
-    return 0;
+    return 0;*/
+    return zaerl_server_error("Zaerl is a Fast CGI application. "
+        "You need to use a webserver and proxy the requests to the socket. "
+        "Follow the instructions found in README.md.", config);
 }

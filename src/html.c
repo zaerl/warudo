@@ -90,6 +90,15 @@ int zaerl_not_allowed(const char* allowed, zaerl* config) {
     return 405;
 }
 
+int zaerl_server_error(const char* description, zaerl* config) {
+    FCGX_PutS("Status: 500 Internal Server Error\r\n", config->request.out);
+    zaerl_content_type("text/plain", config);
+
+    FCGX_PutS(description, config->request.out);
+
+    return 500;
+}
+
 int zaerl_bad_request(const char* description, zaerl* config) {
     FCGX_PutS("Status: 400 Bad Request\r\n", config->request.out);
     zaerl_content_type("application/json", config);

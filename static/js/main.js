@@ -10,6 +10,10 @@ async function get_data() {
   let methods = [];
 
   for(let result of results) {
+    if(typeof result.method === 'undefined') {
+      result.method = 'Unknown';
+    }
+
     if(typeof methods[result.method] === 'undefined') {
       methods[result.method] = 0;
     }
@@ -22,7 +26,7 @@ async function get_data() {
     data: {
       labels: Object.keys(methods),
       datasets: [{
-        label: 'Methods',
+        label: 'Calls',
         data: Object.values(methods),
         borderWidth: 1
         }]
