@@ -125,6 +125,8 @@ int zaerl_accept_connection(zaerl *config) {
         config->page = ZAERL_PAGE_ROOT;
     } else if(script_name != NULL && strcmp(script_name, "/app") == 0) {
         config->page = ZAERL_PAGE_APP;
+    } else if(script_name != NULL && strcmp(script_name, "/app/keys") == 0) {
+        config->page = ZAERL_PAGE_APP_KEYS;
     } else {
         config->page = ZAERL_PAGE_NOT_FOUND;
     }

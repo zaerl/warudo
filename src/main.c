@@ -32,6 +32,8 @@ int main(void) {
     while(zaerl_accept_connection(config) >= 0) {
         if(config->page == ZAERL_PAGE_APP) {
             ret = page_app(config);
+        } else if(config->page == ZAERL_PAGE_APP_KEYS) {
+            ret = page_app_keys(config);
         } else if(config->page == ZAERL_PAGE_ROOT) {
             ret = zaerl_page_home(config);
         } else {

@@ -16,6 +16,7 @@
 #define ZAERL_PAGE_NOT_FOUND 0
 #define ZAERL_PAGE_ROOT 1
 #define ZAERL_PAGE_APP 2
+#define ZAERL_PAGE_APP_KEYS 3
 
 #define ZAERL_REQUEST_UNKNOWN 0
 #define ZAERL_REQUEST_GET 1
@@ -62,8 +63,6 @@ struct zaerl {
 
 typedef struct zaerl zaerl;
 
-typedef void (*zaerl_output_results)(const char*, zaerl* config);
-
 int zaerl_init(const char *filename, zaerl **config);
 
 int zaerl_accept_connection(zaerl *config);
@@ -71,6 +70,8 @@ int zaerl_accept_connection(zaerl *config);
 int zaerl_page_home(zaerl* config);
 
 int page_app(zaerl* config);
+
+int page_app_keys(zaerl* config);
 
 int zaerl_close(zaerl *config);
 

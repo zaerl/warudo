@@ -95,7 +95,7 @@ int zaerl_add_entry(const char* json, zaerl *config) {
     return 0;
 }
 
-int zaerl_get_entries(zaerl_output_results out, zaerl *config) {
+int zaerl_get_entries(zaerl *config) {
     const char *query;
     sqlite3_stmt *stmt;
     int rc;
@@ -141,17 +141,58 @@ int zaerl_get_entries(zaerl_output_results out, zaerl *config) {
         return 1;
     }
 
+    FCGX_PutS("[", config->request.out);
+
     while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         // Retrieve the result
         const char *data = (const char*)sqlite3_column_text(stmt, 0);
 
         if(count != 0) {
-            out(",", config);
+            FCGX_PutS(",", config->request.out);
         }
 
-        out(data, config);
+        FCGX_PutS(data, config->request.out);
         ++count;
     }
+
+    FCGX_PutS("]", config->request.out);
+
+    return 0;
+}
+
+int zaerl_get_keys(zaerl *config) {
+    const char *query = "SELECT key, COUNT(*) AS occurrence_count FROM entries, json_tree(data) GROUP BY key;";
+    int rc;
+    int count = 0;
+    sqlite3_stmt *stmt;
+
+    if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
+        sqlite3_finalize(stmt);
+
+        return 1;
+    }
+
+    FCGX_PutS("{", config->request.out);
+
+    while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        // Retrieve the result
+        const char *key_name = (const char*)sqlite3_column_text(stmt, 0);
+        sqlite3_int64 key_count = sqlite3_column_int64(stmt, 1);
+
+        if(key_name == NULL) {
+            continue;
+        }
+
+        if(count != 0) {
+            FCGX_PutS(",", config->request.out);
+        }
+
+        FCGX_FPrintF(config->request.out, "{\"name\":\"%s\",\"count\":%lld}", key_name, key_count);
+        ++count;
+    }
+
+    FCGX_PutS("}", config->request.out);
 
     return 0;
 }
