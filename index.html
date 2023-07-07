@@ -1,8 +1,8 @@
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Zaerl Dashboard</title>
     <meta name="description" content="Zaerl Dashboard">
     <meta name="robots" content="noindex">
@@ -10,34 +10,26 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
     <link rel="manifest" href="/static/images/site.webmanifest">
-    <link rel="stylesheet" type="text/css" href="static/css/skelet.min.css">
-    <link rel="stylesheet" type="text/css" href="static/css/main.css">
+    <link rel="stylesheet" href="/static/css/pico.min.css">
+    <link rel="stylesheet" href="/static/css/main.css">
   </head>
-  <body id="app">
-    <header class="header sticky">
-      <x-grid columns="2" ai="center">
-        <x-col>
-          <div class="logo">
-            <h1 class="main-title h5">Zaerl</h1>
-          </div>
-        </x-col>
-        <div class="x-col text-end">
-          Hello
+  <body>
+    <nav class="container-fluid">
+      <ul>
+        <li><strong>Zaerl Dashboard</strong></li>
+      </ul>
+    </nav>
+    <main class="container-fluid">
+      <div class="grid">
+        <div id="main-keys-box" aria-busy="true" class="box">
+          <select id="main-keys"></select>
         </div>
-      </x-grid>
-    </header>
-    <main role="main">
-      <section>
-        <x-grid columns="8">
-          <x-col span="2" span-s="row">
-            <div class="box"><select id="main-keys"></select></div>
-          </x-col>
-          <x-col span="6" span-s="row">
-            <div class="box"><canvas id="main"></canvas></div>
-          </x-col>
-        </x-grid>
-      </section>
+        <div id="main-box" aria-busy="true" class="box">
+          <canvas id="main"></canvas>
+        </div>
+      </div>
     </main>
+    <footer></footer>
     <script src="static/js/chart-4.3.0.min.js"></script>
     <script src="static/js/main.js"></script>
   </body>

@@ -1,46 +1,16 @@
-:root {
-  /*--fontSize: 1.4rem;
-  --primary: #0000ff;
-  --blue: var(--primary);
-  --color: rgba(17, 51, 83, 0.6);
-  --colorHeadings: #000000;
-  --buttonBorderColor: var(--borders);
-  --buttonBorderHover: var(--primary);
-  --hovers: #FAFBFC;
-  --globalRadius: 8px;
-  --buttonFontSize: 1.2rem;*/
-  --borders: rgb(236, 239, 241);
-  --boxShadows: 0px 4px 12px 0px rgba(17, 51, 83, 0.02);
-  --boxShadowsHover: 0px 7px 20px rgba(0, 0, 0, 0.05);
-  --globalPadding: calc(var(--padding) * 3);
-}
-
-header {
-  padding: var(--padding);
-}
-
-.main-title {
-  margin-bottom: 0;
-}
-
-main, footer {
-  margin: 0 var(--margin);
+body > main {
+  padding: 0;
 }
 
 .box {
-  padding: var(--padding);
-  margin: var(--padding) auto;
-  border-radius: var(--globalRadius);
-  box-shadow: var(--boxShadows);
-  border: 1px solid var(--borders);
+  box-shadow: var(--card-box-shadow);
+  padding: var(--spacing);
 }
 
-@media (prefers-color-scheme: dark) {
-  canvas {
-    filter: invert(1) hue-rotate(180deg);
-  }
+.box[aria-busy=true] {
+  text-align: center;
+}
 
-  body {
-    background-color: #212121;
-  }
+.box[aria-busy=true] > * {
+  display: none;
 }

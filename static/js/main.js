@@ -1,6 +1,6 @@
-const ctx = document.getElementById('main');
-
 async function get_data() {
+  const ctx = document.getElementById('main');
+
   const params = new URLSearchParams({
     limit: 2000
   });
@@ -20,6 +20,8 @@ async function get_data() {
 
     ++methods[result.method];
   }
+
+  document.getElementById('main-box').removeAttribute('aria-busy');
 
   new Chart(ctx, {
     type: 'bar',
@@ -45,6 +47,8 @@ async function get_keys() {
   const response = await fetch('/app/keys');
   const results = await response.json();
   const select = document.getElementById('main-keys');
+
+  document.getElementById('main-keys-box').removeAttribute('aria-busy');
 
   for(const result of results) {
     const el = document.createElement('option');
