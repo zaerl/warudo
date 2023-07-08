@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "config.h"
-#include "zaerl.h"
+#include "warudo.h"
 
-int zaerl_load_columns(zaerl* config);
+int warudo_load_columns(warudo* config);
 
-int zaerl_db_init(const char *filename, zaerl* config) {
+int warudo_db_init(const char *filename, warudo* config) {
     // Load database
     char* error_msg = 0;
     int rc = sqlite3_open(filename, &config->db);
@@ -18,6 +18,7 @@ int zaerl_db_init(const char *filename, zaerl* config) {
     }
 
     const char *sql = "CREATE TABLE IF NOT EXISTS entries(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
+        "CREATE TABLE IF NOT EXISTS views(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
         "PRAGMA journal_mode = WAL;"
         "PRAGMA synchronous = NORMAL;"
         "PRAGMA busy_timeout = 5000;";
@@ -29,10 +30,10 @@ int zaerl_db_init(const char *filename, zaerl* config) {
         return 1;
     }
 
-    return zaerl_load_columns(config);
+    return warudo_load_columns(config);
 }
 
-int zaerl_load_columns(zaerl* config) {
+int warudo_load_columns(warudo* config) {
     const char* table_info_sql = "PRAGMA table_info('entries');";
     sqlite3_stmt* stmt;
 
@@ -55,7 +56,7 @@ int zaerl_load_columns(zaerl* config) {
     }
 
     for(unsigned int i = 0; i < config->columns_count; ++i) {
-        printf("%s: %s\n", config->columns[i].name, config->columns[i].type);
+        fprintf(stderr, "%s: %s\n", config->columns[i].name, config->columns[i].type);
     }
 
     sqlite3_finalize(stmt);
@@ -63,7 +64,7 @@ int zaerl_load_columns(zaerl* config) {
     return 0;
 }
 
-int zaerl_add_entry(const char* json, zaerl *config) {
+int warudo_add_entry(const char* table, const char* json, warudo *config) {
     const char* sql = "INSERT INTO entries(data) VALUES(json(?));";
     sqlite3_stmt* stmt;
 
@@ -77,6 +78,13 @@ int zaerl_add_entry(const char* json, zaerl *config) {
 
         return 1;
     }
+
+    /*if(sqlite3_bind_text(stmt, 1, table, strlen(json), SQLITE_STATIC) != SQLITE_OK) {
+        fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
+        sqlite3_finalize(stmt);
+
+        return 1;
+    }*/
 
     if(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC) != SQLITE_OK) {
         fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
@@ -95,7 +103,7 @@ int zaerl_add_entry(const char* json, zaerl *config) {
     return 0;
 }
 
-int zaerl_get_entries(zaerl *config) {
+int warudo_get_entries(const char* table, warudo *config) {
     const char *query;
     sqlite3_stmt *stmt;
     int rc;
@@ -117,6 +125,13 @@ int zaerl_get_entries(zaerl *config) {
 
         return 1;
     }
+
+    /*if(sqlite3_bind_text(stmt, 1, table, strlen(table), SQLITE_STATIC) != SQLITE_OK) {
+        fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
+        sqlite3_finalize(stmt);
+
+        return 1;
+    }*/
 
     if(has_search) {
         if(sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC) != SQLITE_OK) {
@@ -160,7 +175,7 @@ int zaerl_get_entries(zaerl *config) {
     return 0;
 }
 
-int zaerl_get_keys(zaerl *config) {
+int warudo_get_keys(warudo *config) {
     const char *query = "SELECT key, COUNT(*) AS occurrence_count FROM entries, json_tree(data) GROUP BY key;";
     int rc;
     int count = 0;
@@ -197,7 +212,7 @@ int zaerl_get_keys(zaerl *config) {
     return 0;
 }
 
-int zaerl_db_close(zaerl *config) {
+int warudo_db_close(warudo *config) {
     if(!config) {
         return 0;
     }

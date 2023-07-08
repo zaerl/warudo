@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include "config.h"
 
-void zaerl_read_config(void) {
-    const char* path = getenv("ZAERL_CONFIG_FILE");
+void warudo_read_config(void) {
+    const char* path = getenv("WARUDO_CONFIG_FILE");
 
     if (path == NULL) {
-        path = ZAERL_CONFIG_FILE;
+        path = WARUDO_CONFIG_FILE;
     }
 
     /*FILE* file = fopen(path, "r");

@@ -1,13 +1,14 @@
-#ifndef ZAERL_DB_H
-#define ZAERL_DB_H
+#ifndef WARUDO_DB_H
+#define WARUDO_DB_H
 
-#include "zaerl.h"
+#include "warudo.h"
 
-int zaerl_db_init(const char *filename, zaerl* config);
-int zaerl_db_close(zaerl *config);
+int warudo_db_init(const char *filename, warudo* config);
+int warudo_db_close(warudo *config);
 
-int zaerl_add_entry(const char* json, zaerl *config);
-int zaerl_get_entries(zaerl *config);
-int zaerl_get_keys(zaerl *config);
+int warudo_add_entry(const char* table, const char* json, warudo *config);
+int warudo_get_entries(const char* table, warudo *config);
 
-#endif /* ZAERL_DB_H */
+int warudo_get_keys(warudo *config);
+
+#endif /* WARUDO_DB_H */

@@ -15,29 +15,29 @@ extern char **environ;
 #endif
 
 // /opt/homebrew/opt/nginx/bin/nginx -g "daemon off;"
-// make && ./bin/zaerl"
+// make && ./bin/warudo"
 int main(void) {
-    zaerl *config;
+    warudo *config;
     int ret;
 
-    zaerl_read_config();
-    ret = zaerl_init(ZAERL_DB_FILE, &config);
+    warudo_read_config();
+    ret = warudo_init(WARUDO_DB_FILE, &config);
 
     if (ret != 0) {
         return ret;
     }
 
-    printf("Starting zaerl %s\n", ZAERL_VERSION);
+    printf("Starting warudo %s\n", WARUDO_VERSION);
 
-    while(zaerl_accept_connection(config) >= 0) {
-        if(config->page == ZAERL_PAGE_APP) {
-            ret = page_app(config);
-        } else if(config->page == ZAERL_PAGE_APP_KEYS) {
+    while(warudo_accept_connection(config) >= 0) {
+        if(config->page == WARUDO_PAGE_APP) {
+            ret = page_app("entries", config);
+        } else if(config->page == WARUDO_PAGE_APP_KEYS) {
             ret = page_app_keys(config);
-        } else if(config->page == ZAERL_PAGE_ROOT) {
-            ret = zaerl_page_home(config);
+        } else if(config->page == WARUDO_PAGE_ROOT) {
+            ret = warudo_page_home(config);
         } else {
-            ret = zaerl_page_not_found(config);
+            ret = warudo_page_not_found(config);
         }
 
         if(ret == 0) {
@@ -49,7 +49,7 @@ int main(void) {
         ++config->requests_count;
     }
 
-    zaerl_close(config);
+    warudo_close(config);
 
     return 0;
 }

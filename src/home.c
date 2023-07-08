@@ -4,10 +4,10 @@
 
 #include <fcgiapp.h>
 
-#include "zaerl.h"
+#include "warudo.h"
 #include "html.h"
 
-/*static void print_env(const char *label, char **envp, zaerl *config) {
+/*static void print_env(const char *label, char **envp, warudo *config) {
     FCGX_FPrintF(config->request.out, "%s:<br>\n<pre>\n", label);
     config->script_name = NULL;
     config->query_string = NULL;
@@ -19,13 +19,13 @@
     FCGX_FPrintF(config->request.out, "</pre>\n");
 }*/
 
-int zaerl_page_home(zaerl* config) {
-    if(config->request_method != ZAERL_REQUEST_GET) {
-        return zaerl_not_allowed("GET", config);
+int warudo_page_home(warudo* config) {
+    if(config->request_method != WARUDO_REQUEST_GET) {
+        return warudo_not_allowed("GET", config);
     }
 
     /*FCGX_PutS("Status: 200 OK\r\n", config->request.out);
-    zaerl_content_type("text/html", config);
+    warudo_content_type("text/html", config);
 
     FCGX_PutS("<html>\n"
         "<head>"
@@ -40,14 +40,14 @@ int zaerl_page_home(zaerl* config) {
         "<body>"
         "<div><select id=\"main-keys\"></select></div>"
         "<div><canvas id=\"main\"></canvas></div>"
-        "<script src=\"static/js/chart-" ZAERL_CHART_VERSION ".min.js\"></script>"
+        "<script src=\"static/js/chart-" WARUDO_CHART_VERSION ".min.js\"></script>"
         "<script src=\"static/js/main.js\"></script>", config->request.out);
     // print_env("Environ", config->request.envp, config);
-    zaerl_environ(config);
+    warudo_environ(config);
     FCGX_PutS("</body></html>", config->request.out);
 
     return 0;*/
-    return zaerl_server_error("Zaerl is a Fast CGI application. "
+    return warudo_server_error("Zaerl is a Fast CGI application. "
         "You need to use a webserver and proxy the requests to the socket. "
         "Follow the instructions found in README.md.", config);
 }

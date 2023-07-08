@@ -16,7 +16,7 @@ SRCS = $(wildcard $(SRCDIR)/*.c)
 OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 
 # Define the final executable name
-TARGET = $(BINDIR)/zaerl
+TARGET = $(BINDIR)/warudo
 
 all: $(TARGET)
 
@@ -34,13 +34,13 @@ clean:
 
 .PHONY: all clean
 
-#TARGET = zaerl
+#TARGET = warudo
 
-#$(TARGET): zaerl.o
-#	$(CC) $(CFLAGS) -o $(TARGET) zaerl.o -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS)
+#$(TARGET): warudo.o
+#	$(CC) $(CFLAGS) -o $(TARGET) warudo.o -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS)
 
-#zaerl.o: src/zaerl.c
-#	$(CC) $(CFLAGS) -c -I$(FCGI_INCLUDE_PATH) src/zaerl.c
+#warudo.o: src/warudo.c
+#	$(CC) $(CFLAGS) -c -I$(FCGI_INCLUDE_PATH) src/warudo.c
 
 #sqlite3.o: src/sqlite3.c
 #	$(CC) $(CFLAGS) -c src/sqlite3.c

@@ -4,17 +4,17 @@
 
 #include <fcgiapp.h>
 
-#include "zaerl.h"
+#include "warudo.h"
 #include "html.h"
 #include "db.h"
 
-int page_app(zaerl* config) {
-    if(config->request_method == ZAERL_REQUEST_GET) {
+int page_app(const char* table, warudo* config) {
+    if(config->request_method == WARUDO_REQUEST_GET) {
         FCGX_PutS("Status: 200 OK\r\n", config->request.out);
-        zaerl_content_type("application/json", config);
+        warudo_content_type("application/json", config);
 
-        return zaerl_get_entries(config);
-    } else if(config->request_method == ZAERL_REQUEST_POST) {
+        return warudo_get_entries(table, config);
+    } else if(config->request_method == WARUDO_REQUEST_POST) {
         char *length = FCGX_GetParam("CONTENT_LENGTH", config->request.envp);
         long int len = 0;
 
@@ -23,7 +23,7 @@ int page_app(zaerl* config) {
         }
 
         if (len <= 0) {
-            zaerl_bad_request("No data from standard input.", config);
+            warudo_bad_request("No data from standard input.", config);
 
             return 1;
         }
@@ -33,29 +33,29 @@ int page_app(zaerl* config) {
         FCGX_GetStr(data, len, config->request.in);
         data[len] = '\0';
 
-        if(zaerl_add_entry(data, config) != 0) {
-            zaerl_bad_request("Failed to add entry.", config);
+        if(warudo_add_entry(table, data, config) != 0) {
+            warudo_bad_request("Failed to add entry.", config);
 
             return 1;
         }
 
         FCGX_PutS("Status: 201 Created\r\n", config->request.out);
-        zaerl_content_type("application/json", config);
+        warudo_content_type("application/json", config);
         FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", sqlite3_last_insert_rowid(config->db));
 
         return 0;
     }
 
-    return zaerl_not_allowed("GET, POST", config);
+    return warudo_not_allowed("GET, POST", config);
 }
 
-int page_app_keys(zaerl* config) {
-    if(config->request_method == ZAERL_REQUEST_GET) {
+int page_app_keys(warudo* config) {
+    if(config->request_method == WARUDO_REQUEST_GET) {
         FCGX_PutS("Status: 200 OK\r\n", config->request.out);
-        zaerl_content_type("application/json", config);
+        warudo_content_type("application/json", config);
 
-        return zaerl_get_keys(config);
+        return warudo_get_keys(config);
     }
 
-    return zaerl_not_allowed("GET", config);
+    return warudo_not_allowed("GET", config);
 }

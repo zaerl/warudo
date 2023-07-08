@@ -1,20 +1,20 @@
-#ifndef ZAERL_HTML_H
-#define ZAERL_HTML_H
+#ifndef WARUDO_HTML_H
+#define WARUDO_HTML_H
 
-#include "zaerl.h"
+#include "warudo.h"
 
-char* zaerl_escape_html(const char* input);
+char* warudo_escape_html(const char* input);
 
-int zaerl_content_type(const char* content_type, zaerl *config);
+int warudo_content_type(const char* content_type, warudo *config);
 
-int zaerl_not_allowed(const char* allowed, zaerl* config);
+int warudo_not_allowed(const char* allowed, warudo* config);
 
-int zaerl_page_not_found(zaerl* config);
+int warudo_page_not_found(warudo* config);
 
-int zaerl_server_error(const char* description, zaerl* config);
+int warudo_server_error(const char* description, warudo* config);
 
-int zaerl_bad_request(const char* description, zaerl* config);
+int warudo_bad_request(const char* description, warudo* config);
 
-int zaerl_environ(zaerl *config);
+int warudo_environ(warudo *config);
 
-#endif /* ZAERL_HTML_H */
+#endif /* WARUDO_HTML_H */
