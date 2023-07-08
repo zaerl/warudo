@@ -29,7 +29,7 @@ int warudo_page_home(warudo* config) {
 
     FCGX_PutS("<html>\n"
         "<head>"
-        "<title>Zaerl</title>"
+        "<title>Warudo</title>"
         "<link rel=\"apple-touch-icon\" sizes=\"180x180\" href=\"static/images/apple-touch-icon.png\">"
         "<link rel=\"icon\" type=\"image/png\" sizes=\"32x32\" href=\"/static/images/favicon-32x32.png\">"
         "<link rel=\"icon\" type=\"image/png\" sizes=\"16x16\" href=\"/static/images/favicon-16x16.png\">"
@@ -47,7 +47,7 @@ int warudo_page_home(warudo* config) {
     FCGX_PutS("</body></html>", config->request.out);
 
     return 0;*/
-    return warudo_server_error("Zaerl is a Fast CGI application. "
+    return warudo_server_error("Warudo is a Fast CGI application. "
         "You need to use a webserver and proxy the requests to the socket. "
         "Follow the instructions found in README.md.", config);
 }
