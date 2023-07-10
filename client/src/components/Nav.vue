@@ -1,8 +1,11 @@
 <script setup lang="ts">
-defineProps({
-  name: String,
-  links: Array,
-});
+interface Props {
+  name: string;
+  links: string[];
+}
+
+const props = defineProps<Props>();
+
 </script>
 <template>
 <div id="navs" class="container-fluid">
