@@ -51,6 +51,7 @@ struct warudo {
     int request_method;
     const char* script_name;
     const char* query_string;
+    const char* access_origin;
     warudo_column columns[WARUDO_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;

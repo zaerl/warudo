@@ -10,8 +10,7 @@
 
 int page_app(const char* table, warudo* config) {
     if(config->request_method == WARUDO_REQUEST_GET) {
-        FCGX_PutS("Status: 200 OK\r\n", config->request.out);
-        warudo_content_type("application/json", config);
+        warudo_header("200 OK", "application/json", config);
 
         return warudo_get_entries(table, config);
     } else if(config->request_method == WARUDO_REQUEST_POST) {
@@ -39,8 +38,7 @@ int page_app(const char* table, warudo* config) {
             return 1;
         }
 
-        FCGX_PutS("Status: 201 Created\r\n", config->request.out);
-        warudo_content_type("application/json", config);
+        warudo_header("201 Created", "application/json", config);
         FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", sqlite3_last_insert_rowid(config->db));
 
         return 0;
@@ -51,8 +49,7 @@ int page_app(const char* table, warudo* config) {
 
 int page_app_keys(warudo* config) {
     if(config->request_method == WARUDO_REQUEST_GET) {
-        FCGX_PutS("Status: 200 OK\r\n", config->request.out);
-        warudo_content_type("application/json", config);
+        warudo_header("200 OK", "application/json", config);
 
         return warudo_get_keys(config);
     }

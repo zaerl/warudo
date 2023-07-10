@@ -5,6 +5,8 @@
 
 char* warudo_escape_html(const char* input);
 
+int warudo_header(const char* status, const char* content_type, warudo* config);
+
 int warudo_content_type(const char* content_type, warudo *config);
 
 int warudo_not_allowed(const char* allowed, warudo* config);

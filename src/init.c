@@ -15,6 +15,7 @@ int warudo_init(const char *filename, warudo **config) {
     pdb = malloc(sizeof(warudo));
     pdb->columns_count = 0;
     pdb->requests_count = 0;
+    pdb->access_origin = NULL;
 
     // Load database
     res = warudo_db_init(filename, pdb);
@@ -63,6 +64,13 @@ int warudo_init(const char *filename, warudo **config) {
     pdb->query_limit = 0;
     pdb->query_key = NULL;
     pdb->query_value = NULL;
+
+    // Environment variables
+    char* access_origin = getenv("WARUODO_ACCESS_ORIGIN");
+
+    if(access_origin != NULL) {
+        pdb->access_origin = access_origin;
+    }
 
     *config = pdb;
 
