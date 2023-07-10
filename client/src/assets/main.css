@@ -16,3 +16,10 @@ body > main {
 .box[aria-busy=true] > * {
   display: none;
 }
+
+.box[aria-invalid=true] {
+  border: var(--border-width) solid var(--form-element-invalid-border-color);
+  box-shadow: none;
+  color: var(--del-color);
+  text-align: center;
+}
