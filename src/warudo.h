@@ -9,6 +9,7 @@
 #define WARUDO_MAX_COLUMNS 64
 #define WARUDO_LOG_LEVEL 1
 #define WARUDO_CHART_VERSION "4.3.0"
+#define WARUDO_CORS NULL
 
 #include <fcgiapp.h>
 #include "sqlite3.h"

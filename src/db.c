@@ -30,7 +30,8 @@ int warudo_db_init(const char *filename, warudo* config) {
         return 1;
     }
 
-    return warudo_load_columns(config);
+    // return warudo_load_columns(config);
+    return 0;
 }
 
 int warudo_load_columns(warudo* config) {
