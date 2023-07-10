@@ -10,6 +10,8 @@
 #define WARUDO_LOG_LEVEL 1
 #define WARUDO_CHART_VERSION "4.3.0"
 #define WARUDO_CORS NULL
+#define WARUDO_ENTRIES_TABLE "entries"
+#define WARUDO_VIEWS_TABLE "views"
 
 #include <fcgiapp.h>
 #include "sqlite3.h"
@@ -18,10 +20,14 @@
 #define WARUDO_PAGE_ROOT 1
 #define WARUDO_PAGE_APP 2
 #define WARUDO_PAGE_APP_KEYS 3
+#define WARUDO_PAGE_APP_VIEWS 4
 
 #define WARUDO_REQUEST_UNKNOWN 0
 #define WARUDO_REQUEST_GET 1
 #define WARUDO_REQUEST_POST 2
+
+#define WARUDO_ENTRY_TYPE_DATA 0
+#define WARUDO_ENTRY_TYPE_VIEW 1
 
 // Query string
 #define WARUDO_DEFAULT_QUERY_LIMIT 100
@@ -71,7 +77,7 @@ int warudo_accept_connection(warudo *config);
 
 int warudo_page_home(warudo* config);
 
-int page_app(const char* table, warudo* config);
+int page_app(int entry_type, warudo* config);
 
 int page_app_keys(warudo* config);
 

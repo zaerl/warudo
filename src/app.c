@@ -8,11 +8,11 @@
 #include "net.h"
 #include "db.h"
 
-int page_app(const char* table, warudo* config) {
+int page_app(int entry_type, warudo* config) {
     if(config->request_method == WARUDO_REQUEST_GET) {
         warudo_header("200 OK", "application/json", config);
 
-        return warudo_get_entries(table, config);
+        return warudo_get_entries(entry_type, config);
     } else if(config->request_method == WARUDO_REQUEST_POST) {
         char *length = FCGX_GetParam("CONTENT_LENGTH", config->request.envp);
         long int len = 0;
@@ -32,7 +32,7 @@ int page_app(const char* table, warudo* config) {
         FCGX_GetStr(data, len, config->request.in);
         data[len] = '\0';
 
-        if(warudo_add_entry(table, data, config) != 0) {
+        if(warudo_add_entry(entry_type, data, config) != 0) {
             warudo_bad_request("Failed to add entry.", config);
 
             return 1;

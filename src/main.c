@@ -31,9 +31,11 @@ int main(void) {
 
     while(warudo_accept_connection(config) >= 0) {
         if(config->page == WARUDO_PAGE_APP) {
-            ret = page_app("entries", config);
+            ret = page_app(WARUDO_ENTRY_TYPE_DATA, config);
         } else if(config->page == WARUDO_PAGE_APP_KEYS) {
             ret = page_app_keys(config);
+        } else if(config->page == WARUDO_PAGE_APP_VIEWS) {
+            ret = page_app(WARUDO_ENTRY_TYPE_VIEW, config);
         } else if(config->page == WARUDO_PAGE_ROOT) {
             ret = warudo_page_home(config);
         } else {

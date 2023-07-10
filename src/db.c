@@ -17,8 +17,8 @@ int warudo_db_init(const char *filename, warudo* config) {
         return 1;
     }
 
-    const char *sql = "CREATE TABLE IF NOT EXISTS entries(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
-        "CREATE TABLE IF NOT EXISTS views(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
+    const char *sql = "CREATE TABLE IF NOT EXISTS " WARUDO_ENTRIES_TABLE "(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
+        "CREATE TABLE IF NOT EXISTS " WARUDO_VIEWS_TABLE "(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
         "PRAGMA journal_mode = WAL;"
         "PRAGMA synchronous = NORMAL;"
         "PRAGMA busy_timeout = 5000;";
@@ -35,7 +35,7 @@ int warudo_db_init(const char *filename, warudo* config) {
 }
 
 int warudo_load_columns(warudo* config) {
-    const char* table_info_sql = "PRAGMA table_info('entries');";
+    const char* table_info_sql = "PRAGMA table_info('" WARUDO_ENTRIES_TABLE "');";
     sqlite3_stmt* stmt;
 
     if(sqlite3_prepare_v2(config->db, table_info_sql, -1, &stmt, NULL) != SQLITE_OK) {
@@ -45,7 +45,7 @@ int warudo_load_columns(warudo* config) {
         return 1;
     }
 
-    fprintf(stderr, "Column names for table '%s':\n", "entries");
+    fprintf(stderr, "Column names for table '%s':\n", WARUDO_ENTRIES_TABLE);
 
     while(sqlite3_step(stmt) == SQLITE_ROW) {
         const char* name = (const char*)sqlite3_column_text(stmt, 1);
@@ -65,9 +65,10 @@ int warudo_load_columns(warudo* config) {
     return 0;
 }
 
-int warudo_add_entry(const char* table, const char* json, warudo *config) {
-    const char* sql = "INSERT INTO entries(data) VALUES(json(?));";
+int warudo_add_entry(int entry_type, const char* json, warudo *config) {
     sqlite3_stmt* stmt;
+    const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
+        "INSERT INTO views(data) VALUES(json(?));";
 
     if(json == NULL) {
         return 1;
@@ -79,13 +80,6 @@ int warudo_add_entry(const char* table, const char* json, warudo *config) {
 
         return 1;
     }
-
-    /*if(sqlite3_bind_text(stmt, 1, table, strlen(json), SQLITE_STATIC) != SQLITE_OK) {
-        fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
-
-        return 1;
-    }*/
 
     if(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC) != SQLITE_OK) {
         fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
@@ -104,7 +98,7 @@ int warudo_add_entry(const char* table, const char* json, warudo *config) {
     return 0;
 }
 
-int warudo_get_entries(const char* table, warudo *config) {
+int warudo_get_entries(int entry_type, warudo *config) {
     const char *query;
     sqlite3_stmt *stmt;
     int rc;
@@ -113,11 +107,12 @@ int warudo_get_entries(const char* table, warudo *config) {
     int has_search = config->query_key != NULL && config->query_value != NULL;
 
     if(has_search) {
-        // query = "SELECT data FROM entries WHERE json_extract(data, ?) = ? LIMIT ?;";
-        query = "SELECT data FROM entries WHERE data ->> ? = ? LIMIT ?;";
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT data FROM entries WHERE data ->> ? = ? LIMIT ?;" :
+            "SELECT data FROM views WHERE data ->> ? = ? LIMIT ?;";
         limit_index = 3;
     } else {
-        query = "SELECT data FROM entries LIMIT ?;";
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT data FROM entries LIMIT ?;" :
+            "SELECT data FROM views LIMIT ?;";
     }
 
     if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
@@ -126,13 +121,6 @@ int warudo_get_entries(const char* table, warudo *config) {
 
         return 1;
     }
-
-    /*if(sqlite3_bind_text(stmt, 1, table, strlen(table), SQLITE_STATIC) != SQLITE_OK) {
-        fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
-
-        return 1;
-    }*/
 
     if(has_search) {
         if(sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC) != SQLITE_OK) {
@@ -177,7 +165,7 @@ int warudo_get_entries(const char* table, warudo *config) {
 }
 
 int warudo_get_keys(warudo *config) {
-    const char *query = "SELECT key, COUNT(*) AS occurrence_count FROM entries, json_tree(data) GROUP BY key;";
+    const char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WARUDO_ENTRIES_TABLE ", json_tree(data) GROUP BY key;";
     int rc;
     int count = 0;
     sqlite3_stmt *stmt;
