@@ -1,0 +1,18 @@
+@import './pico.min.css';
+
+body > main {
+  padding: 0;
+}
+
+.box {
+  box-shadow: var(--card-box-shadow);
+  padding: var(--spacing);
+}
+
+.box[aria-busy=true] {
+  text-align: center;
+}
+
+.box[aria-busy=true] > * {
+  display: none;
+}
