@@ -5,7 +5,7 @@
 #include <fcgiapp.h>
 
 #include "warudo.h"
-#include "html.h"
+#include "net.h"
 
 /*static void print_env(const char *label, char **envp, warudo *config) {
     FCGX_FPrintF(config->request.out, "%s:<br>\n<pre>\n", label);

@@ -6,7 +6,7 @@
 
 #include "config.h"
 #include "db.h"
-#include "html.h"
+#include "net.h"
 
 #ifdef _WIN32
 #include <process.h>

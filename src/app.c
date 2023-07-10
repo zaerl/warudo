@@ -5,7 +5,7 @@
 #include <fcgiapp.h>
 
 #include "warudo.h"
-#include "html.h"
+#include "net.h"
 #include "db.h"
 
 int page_app(const char* table, warudo* config) {
