@@ -34,19 +34,18 @@ export async function getData<T>(
   type: GetDataType = 'entries',
   search: SearchParams = {}
 ): Promise<T | null> {
-  const params = new URLSearchParams(search as unknown as Record<string, string>)
+  const params = new URLSearchParams(search as unknown as Record<string, string>);
 
   try {
-    const response = await fetch(`http://localhost:6252/app/${type}?${params}`)
-    const data = await response.json()
-    console.log(data)
+    const response = await fetch(`http://localhost:6252/app/${type}?${params}`);
+    const data = await response.json();
 
-    return data
+    return data;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.log(error.message)
+      console.log(error.message);
     } else {
-      console.log(error)
+      console.log(error);
     }
 
     return null

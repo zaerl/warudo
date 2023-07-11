@@ -7,12 +7,13 @@ interface Props {
 
 const props = defineProps<Props>()
 </script>
+
 <template>
 <div id="navs" class="container-fluid">
   <nav>
     <ul>
-      <li>
-        <strong>{{ name }}</strong>
+      <li class="main-title">
+        <span @click="$router.push('/')">{{ name }}</span>
       </li>
     </ul>
     <ul>
@@ -23,3 +24,10 @@ const props = defineProps<Props>()
   </nav>
 </div>
 </template>
+
+<style scoped>
+.main-title {
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
