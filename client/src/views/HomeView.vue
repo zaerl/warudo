@@ -2,12 +2,12 @@
 import { getData, type Entry, type View } from '@/data/api';
 import { onMounted, ref } from 'vue';
 
-let entries = ref<any[] | null>([]);
+let entries = ref<Entry[] | null>([]);
 let busy = ref(true);
 let invalid = ref(false);
 
 onMounted(async () => {
-  entries.value = await getData<any[]>();
+  entries.value = await getData<Entry[]>();
 
   busy.value = false;
   invalid.value = entries.value === null;
@@ -31,7 +31,7 @@ onMounted(async () => {
       </tr>
       <tr v-else v-for="entry in entries">
         <td>
-          <samp><span v-for="(value, key, index) in entry"><span v-if="index !== 0">, </span><strong>{{ key }}</strong>: {{ value }}</span></samp>
+          <samp><span v-for="(value, key, index) in entry.data"><span v-if="index !== 0">, </span><strong>{{ key }}</strong>: {{ value }}</span></samp>
         </td>
       </tr>
     </tbody>

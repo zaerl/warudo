@@ -22,18 +22,21 @@ export interface ViewItem extends GridPosition {
   type: ViewItemTypes,
 }
 
-export interface Entry<T> {
+export interface Entry {
   id: number;
-  created: number;
-  modified: number;
-  name: string;
-  data: T;
+  data: Object;
 }
 
 export interface View {
-  rows: number;
-  columns: number;
-  items: ViewItem[];
+  id: number;
+  created: number;
+  modified: number;
+  data: {
+    name: string;
+    rows: number;
+    columns: number;
+    items: ViewItem[];
+  };
 }
 
 export async function getData<T>(

@@ -111,11 +111,11 @@ int warudo_get_entries(int entry_type, warudo *config) {
     int has_search = config->query_key != NULL && config->query_value != NULL;
 
     if(has_search) {
-        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT data FROM entries WHERE data ->> ? = ? LIMIT ?;" :
-            "SELECT id, created_at, data FROM views WHERE data ->> ? = ? LIMIT ?;";
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, data FROM entries WHERE data ->> ? = ? LIMIT ?;" :
+            "SELECT id, created, modified, data FROM views WHERE data ->> ? = ? LIMIT ?;";
         limit_index = 3;
     } else {
-        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT data FROM entries LIMIT ?;" :
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, data FROM entries LIMIT ?;" :
             "SELECT id, created, modified, data FROM views LIMIT ?;";
     }
 
@@ -154,13 +154,14 @@ int warudo_get_entries(int entry_type, warudo *config) {
     if(entry_type == WARUDO_ENTRY_TYPE_DATA) {
         while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
             // Retrieve the result
-            const char *data = (const char*)sqlite3_column_text(stmt, 0);
+            sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
+            const char *data = (const char*)sqlite3_column_text(stmt, 1);
 
             if(count != 0) {
                 FCGX_PutS(",", config->request.out);
             }
 
-            FCGX_PutS(data, config->request.out);
+            FCGX_FPrintF(config->request.out, "{\"id\":%lld,\"data\":%s}", id, data ? data : "{}");
             ++count;
         }
     } else if(entry_type == WARUDO_ENTRY_TYPE_VIEW) {
