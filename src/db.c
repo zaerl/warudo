@@ -18,7 +18,10 @@ int warudo_db_init(const char *filename, warudo* config) {
     }
 
     const char *sql = "CREATE TABLE IF NOT EXISTS " WARUDO_ENTRIES_TABLE "(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
-        "CREATE TABLE IF NOT EXISTS " WARUDO_VIEWS_TABLE "(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
+        "CREATE TABLE IF NOT EXISTS " WARUDO_VIEWS_TABLE "("
+        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "created_at INTEGER DEFAULT (UNIXEPOCH()), "
+        "data TEXT NOT NULL);"
         "PRAGMA journal_mode = WAL;"
         "PRAGMA synchronous = NORMAL;"
         "PRAGMA busy_timeout = 5000;";
