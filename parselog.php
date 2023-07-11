@@ -8,7 +8,7 @@ if ($argc < 2) {
 // Get the log file path from the command line argument
 $path = $argv[1];
 // $url = 'http://localhost:6251';
-$url = 'http://localhost:6252/app';
+$url = 'http://localhost:6252/app/entries';
 $curl = curl_init($url);
 curl_setopt($curl, CURLOPT_POST, true);
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
