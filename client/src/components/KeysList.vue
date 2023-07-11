@@ -22,7 +22,7 @@ onMounted(async () => {
 <div id="main-keys-box" :aria-busy="busy" :aria-invalid="invalid" class="box">
   <div v-if="invalid">Can't catch data from server</div>
   <select v-else id="main-keys">
-    <option v-for="key in keys" :value="key.name">{{ key.name }} ({{ key.count }})</option>
+    <option v-bind:key="key.name" v-for="key in keys" :value="key.name">{{ key.name }} ({{ key.count }})</option>
   </select>
 </div>
 </template>

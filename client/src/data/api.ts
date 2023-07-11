@@ -1,6 +1,6 @@
 export type GetDataType = 'keys' | 'entries' | 'views'
 
-export interface SearchParams {
+export interface SearchBarParams {
   limit?: number
   key?: string
   value?: string
@@ -32,9 +32,9 @@ export interface View {
 
 export async function getData<T>(
   type: GetDataType = 'entries',
-  search: SearchParams = {}
+  search: SearchBarParams = {}
 ): Promise<T | null> {
-  const params = new URLSearchParams(search as unknown as Record<string, string>);
+  const params = new URLSearchBarParams(search as unknown as Record<string, string>);
 
   try {
     const response = await fetch(`http://localhost:6252/app/${type}?${params}`);

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { RouterView } from 'vue-router';
-import Footer from './components/Footer.vue';
-import Nav from './components/Nav.vue';
+import PageFooter from './components/PageFooter.vue';
+import PageNav from './components/PageNav.vue';
 import { getSettings } from './data/settings';
 import { setMainTheme } from './data/theme';
 
@@ -13,9 +13,9 @@ setMainTheme(settings.value.preferredTheme);
 </script>
 
 <template>
-  <Nav name="Warudo Dashboard" />
+  <PageNav name="Warudo Dashboard" />
   <RouterView />
-  <Footer />
+  <PageFooter />
 </template>
 
 <style scoped></style>

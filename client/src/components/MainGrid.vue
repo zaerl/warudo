@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { GridPosition } from '@/data/api'
-import Graph from './Graph.vue'
+import ResultsGraph from './ResultsGraph.vue'
 import KeysList from './KeysList.vue'
 
 function getGridStyle(position?: GridPosition) {
@@ -18,7 +18,7 @@ function getGridStyle(position?: GridPosition) {
 <main class="container-fluid">
   <div class="main-grid">
     <KeysList :style="getGridStyle()" />
-    <Graph />
+    <ResultsGraph />
     <div></div>
     <div></div>
   </div>

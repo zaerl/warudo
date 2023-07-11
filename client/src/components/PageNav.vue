@@ -13,7 +13,7 @@ const props = defineProps<Props>()
   <nav>
     <ul>
       <li class="main-title">
-        <span @click="$router.push('/')">{{ name }}</span>
+        <span @click="$router.push('/')">{{ props.name }}</span>
       </li>
     </ul>
     <ul>

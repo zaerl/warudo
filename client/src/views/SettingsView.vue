@@ -5,7 +5,7 @@ import { ref } from 'vue';
 
 const settings = ref(getSettings());
 
-function save(event: Event) {
+function save() {
   console.log('on save');
   saveSettings(settings.value);
   setMainTheme(settings.value.preferredTheme);
