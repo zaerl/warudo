@@ -18,6 +18,12 @@ const props = defineProps<Props>()
     </ul>
     <ul>
       <li>
+        <RouterLink to="/">List</RouterLink>
+      </li>
+      <li>
+        <RouterLink to="/views">Views</RouterLink>
+      </li>
+      <li>
         <RouterLink to="/settings">Settings</RouterLink>
       </li>
     </ul>

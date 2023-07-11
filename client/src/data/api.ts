@@ -34,7 +34,7 @@ export async function getData<T>(
   type: GetDataType = 'entries',
   search: SearchBarParams = {}
 ): Promise<T | null> {
-  const params = new URLSearchBarParams(search as unknown as Record<string, string>);
+  const params = new URLSearchParams(search as unknown as Record<string, string>);
 
   try {
     const response = await fetch(`http://localhost:6252/app/${type}?${params}`);
@@ -48,6 +48,6 @@ export async function getData<T>(
       console.log(error);
     }
 
-    return null
+    return null;
   }
 }

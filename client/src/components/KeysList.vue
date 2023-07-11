@@ -11,10 +11,10 @@ let invalid = ref(false);
 let keys = ref<Key[] | null>([]);
 
 onMounted(async () => {
-  keys.value = await getData<Key[]>('keys')
+  keys.value = await getData<Key[]>('keys');
 
-  busy.value = false
-  invalid.value = keys.value === null
+  busy.value = false;
+  invalid.value = keys.value === null;
 });
 </script>
 
