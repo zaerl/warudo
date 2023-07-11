@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import type { GridPosition } from '@/data/api';
-import Graph from './Graph.vue';
-import KeysList from './KeysList.vue';
+import type { GridPosition } from '@/data/api'
+import Graph from './Graph.vue'
+import KeysList from './KeysList.vue'
 
 function getGridStyle(position?: GridPosition) {
-  if(!position) {
-    return {};
+  if (!position) {
+    return {}
   }
 
   return {
     'grid-area': `${position.rowStart} / ${position.columnStart} | ${position.rowEnd} / ${position.columnEnd}`
-  };
+  }
 }
-
 </script>
 
 <template>
