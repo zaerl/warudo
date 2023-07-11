@@ -1,33 +1,39 @@
 export type GetDataType = 'keys' | 'entries' | 'views'
 
 export interface SearchBarParams {
-  limit?: number
-  key?: string
-  value?: string
+  limit?: number;
+  key?: string;
+  value?: string;
 }
 
 export enum ViewItemTypes {
   List,
-  Keys
+  Keys,
 }
 
 export interface GridPosition {
-  rowStart: number | string
-  columnStart: number | string
-  rowEnd: number | string
-  columnEnd: number | string
+  rowStart: number | string;
+  columnStart: number | string;
+  rowEnd: number | string;
+  columnEnd: number | string;
 }
 
 export interface ViewItem extends GridPosition {
-  type: ViewItemTypes
+  type: ViewItemTypes,
+}
+
+export interface Entry<T> {
+  id: number;
+  created: number;
+  modified: number;
+  name: string;
+  data: T;
 }
 
 export interface View {
-  id: number
-  name: string
-  rows: number
-  columns: number
-  items: ViewItem[]
+  rows: number;
+  columns: number;
+  items: ViewItem[];
 }
 
 export async function getData<T>(

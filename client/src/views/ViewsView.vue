@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { getData, type View } from '@/data/api';
+import DateTime from '@/components/DateTime.vue';
+import { getData, type Entry, type View } from '@/data/api';
 import { onMounted, ref } from 'vue';
 
-let views = ref<View[] | null>([]);
+let views = ref<Entry<View>[] | null>([]);
 let busy = ref(true);
 let invalid = ref(false);
-console.log('views', views);
 
 onMounted(async () => {
-  views.value = await getData<View[]>('views');
-  console.log('views', views);
+  views.value = await getData<Entry<View>[]>('views');
 
   busy.value = false;
   invalid.value = views.value === null;
@@ -22,18 +21,20 @@ onMounted(async () => {
     <thead>
       <tr>
         <td>#</td>
+        <td>Created</td>
         <td>Name</td>
       </tr>
     </thead>
     <tbody>
       <tr v-if="invalid || !views">
-        <td colspan="2">Can't catch data from server</td>
+        <td colspan="3">Can't catch data from server</td>
       </tr>
       <tr v-else-if="!views.length">
-        <td colspan="2">No results</td>
+        <td colspan="3">No results</td>
       </tr>
       <tr v-else v-for="view in views">
         <td>{{ view.id }}</td>
+        <td><DateTime :timestamp="view.created" /></td>
         <td>{{ view.name }}</td>
       </tr>
     </tbody>

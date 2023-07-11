@@ -6,7 +6,6 @@ import { ref } from 'vue';
 const settings = ref(getSettings());
 
 function save() {
-  console.log('on save');
   saveSettings(settings.value);
   setMainTheme(settings.value.preferredTheme);
 }
