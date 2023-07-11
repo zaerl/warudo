@@ -47,8 +47,6 @@ int main(void) {
         } else {
             fprintf(stderr, "Failed to accept request %llu. Code %d\n", config->requests_count, ret);
         }
-
-        ++config->requests_count;
     }
 
     warudo_close(config);

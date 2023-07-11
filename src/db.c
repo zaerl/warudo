@@ -20,7 +20,8 @@ int warudo_db_init(const char *filename, warudo* config) {
     const char *sql = "CREATE TABLE IF NOT EXISTS " WARUDO_ENTRIES_TABLE "(id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL);"
         "CREATE TABLE IF NOT EXISTS " WARUDO_VIEWS_TABLE "("
         "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        "created_at INTEGER DEFAULT (UNIXEPOCH()), "
+        "created INTEGER DEFAULT (UNIXEPOCH()), "
+        "modified INTEGER DEFAULT (UNIXEPOCH()), "
         "data TEXT NOT NULL);"
         "PRAGMA journal_mode = WAL;"
         "PRAGMA synchronous = NORMAL;"
@@ -111,11 +112,11 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
     if(has_search) {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT data FROM entries WHERE data ->> ? = ? LIMIT ?;" :
-            "SELECT data FROM views WHERE data ->> ? = ? LIMIT ?;";
+            "SELECT id, created_at, data FROM views WHERE data ->> ? = ? LIMIT ?;";
         limit_index = 3;
     } else {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT data FROM entries LIMIT ?;" :
-            "SELECT data FROM views LIMIT ?;";
+            "SELECT id, created, modified, data FROM views LIMIT ?;";
     }
 
     if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
@@ -150,16 +151,34 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
     FCGX_PutS("[", config->request.out);
 
-    while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-        // Retrieve the result
-        const char *data = (const char*)sqlite3_column_text(stmt, 0);
+    if(entry_type == WARUDO_ENTRY_TYPE_DATA) {
+        while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+            // Retrieve the result
+            const char *data = (const char*)sqlite3_column_text(stmt, 0);
 
-        if(count != 0) {
-            FCGX_PutS(",", config->request.out);
+            if(count != 0) {
+                FCGX_PutS(",", config->request.out);
+            }
+
+            FCGX_PutS(data, config->request.out);
+            ++count;
         }
+    } else if(entry_type == WARUDO_ENTRY_TYPE_VIEW) {
+        while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+            // Retrieve the result
+            sqlite3_int64 id = sqlite3_column_int64(stmt, 0);
+            sqlite3_int64 created = sqlite3_column_int64(stmt, 1);
+            sqlite3_int64 modified = sqlite3_column_int64(stmt, 2);
+            const char *data = (const char*)sqlite3_column_text(stmt, 3);
 
-        FCGX_PutS(data, config->request.out);
-        ++count;
+            if(count != 0) {
+                FCGX_PutS(",", config->request.out);
+            }
+
+            FCGX_FPrintF(config->request.out, "{\"id\":%lld,\"created\":%lld,\"modified\":%lld,\"data\":%s}",
+                id, created, modified, data ? data : "{}");
+            ++count;
+        }
     }
 
     FCGX_PutS("]", config->request.out);
