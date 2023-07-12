@@ -17,7 +17,7 @@ function getIndent(indent: number, space = 2): string {
   let result = '';
 
   for(let i = 0; i < indent * space; i++) {
-    result += ' ';
+    result += '&nbsp;';
   }
 
   return result;
@@ -34,7 +34,7 @@ function getObject(object: { [x: string]: JSONValue }, indent = 0, space = 2): s
     let spaces = getIndent(indent + 1, space);
     let type: string = typeof value;
 
-    output += "\n" + spaces + `"${property}": `;
+    output += "\n" + spaces + `<b>"${property}"</b>: `;
 
     if(type === 'object' && Array.isArray(value)) {
       type = 'array';
@@ -42,13 +42,13 @@ function getObject(object: { [x: string]: JSONValue }, indent = 0, space = 2): s
 
     switch(type) {
       case 'string':
-        output += `"${value}"`;
+        output += `<u>"${value}"</u>`;
         break;
       case 'number':
-        output += `${value}`;
+        output += `<i>${value}</i>`;
         break;
       case 'boolean':
-        output += `${value}`;
+        output += `<strong><i>${value}</i></strong>`;
         break;
       case 'array':
         output += '[]';
@@ -79,7 +79,7 @@ const json = getObject(props.json, 0);
 
 <template>
 <section>
-  <pre><code>{{ json }}</code></pre>
+  <pre><code v-html="json"></code></pre>
 </section>
 </template>
 
