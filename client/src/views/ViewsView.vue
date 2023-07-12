@@ -35,7 +35,7 @@ onMounted(async () => {
       <tr v-else v-for="view in views">
         <td>{{ view.id }}</td>
         <td><DateTime :timestamp="view.created" /></td>
-        <td>{{ view?.data?.name }}</td>
+        <td><RouterLink :to="{ name: 'view', params: { id: view.id } }">{{ view?.data?.name }}</RouterLink></td>
       </tr>
     </tbody>
   </table>

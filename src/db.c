@@ -107,16 +107,20 @@ int warudo_get_entries(int entry_type, warudo *config) {
     sqlite3_stmt *stmt;
     int rc;
     int count = 0;
-    int limit_index = 1;
-    int has_search = config->query_key != NULL && config->query_value != NULL;
+    int limit_index = 0;
+    int has_search = !config->query_id && config->query_key != NULL && config->query_value != NULL;
 
     if(has_search) {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, data FROM entries WHERE data ->> ? = ? LIMIT ?;" :
             "SELECT id, created, modified, data FROM views WHERE data ->> ? = ? LIMIT ?;";
         limit_index = 3;
+    } else if(config->query_id) {
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, data FROM entries WHERE id = ?;" :
+            "SELECT id, created, modified, data FROM views WHERE id= ?;";
     } else {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, data FROM entries LIMIT ?;" :
             "SELECT id, created, modified, data FROM views LIMIT ?;";
+        limit_index = 1;
     }
 
     if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
@@ -140,9 +144,16 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
             return 1;
         }
+    } else if(config->query_id) {
+        if(sqlite3_bind_int64(stmt, 1, config->query_id) != SQLITE_OK) {
+            fprintf(stderr, "Failed to bind id: %s\n", sqlite3_errmsg(config->db));
+            sqlite3_finalize(stmt);
+
+            return 1;
+        }
     }
 
-    if(sqlite3_bind_int(stmt, limit_index, config->query_limit) != SQLITE_OK) {
+    if(limit_index && sqlite3_bind_int(stmt, limit_index, config->query_limit) != SQLITE_OK) {
         fprintf(stderr, "Failed to bind limit: %s\n", sqlite3_errmsg(config->db));
         sqlite3_finalize(stmt);
 

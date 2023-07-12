@@ -63,6 +63,7 @@ struct warudo {
     unsigned long long int requests_count;
 
     // Query string
+    ZA_QUERY_VALUE(unsigned int, id)
     ZA_QUERY_VALUE(short, limit)
     ZA_QUERY_VALUE(const char*, key)
     ZA_QUERY_VALUE(const char*, value)
