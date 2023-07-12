@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { getData, type Entry, type View } from '@/data/api';
+import DateTime from '@/components/DateTime.vue';
+import { getData, type Entry } from '@/data/api';
 import router from '@/router';
 import { onMounted, ref } from 'vue';
 
@@ -20,17 +21,21 @@ onMounted(async () => {
   <table :aria-busy="busy" :aria-invalid="invalid">
     <thead>
       <tr>
+        <td>#</td>
+        <td>Created</td>
         <td>Data</td>
       </tr>
     </thead>
     <tbody>
       <tr v-if="invalid || !entries">
-        <td colspan="1">Can't catch data from server</td>
+        <td colspan="3">Can't catch data from server</td>
       </tr>
       <tr v-else-if="!entries.length">
-        <td colspan="1">No results</td>
+        <td colspan="3">No results</td>
       </tr>
       <tr v-else v-for="entry in entries">
+        <td>{{ entry.id }}</td>
+        <td><DateTime :timestamp="entry.created" /></td>
         <td @click="router.push({ name: 'entry', params: { id: entry.id } })">
           <samp><span v-for="(value, key, index) in entry.data"><span v-if="index !== 0">, </span><strong>{{ key }}</strong>: {{ value }}</span></samp>
         </td>

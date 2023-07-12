@@ -29,6 +29,7 @@ interface EntryData {
 
 export interface Entry {
   id: number;
+  created: number;
   data: EntryData;
 }
 
