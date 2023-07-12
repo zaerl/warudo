@@ -24,7 +24,6 @@ function getIndent(indent: number, space = 2): string {
 }
 
 function getObject(object: { [x: string]: JSONValue }, indent = 0, space = 2): string {
-  let addComma = false;
   let output = '{';
   let length = Object.keys(object).length;
   let i = 0;
@@ -64,7 +63,6 @@ function getObject(object: { [x: string]: JSONValue }, indent = 0, space = 2): s
     if(i === length - 1) {
       output += "\n" + getIndent(indent, space) + '}';
     } else {
-      addComma = true;
       output += ',';
     }
 
