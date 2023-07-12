@@ -13,7 +13,7 @@ const router = createRouter({
     {
       path: '/entries/:id',
       name: 'entry',
-      component: () => import('../views/ViewView.vue')
+      component: () => import('../views/EntryView.vue')
     },
     {
       path: '/views',

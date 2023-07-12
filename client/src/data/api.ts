@@ -1,6 +1,7 @@
 export type GetDataType = 'keys' | 'entries' | 'views'
 
 export interface SearchBarParams {
+  id?: number;
   limit?: number;
   key?: string;
   value?: string;
@@ -22,9 +23,13 @@ export interface ViewItem extends GridPosition {
   type: ViewItemTypes,
 }
 
+interface EntryData {
+  [key: string]: number
+}
+
 export interface Entry {
   id: number;
-  data: Object;
+  data: EntryData;
 }
 
 export interface View {
