@@ -23,17 +23,23 @@ function getIndent(indent: number, space = 2): string {
   return result;
 }
 
-function getObject(object: { [x: string]: JSONValue }, indent = 0, space = 2): string {
-  let output = '{';
-  let length = Object.keys(object).length;
+function getObject(object: { [x: string]: JSONValue } | JSONValue[], indent = 0, space = 2): string {
+  let isArray = Array.isArray(object);
+  let output = isArray ? '[' : '{';
+  let length = isArray ? (object as JSONValue[]).length : Object.keys(object).length;
   let i = 0;
 
   for(const property in object) {
-    const value = object[property];
+    const value = isArray ? (object as JSONValue[])[property as unknown as number] :
+        (object as { [x: string]: JSONValue })[property];
     let spaces = getIndent(indent + 1, space);
     let type: string = typeof value;
 
-    output += "\n" + spaces + `<b>"${property}"</b>: `;
+    if(isArray) {
+      output += "\n" + spaces;
+    } else {
+      output += "\n" + spaces + `<b>"${property}"</b>: `;
+    }
 
     if(type === 'object' && Array.isArray(value)) {
       type = 'array';
@@ -50,7 +56,7 @@ function getObject(object: { [x: string]: JSONValue }, indent = 0, space = 2): s
         output += `<strong><i>${value}</i></strong>`;
         break;
       case 'array':
-        output += '[]';
+        output += getObject(value as JSONValue[], indent + 1, space);
         break;
       case 'object':
         output += getObject(value as { [x: string]: JSONValue }, indent + 1, space);
@@ -61,7 +67,7 @@ function getObject(object: { [x: string]: JSONValue }, indent = 0, space = 2): s
     }
 
     if(i === length - 1) {
-      output += "\n" + getIndent(indent, space) + '}';
+      output += "\n" + getIndent(indent, space) + (isArray ? ']' : '}');
     } else {
       output += ',';
     }
