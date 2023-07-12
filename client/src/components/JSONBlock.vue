@@ -9,12 +9,21 @@ export type JSONValue =
 
 interface Props {
   json: { [x: string]: JSONValue },
+  inline: boolean,
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(
+  defineProps<Props>(), {
+    inline: false,
+  }
+);
 
 function getIndent(indent: number, space = 2): string {
-  let result = '';
+  if(props.inline) {
+    return '';
+  }
+
+  let result = "\n";
 
   for(let i = 0; i < indent * space; i++) {
     result += '&nbsp;';
@@ -29,6 +38,10 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], indent = 0,
   let length = isArray ? (object as JSONValue[]).length : Object.keys(object).length;
   let i = 0;
 
+  if(props.inline) {
+    output += ' ';
+  }
+
   for(const property in object) {
     const value = isArray ? (object as JSONValue[])[property as unknown as number] :
         (object as { [x: string]: JSONValue })[property];
@@ -36,9 +49,9 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], indent = 0,
     let type: string = typeof value;
 
     if(isArray) {
-      output += "\n" + spaces;
+      output += spaces;
     } else {
-      output += "\n" + spaces + `<b>"${property}"</b>: `;
+      output += spaces + `<b>"${property}"</b>: `;
     }
 
     if(type === 'object' && Array.isArray(value)) {
@@ -67,9 +80,13 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], indent = 0,
     }
 
     if(i === length - 1) {
-      output += "\n" + getIndent(indent, space) + (isArray ? ']' : '}');
+      if(props.inline) {
+        output += ' ';
+      }
+
+      output += getIndent(indent, space) + (isArray ? ']' : '}');
     } else {
-      output += ',';
+      output += props.inline ? ', ' : ',';
     }
 
     ++i;
@@ -82,7 +99,7 @@ const json = getObject(props.json, 0);
 </script>
 
 <template>
-<section>
+<section :class="{ inline: props.inline }">
   <pre><code v-html="json"></code></pre>
 </section>
 </template>
@@ -91,5 +108,26 @@ const json = getObject(props.json, 0);
 section > pre {
   background: var(--article-code-background-color);
   box-shadow: var(--card-box-shadow);
+}
+
+section.inline {
+  margin: 0;
+}
+
+section > pre {
+  white-space: break-spaces;
+}
+
+section.inline > pre {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+section.inline > pre > code {
+  margin: 0;
+  padding: 0;
+  white-space: normal;
 }
 </style>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DateTime from '@/components/DateTime.vue';
+import JSONBlock from '@/components/JSONBlock.vue';
 import { getData, type Entry } from '@/data/api';
 import router from '@/router';
 import { onMounted, ref } from 'vue';
@@ -37,7 +38,8 @@ onMounted(async () => {
         <td>{{ entry.id }}</td>
         <td><DateTime :timestamp="entry.created" /></td>
         <td @click="router.push({ name: 'entry', params: { id: entry.id } })">
-          <samp><span v-for="(value, key, index) in entry.data"><span v-if="index !== 0">, </span><strong>{{ key }}</strong>: {{ value }}</span></samp>
+          <!--<samp><span v-for="(value, key, index) in entry.data"><span v-if="index !== 0">, </span><strong>{{ key }}</strong>: {{ value }}</span></samp>-->
+          <JSONBlock :json="entry.data" :inline="true" />
         </td>
       </tr>
     </tbody>
