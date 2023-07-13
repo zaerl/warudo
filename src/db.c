@@ -101,6 +101,8 @@ int warudo_add_entry(int entry_type, const char* json, warudo *config) {
         return 1;
     }
 
+    sqlite3_finalize(stmt);
+
     return 0;
 }
 
@@ -113,15 +115,15 @@ int warudo_get_entries(int entry_type, warudo *config) {
     int has_search = !config->query_id && config->query_key != NULL && config->query_value != NULL;
 
     if(has_search) {
-        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries WHERE data ->> ? = ? LIMIT ?;" :
-            "SELECT id, created, modified, data FROM views WHERE data ->> ? = ? LIMIT ?;";
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries WHERE data ->> ? = ? LIMIT ? OFFSET ?;" :
+            "SELECT id, created, modified, data FROM views WHERE data ->> ? = ? LIMIT ? OFFSET ?;";
         limit_index = 3;
     } else if(config->query_id) {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries WHERE id = ?;" :
             "SELECT id, created, modified, data FROM views WHERE id= ?;";
     } else {
-        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries LIMIT ?;" :
-            "SELECT id, created, modified, data FROM views LIMIT ?;";
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries LIMIT ? OFFSET ?;" :
+            "SELECT id, created, modified, data FROM views LIMIT ? OFFSET ?;";
         limit_index = 1;
     }
 
@@ -155,11 +157,20 @@ int warudo_get_entries(int entry_type, warudo *config) {
         }
     }
 
-    if(limit_index && sqlite3_bind_int(stmt, limit_index, config->query_limit) != SQLITE_OK) {
-        fprintf(stderr, "Failed to bind limit: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
+    if(limit_index) {
+        if(sqlite3_bind_int(stmt, limit_index, config->query_limit) != SQLITE_OK) {
+            fprintf(stderr, "Failed to bind limit: %s\n", sqlite3_errmsg(config->db));
+            sqlite3_finalize(stmt);
 
-        return 1;
+            return 1;
+        }
+
+        if(sqlite3_bind_int64(stmt, limit_index + 1, config->query_offset) != SQLITE_OK) {
+            fprintf(stderr, "Failed to bind offset: %s\n", sqlite3_errmsg(config->db));
+            sqlite3_finalize(stmt);
+
+            return 1;
+        }
     }
 
     FCGX_PutS("[", config->request.out);
@@ -197,6 +208,7 @@ int warudo_get_entries(int entry_type, warudo *config) {
     }
 
     FCGX_PutS("]", config->request.out);
+    sqlite3_finalize(stmt);
 
     return 0;
 }
@@ -234,6 +246,7 @@ int warudo_get_keys(warudo *config) {
     }
 
     FCGX_PutS("]", config->request.out);
+    sqlite3_finalize(stmt);
 
     return 0;
 }

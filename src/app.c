@@ -41,6 +41,8 @@ int page_app(int entry_type, warudo* config) {
         warudo_header("201 Created", "application/json", config);
         FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", sqlite3_last_insert_rowid(config->db));
 
+        free(data);
+
         return 0;
     }
 
