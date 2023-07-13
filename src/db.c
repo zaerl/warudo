@@ -4,11 +4,13 @@
 #include "config.h"
 #include "warudo.h"
 
-#define WARUDO_DB_CALL(CALL) \
-    if(CALL != SQLITE_OK) { \
+#define WARUDO_DB_RET_CALL(CALL, RET) \
+    if(CALL != RET) { \
     fprintf(stderr, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
     sqlite3_finalize(stmt); \
     return 1; } \
+
+#define WARUDO_DB_CALL(CALL) WARUDO_DB_RET_CALL(CALL, SQLITE_OK)
 
 int warudo_load_columns(warudo* config);
 
@@ -85,7 +87,7 @@ int warudo_add_entry(int entry_type, const char* json, warudo *config) {
 
     WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC));
 
-    WARUDO_DB_CALL(sqlite3_step(stmt));
+    WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
     sqlite3_finalize(stmt);
 
