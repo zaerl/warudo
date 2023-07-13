@@ -84,9 +84,7 @@ int warudo_add_entry(int entry_type, const char* json, warudo *config) {
     }
 
     WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
-
     WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC));
-
     WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
     sqlite3_finalize(stmt);
@@ -119,7 +117,6 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
     if(has_search) {
         WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC));
-
         WARUDO_DB_CALL(sqlite3_bind_text(stmt, 2, config->query_value, strlen(config->query_value), SQLITE_STATIC));
     } else if(config->query_id) {
         WARUDO_DB_CALL(sqlite3_bind_int64(stmt, 1, config->query_id));
@@ -127,7 +124,6 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
     if(limit_index) {
         WARUDO_DB_CALL(sqlite3_bind_int(stmt, limit_index, config->query_limit));
-
         WARUDO_DB_CALL(sqlite3_bind_int64(stmt, limit_index + 1, config->query_offset));
     }
 
