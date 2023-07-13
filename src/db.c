@@ -9,7 +9,7 @@
     if(CALL != RET) { \
     fprintf(stderr, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
     sqlite3_finalize(stmt); \
-    return 1; } \
+    return WARUDO_DB_ERROR; } \
 
 #define WARUDO_DB_CALL(CALL) WARUDO_DB_RET_CALL(CALL, SQLITE_OK)
 
@@ -23,7 +23,7 @@ int warudo_db_init(const char *filename, warudo* config) {
     if(rc != SQLITE_OK) {
         fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(config->db));
 
-        return 1;
+        return WARUDO_DB_OPEN_ERROR;
     }
 
     const char *sql = "CREATE TABLE IF NOT EXISTS " WARUDO_ENTRIES_TABLE "("
@@ -42,11 +42,11 @@ int warudo_db_init(const char *filename, warudo* config) {
     if(rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", error_msg);
 
-        return 1;
+        return WARUDO_DB_OPEN_ERROR;
     }
 
     // return warudo_load_columns(config);
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_load_columns(warudo* config) {
@@ -72,7 +72,7 @@ int warudo_load_columns(warudo* config) {
 
     sqlite3_finalize(stmt);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_add_entry(int entry_type, warudo *config) {
@@ -83,13 +83,13 @@ int warudo_add_entry(int entry_type, warudo *config) {
     long int length = warudo_content_length(config);
 
     if(length <= 0) {
-        return 1;
+        return WARUDO_EMPTY_CONTENT_ERROR;
     }
 
     char* json = warudo_read_content(config, length);
 
     if(json == NULL) {
-        return 1;
+        return WARUDO_READ_ERROR;
     }
 
     WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
@@ -99,7 +99,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
     sqlite3_finalize(stmt);
     free(json);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_add_entries(int entry_type, warudo *config) {
@@ -110,13 +110,13 @@ int warudo_add_entries(int entry_type, warudo *config) {
     long int length = warudo_content_length(config);
 
     if(length <= 0) {
-        return 1;
+        return WARUDO_EMPTY_CONTENT_ERROR;
     }
 
     char* json = warudo_read_content(config, length);
 
     if(json == NULL) {
-        return 1;
+        return WARUDO_READ_ERROR;
     }
 
     WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
@@ -126,7 +126,7 @@ int warudo_add_entries(int entry_type, warudo *config) {
     sqlite3_finalize(stmt);
     free(json);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_get_entries(int entry_type, warudo *config) {
@@ -201,7 +201,7 @@ int warudo_get_entries(int entry_type, warudo *config) {
     FCGX_PutS("]", config->request.out);
     sqlite3_finalize(stmt);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_get_keys(warudo *config) {
@@ -234,7 +234,7 @@ int warudo_get_keys(warudo *config) {
     FCGX_PutS("]", config->request.out);
     sqlite3_finalize(stmt);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 unsigned long long int warudo_last_insert_rowid(warudo *config) {
@@ -243,7 +243,7 @@ unsigned long long int warudo_last_insert_rowid(warudo *config) {
 
 int warudo_db_close(warudo *config) {
     if(!config) {
-        return 0;
+        return WARUDO_OK;
     }
 
     for(unsigned int i = 0; i < config->columns_count; ++i) {
@@ -256,5 +256,5 @@ int warudo_db_close(warudo *config) {
 
     config->columns_count = 0;
 
-    return sqlite3_close(config->db) == SQLITE_OK ? 0 : 1;
+    return sqlite3_close(config->db) == SQLITE_OK ? WARUDO_OK : WARUDO_DB_CLOSE_ERROR;
 }

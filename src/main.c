@@ -53,5 +53,5 @@ int main(void) {
 
     warudo_close(config);
 
-    return 0;
+    return WARUDO_OK;
 }

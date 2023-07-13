@@ -78,7 +78,7 @@ char* warudo_escape_html(const char* input) {
 int warudo_status(const char* status, warudo* config) {
     FCGX_FPrintF(config->request.out, "Status: %s\r\n", status);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_content_type(const char* content_type, warudo *config) {
@@ -88,14 +88,14 @@ int warudo_content_type(const char* content_type, warudo *config) {
 
     FCGX_FPrintF(config->request.out, "Content-type: %s;charset=utf-8\r\n\r\n", content_type);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_header(const char* status, const char* content_type, warudo* config) {
     warudo_status(status, config);
     warudo_content_type(content_type, config);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_not_allowed(const char* allowed, warudo* config) {
@@ -104,28 +104,28 @@ int warudo_not_allowed(const char* allowed, warudo* config) {
     warudo_content_type("text/type", config);
     FCGX_PutS("Not allowed.", config->request.out);
 
-    return 405;
+    return WARUDO_HTTP_NOT_ALLOWED;
 }
 
 int warudo_server_error(const char* description, warudo* config) {
     warudo_header("500 Internal Server Error", "text/plain", config);
     FCGX_PutS(description, config->request.out);
 
-    return 500;
+    return WARUDO_HTTP_INTERNAL_ERROR;
 }
 
 int warudo_bad_request(const char* description, warudo* config) {
     warudo_header("400 Bad Request", "application/json", config);
     FCGX_FPrintF(config->request.out, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
 
-    return 400;
+    return WARUDO_HTTP_BAD_REQUEST;
 }
 
 int warudo_page_not_found(warudo* config) {
     warudo_header("404 Not Found", "text/plain", config);
     FCGX_PutS("Unknown.", config->request.out);
 
-    return 404;
+    return WARUDO_HTTP_NOT_FOUND;
 }
 
 
@@ -142,7 +142,7 @@ int warudo_environ(warudo* config) {
     FCGX_FPrintF(config->request.out, "<!--config: %s-->\n", WARUDO_CONFIG_FILE);
     FCGX_FPrintF(config->request.out, "<!--pid: %lu-->\n", warudo_process_id());
 
-    return 0;
+    return WARUDO_OK;
 }
 
 long int warudo_content_length(warudo* config) {

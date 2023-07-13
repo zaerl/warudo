@@ -31,7 +31,7 @@ int warudo_init(const char *filename, warudo **config) {
     if(res != 0) {
         warudo_close(pdb);
 
-        return 1;
+        return WARUDO_DB_INIT_ERROR;
     }
 
     // Load FCGI
@@ -40,7 +40,7 @@ int warudo_init(const char *filename, warudo **config) {
     if(res != 0) {
         warudo_close(pdb);
 
-        return 1;
+        return WARUDO_FCGI_INIT_ERROR;
     }
 
     // Create a socket to listen for connections
@@ -49,7 +49,7 @@ int warudo_init(const char *filename, warudo **config) {
     if(socket == -1) {
         warudo_close(pdb);
 
-        return 1;
+        return WARUDO_SOCKER_ERROR;
     }
 
     pdb->socket = socket;
@@ -60,7 +60,7 @@ int warudo_init(const char *filename, warudo **config) {
     if(res != 0) {
         warudo_close(pdb);
 
-        return 1;
+        return WARUDO_INIT_REQUEST_ERROR;
     }
 
     pdb->page = -1;
@@ -86,12 +86,12 @@ int warudo_init(const char *filename, warudo **config) {
 
     *config = pdb;
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_parse_query_string(char* query_string, warudo* config) {
     if(query_string == NULL) {
-        return 1;
+        return WARUDO_EMPTY_QUERY_STRING_ERROR;
     }
 
     char* saveptr;
@@ -119,7 +119,7 @@ int warudo_parse_query_string(char* query_string, warudo* config) {
         parameter = strtok_r(NULL, "&", &saveptr);
     }
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_accept_connection(warudo *config) {
@@ -144,7 +144,7 @@ int warudo_accept_connection(warudo *config) {
 #endif
 
     if(accepted < 0) {
-        return 1;
+        return WARUDO_ACCEPT_ERROR;
     }
 
     const char* script_name = FCGX_GetParam("SCRIPT_NAME", config->request.envp);
@@ -180,7 +180,7 @@ int warudo_accept_connection(warudo *config) {
     config->script_name = script_name;
     config->query_string = query_string;
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_after_connection(warudo *config) {
@@ -190,7 +190,7 @@ int warudo_after_connection(warudo *config) {
     warudo_end_time(config, 1000, "after finish request");
 #endif
 
-    return 0;
+    return WARUDO_OK;
 }
 
 #ifdef WARUDO_TIMING
@@ -200,7 +200,7 @@ int warudo_start_time(warudo *config) {
     config->timing_end_count = 0;
     clock_gettime(CLOCK_MONOTONIC, &config->start);
 
-    return 0;
+    return WARUDO_OK;
 }
 
 int warudo_end_time(warudo *config, double ms, const char* message) {
@@ -216,13 +216,13 @@ int warudo_end_time(warudo *config, double ms, const char* message) {
             config->timing_end_count, config->time_taken, message ? message : "");
     }
 
-    return 0;
+    return WARUDO_OK;
 }
 #endif
 
 int warudo_close(warudo *config) {
     if(!config) {
-        return 0;
+        return WARUDO_OK;
     }
 
     FCGX_Free(&config->request, 1);
@@ -230,5 +230,5 @@ int warudo_close(warudo *config) {
 
     free(config);
 
-    return 0;
+    return WARUDO_OK;
 }

@@ -24,13 +24,13 @@ int page_app(int entry_type, warudo* config) {
         if(res != 0) {
             warudo_bad_request("Failed to add entries.", config);
 
-            return 1;
+            return WARUDO_ADD_ERROR;
         }
 
         warudo_header("201 Created", "application/json", config);
         FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", warudo_last_insert_rowid(config));
 
-        return 0;
+        return WARUDO_OK;
     }
 
     return warudo_not_allowed("GET, POST", config);
