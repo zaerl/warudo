@@ -17,4 +17,8 @@ int warudo_bad_request(const char* description, warudo* config);
 
 int warudo_environ(warudo *config);
 
+long int warudo_content_length(warudo* config);
+
+char* warudo_read_content(warudo* config, long int length);
+
 #endif /* WARUDO_NET_H */

@@ -14,34 +14,21 @@ int page_app(int entry_type, warudo* config) {
 
         return warudo_get_entries(entry_type, config);
     } else if(config->request_method == WARUDO_REQUEST_POST) {
-        char *length = FCGX_GetParam("CONTENT_LENGTH", config->request.envp);
-        long int len = 0;
-
-        if(length != NULL) {
-            len = strtol(length, NULL, 10);
+        int res = 0;
+        if(config->query_multi && entry_type == WARUDO_ENTRY_TYPE_DATA) {
+            res = warudo_add_entries(entry_type, config);
+        } else {
+            res = warudo_add_entry(entry_type, config);
         }
 
-        if(len <= 0) {
-            warudo_bad_request("No data from standard input.", config);
-
-            return 1;
-        }
-
-        char *data = malloc(len + 1);
-
-        FCGX_GetStr(data, len, config->request.in);
-        data[len] = '\0';
-
-        if(warudo_add_entry(entry_type, data, config) != 0) {
-            warudo_bad_request("Failed to add entry.", config);
+        if(res != 0) {
+            warudo_bad_request("Failed to add entries.", config);
 
             return 1;
         }
 
         warudo_header("201 Created", "application/json", config);
         FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", warudo_last_insert_rowid(config));
-
-        free(data);
 
         return 0;
     }

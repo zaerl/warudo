@@ -6,7 +6,8 @@
 int warudo_db_init(const char *filename, warudo* config);
 int warudo_db_close(warudo *config);
 
-int warudo_add_entry(int entry_type, const char* json, warudo *config);
+int warudo_add_entry(int entry_type, warudo *config);
+int warudo_add_entries(int entry_type, warudo *config);
 int warudo_get_entries(int entry_type, warudo *config);
 
 unsigned long long int warudo_last_insert_rowid(warudo *config);

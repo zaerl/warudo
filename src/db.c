@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "config.h"
 #include "warudo.h"
+#include "config.h"
+#include "net.h"
 
 #define WARUDO_DB_RET_CALL(CALL, RET) \
     if(CALL != RET) { \
@@ -74,10 +75,12 @@ int warudo_load_columns(warudo* config) {
     return 0;
 }
 
-int warudo_add_entry(int entry_type, const char* json, warudo *config) {
+int warudo_add_entry(int entry_type, warudo *config) {
     sqlite3_stmt* stmt;
     const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
         "INSERT INTO views(data) VALUES(json(?));";
+
+    char* json = warudo_read_content(config, 0);
 
     if(json == NULL) {
         return 1;
@@ -88,6 +91,28 @@ int warudo_add_entry(int entry_type, const char* json, warudo *config) {
     WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
     sqlite3_finalize(stmt);
+    free(json);
+
+    return 0;
+}
+
+int warudo_add_entries(int entry_type, warudo *config) {
+    sqlite3_stmt* stmt;
+    const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
+        "INSERT INTO views(data) VALUES(json(?));";
+
+    char* json = warudo_read_content(config, 0);
+
+    if(json == NULL) {
+        return 1;
+    }
+
+    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
+    WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC));
+    WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
+
+    sqlite3_finalize(stmt);
+    free(json);
 
     return 0;
 }

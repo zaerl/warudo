@@ -128,9 +128,6 @@ int warudo_accept_connection(warudo *config) {
     config->script_name = NULL;
     config->query_string = NULL;
     ++config->requests_count;
-#ifdef WARUDO_TIMING
-    warudo_start_time(config);
-#endif
 
     // Query string
     ZA_FREE_QUERY_ULLINT_VALUE(id, 0)
@@ -141,6 +138,10 @@ int warudo_accept_connection(warudo *config) {
     ZA_FREE_QUERY_STRING_VALUE(value)
 
     int accepted = FCGX_Accept_r(&config->request);
+
+#ifdef WARUDO_TIMING
+    warudo_start_time(config);
+#endif
 
     if(accepted < 0) {
         return 1;

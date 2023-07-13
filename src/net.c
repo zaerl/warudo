@@ -144,3 +144,30 @@ int warudo_environ(warudo* config) {
 
     return 0;
 }
+
+long int warudo_content_length(warudo* config) {
+    char *length = FCGX_GetParam("CONTENT_LENGTH", config->request.envp);
+    long int len = 0;
+
+    if(length != NULL) {
+        len = strtol(length, NULL, 10);
+    }
+
+    return len;
+}
+
+
+char* warudo_read_content(warudo* config, long int length) {
+    long int len = length == 0 ? warudo_content_length(config) : length;
+
+    if(len <= 0) {
+        return NULL;
+    }
+
+    char *data = malloc(len + 1);
+
+    FCGX_GetStr(data, len, config->request.in);
+    data[len] = '\0';
+
+    return data;
+}
