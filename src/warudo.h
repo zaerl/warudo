@@ -3,15 +3,16 @@
 
 #define WARUDO_VERSION "0.1.0"
 
-#define WARUDO_DB_FILE "warudo.db"
+#define WARUDO_BUFFLEN 8192
 #define WARUDO_CONFIG_FILE "warudo.conf"
-#define WARUDO_SOCKET_PATH ":6251"
-#define WARUDO_MAX_COLUMNS 64
-#define WARUDO_LOG_LEVEL 1
 #define WARUDO_CORS NULL
+#define WARUDO_DB_FILE "warudo.db"
 #define WARUDO_ENTRIES_TABLE "entries"
-#define WARUDO_VIEWS_TABLE "views"
+#define WARUDO_LOG_LEVEL 1
+#define WARUDO_MAX_COLUMNS 64
+#define WARUDO_SOCKET_PATH ":6251"
 #define WARUDO_TIMING 1
+#define WARUDO_VIEWS_TABLE "views"
 
 #ifdef WARUDO_TIMING
 #include <time.h>
@@ -37,7 +38,8 @@
 #define WARUDO_DEFAULT_QUERY_LIMIT 100
 #define WARUDO_DEFAULT_QUERY_MULTI 0
 
-#define ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && strncmp(KEY, #IDX, LENGTH_1) == 0) {\
+#define ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && \
+    strncmp(KEY, #IDX, LENGTH_1) == 0) { \
     config->query_##IDX = FN; \
     config->query_valid_##IDX = 1; }
 #define ZA_GET_QUERY_ULLINT_VALUE(KEY, IDX, VALUE, LENGTH_1) ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, strtoll(VALUE, NULL, 10), LENGTH_1)
@@ -46,7 +48,9 @@
 
 #define ZA_FREE_QUERY_ULLINT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
 #define ZA_FREE_QUERY_INT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
-#define ZA_FREE_QUERY_STRING_VALUE(NAME) if(config->query_##NAME != NULL) free((void*)config->query_##NAME); config->query_##NAME = NULL; config->query_valid_##NAME = 0;
+#define ZA_FREE_QUERY_STRING_VALUE(NAME) if(config->query_##NAME != NULL) free((void*)config->query_##NAME); \
+    config->query_##NAME = NULL; \
+    config->query_valid_##NAME = 0;
 
 #define ZA_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
 
@@ -87,24 +91,32 @@ struct warudo {
 
 typedef struct warudo warudo;
 
+// Init the system
 int warudo_init(const char *filename, warudo **config);
 
+// Accept a FCGI connection
 int warudo_accept_connection(warudo *config);
 
+// Run at the end of a connection
 int warudo_after_connection(warudo *config);
 
+// Homepage error page
 int warudo_page_home(warudo* config);
 
+// Root JSON endpoints
 int page_app(int entry_type, warudo* config);
 
+// Keys JSON endpoint
 int page_app_keys(warudo* config);
 
+// Timing functions
 #ifdef WARUDO_TIMING
 int warudo_start_time(warudo *config);
 
 int warudo_end_time(warudo *config, double ms, const char* message);
 #endif
 
+// Close the system
 int warudo_close(warudo *config);
 
 #endif /* WARUDO_H */
