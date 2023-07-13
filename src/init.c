@@ -6,8 +6,6 @@
 #include <time.h>
 #endif
 
-#include <fcgiapp.h>
-
 #include "config.h"
 #include "warudo.h"
 #include "db.h"

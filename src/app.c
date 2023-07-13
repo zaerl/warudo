@@ -2,8 +2,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <fcgiapp.h>
-
 #include "warudo.h"
 #include "net.h"
 #include "db.h"
