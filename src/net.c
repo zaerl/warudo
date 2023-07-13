@@ -164,10 +164,9 @@ char* warudo_read_content(warudo* config, long int length) {
         return NULL;
     }
 
-    char *data = malloc(len + 1);
+    char *data = malloc(len);
 
     FCGX_GetStr(data, len, config->request.in);
-    data[len] = '\0';
 
     return data;
 }

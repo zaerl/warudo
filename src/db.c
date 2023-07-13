@@ -80,14 +80,20 @@ int warudo_add_entry(int entry_type, warudo *config) {
     const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
         "INSERT INTO views(data) VALUES(json(?));";
 
-    char* json = warudo_read_content(config, 0);
+    long int length = warudo_content_length(config);
+
+    if(length <= 0) {
+        return 1;
+    }
+
+    char* json = warudo_read_content(config, length);
 
     if(json == NULL) {
         return 1;
     }
 
     WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
-    WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC));
+    WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
     WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
     sqlite3_finalize(stmt);
@@ -101,14 +107,20 @@ int warudo_add_entries(int entry_type, warudo *config) {
     const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
         "INSERT INTO views(data) VALUES(json(?));";
 
-    char* json = warudo_read_content(config, 0);
+    long int length = warudo_content_length(config);
+
+    if(length <= 0) {
+        return 1;
+    }
+
+    char* json = warudo_read_content(config, length);
 
     if(json == NULL) {
         return 1;
     }
 
     WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
-    WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC));
+    WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
     WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
     sqlite3_finalize(stmt);
