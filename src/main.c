@@ -1,4 +1,4 @@
-// #define NO_FCGI_DEFINES
+#define NO_FCGI_DEFINES
 
 #include <fcgiapp.h>
 #include <stdio.h>
@@ -41,6 +41,8 @@ int main(void) {
         } else {
             ret = warudo_page_not_found(config);
         }
+
+        warudo_after_connection(config);
 
         if(ret == 0) {
             fprintf(stderr, "Accepted request %llu\n", config->requests_count);

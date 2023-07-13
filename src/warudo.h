@@ -11,6 +11,11 @@
 #define WARUDO_CORS NULL
 #define WARUDO_ENTRIES_TABLE "entries"
 #define WARUDO_VIEWS_TABLE "views"
+#define WARUDO_TIMING 1
+
+#ifdef WARUDO_TIMING
+#include <time.h>
+#endif
 
 #include <fcgiapp.h>
 #include "sqlite3.h"
@@ -34,9 +39,11 @@
 #define ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && strncmp(KEY, #IDX, LENGTH_1) == 0) {\
     config->query_##IDX = FN; \
     config->query_valid_##IDX = 1; }
+#define ZA_GET_QUERY_ULLINT_VALUE(KEY, IDX, VALUE, LENGTH_1) ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, strtoll(VALUE, NULL, 10), LENGTH_1)
 #define ZA_GET_QUERY_INT_VALUE(KEY, IDX, VALUE, LENGTH_1) ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, strtol(VALUE, NULL, 10), LENGTH_1)
 #define ZA_GET_QUERY_STRING_VALUE(KEY, IDX, VALUE, LENGTH_1) ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, strdup(VALUE), LENGTH_1)
 
+#define ZA_FREE_QUERY_ULLINT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
 #define ZA_FREE_QUERY_INT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
 #define ZA_FREE_QUERY_STRING_VALUE(NAME) if(config->query_##NAME != NULL) free((void*)config->query_##NAME); config->query_##NAME = NULL; config->query_valid_##NAME = 0;
 
@@ -61,10 +68,17 @@ struct warudo {
     warudo_column columns[WARUDO_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;
+    struct timespec start;
+#ifdef WARUDO_TIMING
+    unsigned long long int timing_count;
+    unsigned long long int timing_end_count;
+    double time_taken;
+#endif
 
     // Query string
-    ZA_QUERY_VALUE(unsigned int, id)
-    ZA_QUERY_VALUE(short, limit)
+    ZA_QUERY_VALUE(unsigned long long int, id)
+    ZA_QUERY_VALUE(unsigned long long int, offset)
+    ZA_QUERY_VALUE(unsigned int, limit)
     ZA_QUERY_VALUE(const char*, key)
     ZA_QUERY_VALUE(const char*, value)
 };
@@ -75,11 +89,19 @@ int warudo_init(const char *filename, warudo **config);
 
 int warudo_accept_connection(warudo *config);
 
+int warudo_after_connection(warudo *config);
+
 int warudo_page_home(warudo* config);
 
 int page_app(int entry_type, warudo* config);
 
 int page_app_keys(warudo* config);
+
+#ifdef WARUDO_TIMING
+int warudo_start_time(warudo *config);
+
+int warudo_end_time(warudo *config, double ms, const char* message);
+#endif
 
 int warudo_close(warudo *config);
 

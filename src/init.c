@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef WARUDO_TIMING
+#include <time.h>
+#endif
+
 #include <fcgiapp.h>
 
 #include "config.h"
@@ -15,6 +19,10 @@ int warudo_init(const char *filename, warudo **config) {
     pdb = malloc(sizeof(warudo));
     pdb->columns_count = 0;
     pdb->requests_count = 0;
+#ifdef WARUDO_TIMING
+    pdb->timing_count = 0;
+    pdb->timing_end_count = 0;
+#endif
     pdb->access_origin = WARUDO_CORS;
 
     // Load database
@@ -36,7 +44,7 @@ int warudo_init(const char *filename, warudo **config) {
     }
 
     // Create a socket to listen for connections
-    int socket = FCGX_OpenSocket(WARUDO_SOCKET_PATH, 10);
+    int socket = FCGX_OpenSocket(WARUDO_SOCKET_PATH, 1024);
 
     if(socket == -1) {
         warudo_close(pdb);
@@ -62,6 +70,7 @@ int warudo_init(const char *filename, warudo **config) {
 
     // Query string
     pdb->query_id = 0;
+    pdb->query_offset = 0;
     pdb->query_limit = 0;
     pdb->query_key = NULL;
     pdb->query_value = NULL;
@@ -97,8 +106,9 @@ int warudo_parse_query_string(char* query_string, warudo* config) {
             char* value = delimiter + 1;
 
             if(value != NULL) {
-                ZA_GET_QUERY_INT_VALUE(parameter, limit, value, length_1)
-                else ZA_GET_QUERY_INT_VALUE(parameter, id, value, length_1)
+                ZA_GET_QUERY_ULLINT_VALUE(parameter, limit, value, length_1)
+                else ZA_GET_QUERY_INT_VALUE(parameter, offset, value, length_1)
+                else ZA_GET_QUERY_ULLINT_VALUE(parameter, id, value, length_1)
                 else ZA_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
                 else ZA_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
             }
@@ -116,10 +126,14 @@ int warudo_accept_connection(warudo *config) {
     config->script_name = NULL;
     config->query_string = NULL;
     ++config->requests_count;
+#ifdef WARUDO_TIMING
+    warudo_start_time(config);
+#endif
 
     // Query string
-    ZA_FREE_QUERY_INT_VALUE(id, 0)
+    ZA_FREE_QUERY_ULLINT_VALUE(id, 0)
     ZA_FREE_QUERY_INT_VALUE(limit, WARUDO_DEFAULT_QUERY_LIMIT)
+    ZA_FREE_QUERY_ULLINT_VALUE(offset, 0)
     ZA_FREE_QUERY_STRING_VALUE(key)
     ZA_FREE_QUERY_STRING_VALUE(value)
 
@@ -164,6 +178,43 @@ int warudo_accept_connection(warudo *config) {
 
     return 0;
 }
+
+int warudo_after_connection(warudo *config) {
+    FCGX_Finish_r(&config->request);
+
+#ifdef WARUDO_TIMING
+    warudo_end_time(config, 1000, "after finish request");
+#endif
+
+    return 0;
+}
+
+#ifdef WARUDO_TIMING
+int warudo_start_time(warudo *config) {
+    config->time_taken = 0.0;
+    ++config->timing_count;
+    config->timing_end_count = 0;
+    clock_gettime(CLOCK_MONOTONIC, &config->start);
+
+    return 0;
+}
+
+int warudo_end_time(warudo *config, double ms, const char* message) {
+    struct timespec end;
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    ++config->timing_end_count;
+    config->time_taken = (end.tv_sec - config->start.tv_sec) * 1000.0;
+    config->time_taken += (end.tv_nsec - config->start.tv_nsec) / 1000000.0;
+
+    if(ms && config->time_taken > ms) {
+        fprintf(stderr, "%llu: %llu time %.0lf ms %s\n", config->timing_count,
+            config->timing_end_count, config->time_taken, message ? message : "");
+    }
+
+    return 0;
+}
+#endif
 
 int warudo_close(warudo *config) {
     if(!config) {
