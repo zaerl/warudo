@@ -21,7 +21,7 @@ int page_app(int entry_type, warudo* config) {
             res = warudo_add_entry(entry_type, config);
         }
 
-        if(res != 0) {
+        if(res != WARUDO_OK) {
             warudo_bad_request("Failed to add entries.", config);
 
             return WARUDO_ADD_ERROR;

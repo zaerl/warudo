@@ -23,7 +23,7 @@ int main(void) {
     warudo_read_config();
     ret = warudo_init(WARUDO_DB_FILE, &config);
 
-    if(ret != 0) {
+    if(ret != WARUDO_OK) {
         return ret;
     }
 

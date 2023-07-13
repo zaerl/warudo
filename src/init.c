@@ -28,7 +28,7 @@ int warudo_init(const char *filename, warudo **config) {
     // Load database
     res = warudo_db_init(filename, pdb);
 
-    if(res != 0) {
+    if(res != WARUDO_OK) {
         warudo_close(pdb);
 
         return WARUDO_DB_INIT_ERROR;
