@@ -195,7 +195,6 @@ int warudo_after_connection(warudo *config) {
 
 #ifdef WARUDO_TIMING
 int warudo_start_time(warudo *config) {
-    config->time_taken = 0.0;
     ++config->timing_count;
     config->timing_end_count = 0;
     clock_gettime(CLOCK_MONOTONIC, &config->start);
@@ -208,12 +207,12 @@ int warudo_end_time(warudo *config, double ms, const char* message) {
     clock_gettime(CLOCK_MONOTONIC, &end);
 
     ++config->timing_end_count;
-    config->time_taken = (end.tv_sec - config->start.tv_sec) * 1000.0;
-    config->time_taken += (end.tv_nsec - config->start.tv_nsec) / 1000000.0;
+    double time_taken = (end.tv_sec - config->start.tv_sec) * 1000.0;
+    time_taken += (end.tv_nsec - config->start.tv_nsec) / 1000000.0;
 
-    if(ms && config->time_taken > ms) {
+    if(ms && time_taken > ms) {
         fprintf(stderr, "%llu: %llu time %.0lf ms %s\n", config->timing_count,
-            config->timing_end_count, config->time_taken, message ? message : "");
+            config->timing_end_count, time_taken, message ? message : "");
     }
 
     return WARUDO_OK;

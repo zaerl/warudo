@@ -96,11 +96,10 @@ struct warudo {
     warudo_column columns[WARUDO_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;
-    struct timespec start;
 #ifdef WARUDO_TIMING
+    struct timespec start;
     unsigned long long int timing_count;
     unsigned long long int timing_end_count;
-    double time_taken;
 #endif
 
     // Query string
