@@ -71,6 +71,7 @@ int warudo_init(const char *filename, warudo **config) {
     // Query string
     pdb->query_id = 0;
     pdb->query_offset = 0;
+    pdb->query_multi = 0;
     pdb->query_limit = 0;
     pdb->query_key = NULL;
     pdb->query_value = NULL;
@@ -109,6 +110,7 @@ int warudo_parse_query_string(char* query_string, warudo* config) {
                 ZA_GET_QUERY_ULLINT_VALUE(parameter, limit, value, length_1)
                 else ZA_GET_QUERY_INT_VALUE(parameter, offset, value, length_1)
                 else ZA_GET_QUERY_ULLINT_VALUE(parameter, id, value, length_1)
+                else ZA_GET_QUERY_INT_VALUE(parameter, multi, value, length_1)
                 else ZA_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
                 else ZA_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
             }
@@ -134,6 +136,7 @@ int warudo_accept_connection(warudo *config) {
     ZA_FREE_QUERY_ULLINT_VALUE(id, 0)
     ZA_FREE_QUERY_INT_VALUE(limit, WARUDO_DEFAULT_QUERY_LIMIT)
     ZA_FREE_QUERY_ULLINT_VALUE(offset, 0)
+    ZA_FREE_QUERY_ULLINT_VALUE(multi, WARUDO_DEFAULT_QUERY_MULTI)
     ZA_FREE_QUERY_STRING_VALUE(key)
     ZA_FREE_QUERY_STRING_VALUE(value)
 

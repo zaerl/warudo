@@ -29,6 +29,9 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
+stress-test:
+	$(CC) $(CFLAGS) -o stress-test stress-test.c -L/opt/homebrew/opt/curl/lib -lcurl
+
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)/* ${DBS}
 

@@ -5,7 +5,7 @@
 void warudo_read_config(void) {
     const char* path = getenv("WARUDO_CONFIG_FILE");
 
-    if (path == NULL) {
+    if(path == NULL) {
         path = WARUDO_CONFIG_FILE;
     }
 

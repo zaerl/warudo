@@ -4,6 +4,12 @@
 #include "config.h"
 #include "warudo.h"
 
+#define WARUDO_DB_CALL(CALL) \
+    if(CALL != SQLITE_OK) { \
+    fprintf(stderr, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
+    sqlite3_finalize(stmt); \
+    return 1; } \
+
 int warudo_load_columns(warudo* config);
 
 int warudo_db_init(const char *filename, warudo* config) {
@@ -30,7 +36,7 @@ int warudo_db_init(const char *filename, warudo* config) {
         "PRAGMA busy_timeout = 5000;";
     rc = sqlite3_exec(config->db, sql, 0, 0, &error_msg);
 
-    if (rc != SQLITE_OK) {
+    if(rc != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", error_msg);
 
         return 1;
@@ -44,12 +50,7 @@ int warudo_load_columns(warudo* config) {
     const char* table_info_sql = "PRAGMA table_info('" WARUDO_ENTRIES_TABLE "');";
     sqlite3_stmt* stmt;
 
-    if(sqlite3_prepare_v2(config->db, table_info_sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
-
-        return 1;
-    }
+    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, table_info_sql, -1, &stmt, NULL));
 
     fprintf(stderr, "Column names for table '%s':\n", WARUDO_ENTRIES_TABLE);
 
@@ -80,26 +81,11 @@ int warudo_add_entry(int entry_type, const char* json, warudo *config) {
         return 1;
     }
 
-    if (sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
+    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
 
-        return 1;
-    }
+    WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC));
 
-    if(sqlite3_bind_text(stmt, 1, json, strlen(json), SQLITE_STATIC) != SQLITE_OK) {
-        fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
-
-        return 1;
-    }
-
-    if(sqlite3_step(stmt) != SQLITE_DONE) {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
-
-        return 1;
-    }
+    WARUDO_DB_CALL(sqlite3_step(stmt));
 
     sqlite3_finalize(stmt);
 
@@ -127,50 +113,20 @@ int warudo_get_entries(int entry_type, warudo *config) {
         limit_index = 1;
     }
 
-    if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
-
-        return 1;
-    }
+    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
     if(has_search) {
-        if(sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC) != SQLITE_OK) {
-            fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
-            sqlite3_finalize(stmt);
+        WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC));
 
-            return 1;
-        }
-
-        if(sqlite3_bind_text(stmt, 2, config->query_value, strlen(config->query_value), SQLITE_STATIC) != SQLITE_OK) {
-            fprintf(stderr, "Failed to bind text: %s\n", sqlite3_errmsg(config->db));
-            sqlite3_finalize(stmt);
-
-            return 1;
-        }
+        WARUDO_DB_CALL(sqlite3_bind_text(stmt, 2, config->query_value, strlen(config->query_value), SQLITE_STATIC));
     } else if(config->query_id) {
-        if(sqlite3_bind_int64(stmt, 1, config->query_id) != SQLITE_OK) {
-            fprintf(stderr, "Failed to bind id: %s\n", sqlite3_errmsg(config->db));
-            sqlite3_finalize(stmt);
-
-            return 1;
-        }
+        WARUDO_DB_CALL(sqlite3_bind_int64(stmt, 1, config->query_id));
     }
 
     if(limit_index) {
-        if(sqlite3_bind_int(stmt, limit_index, config->query_limit) != SQLITE_OK) {
-            fprintf(stderr, "Failed to bind limit: %s\n", sqlite3_errmsg(config->db));
-            sqlite3_finalize(stmt);
+        WARUDO_DB_CALL(sqlite3_bind_int(stmt, limit_index, config->query_limit));
 
-            return 1;
-        }
-
-        if(sqlite3_bind_int64(stmt, limit_index + 1, config->query_offset) != SQLITE_OK) {
-            fprintf(stderr, "Failed to bind offset: %s\n", sqlite3_errmsg(config->db));
-            sqlite3_finalize(stmt);
-
-            return 1;
-        }
+        WARUDO_DB_CALL(sqlite3_bind_int64(stmt, limit_index + 1, config->query_offset));
     }
 
     FCGX_PutS("[", config->request.out);
@@ -219,12 +175,7 @@ int warudo_get_keys(warudo *config) {
     int count = 0;
     sqlite3_stmt *stmt;
 
-    if (sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(config->db));
-        sqlite3_finalize(stmt);
-
-        return 1;
-    }
+    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
     FCGX_PutS("[", config->request.out);
 
@@ -249,6 +200,10 @@ int warudo_get_keys(warudo *config) {
     sqlite3_finalize(stmt);
 
     return 0;
+}
+
+unsigned long long int warudo_last_insert_rowid(warudo *config) {
+    return sqlite3_last_insert_rowid(config->db);
 }
 
 int warudo_db_close(warudo *config) {

@@ -22,7 +22,7 @@ char* warudo_escape_html(const char* input) {
     size_t escaped_len = len * 6 + 1;
     char* escaped = malloc(len);
 
-    if (escaped == NULL) {
+    if(escaped == NULL) {
         return NULL;
     }
 
@@ -55,12 +55,12 @@ char* warudo_escape_html(const char* input) {
                 break;
         }
 
-        if (j >= escaped_len - 6) {
+        if(j >= escaped_len - 6) {
             // Increase buffer size if necessary
             escaped_len *= 2;
             char* temp = realloc(escaped, escaped_len);
 
-            if (temp == NULL) {
+            if(temp == NULL) {
                 free(escaped);
 
                 return NULL;

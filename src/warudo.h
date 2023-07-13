@@ -35,6 +35,7 @@
 
 // Query string
 #define WARUDO_DEFAULT_QUERY_LIMIT 100
+#define WARUDO_DEFAULT_QUERY_MULTI 0
 
 #define ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && strncmp(KEY, #IDX, LENGTH_1) == 0) {\
     config->query_##IDX = FN; \
@@ -79,6 +80,7 @@ struct warudo {
     ZA_QUERY_VALUE(unsigned long long int, id)
     ZA_QUERY_VALUE(unsigned long long int, offset)
     ZA_QUERY_VALUE(unsigned int, limit)
+    ZA_QUERY_VALUE(unsigned int, multi)
     ZA_QUERY_VALUE(const char*, key)
     ZA_QUERY_VALUE(const char*, value)
 };
