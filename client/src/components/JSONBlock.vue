@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 export type JSONValue =
   | string
   | number
@@ -8,13 +7,14 @@ export type JSONValue =
   | Array<JSONValue>;
 
 interface Props {
-  json: { [x: string]: JSONValue },
+  json: { [x: string]: JSONValue } | null,
   inline: boolean,
 }
 
 const props = withDefaults(
   defineProps<Props>(), {
     inline: false,
+    json: null,
   }
 );
 
@@ -95,11 +95,11 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], indent = 0,
   return output;
 }
 
-const json = getObject(props.json, 0);
+const json: string | null = props.json ? getObject(props.json, 0) : null;
 </script>
 
 <template>
-<section :class="{ inline: props.inline }">
+<section v-if="json" :class="{ inline: props.inline }">
   <pre><code v-html="json"></code></pre>
 </section>
 </template>

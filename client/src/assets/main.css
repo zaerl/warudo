@@ -14,9 +14,9 @@ body > main {
   text-align: center;
 }
 
-[aria-busy='true'] > * {
+/*[aria-busy='true'] > * {
   display: none;
-}
+}*/
 
 [aria-invalid='true'] {
   border: var(--border-width) solid var(--form-element-invalid-border-color);

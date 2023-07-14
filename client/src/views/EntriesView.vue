@@ -34,10 +34,10 @@ onMounted(async () => {
       <tr v-else-if="!entries.length">
         <td colspan="3">No results</td>
       </tr>
-      <tr v-else v-for="entry in entries">
+      <tr v-else v-for="entry in entries" :key="entry.id" @click="router.push({ name: 'entry', params: { id: entry.id } })">
         <td>{{ entry.id }}</td>
-        <td><DateTime :timestamp="entry.created" /></td>
-        <td @click="router.push({ name: 'entry', params: { id: entry.id } })">
+        <td class="date"><DateTime :timestamp="entry.created" /></td>
+        <td>
           <!--<samp><span v-for="(value, key, index) in entry.data"><span v-if="index !== 0">, </span><strong>{{ key }}</strong>: {{ value }}</span></samp>-->
           <JSONBlock :json="entry.data" :inline="true" />
         </td>
@@ -48,7 +48,11 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-td {
+tr {
   cursor: pointer;
+}
+
+td.date {
+  white-space: pre;
 }
 </style>

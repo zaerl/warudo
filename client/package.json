@@ -12,7 +12,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "echarts": "^5.4.2",
     "vue": "^3.3.4",
+    "vue-echarts": "latest",
     "vue-router": "^4.2.4"
   },
   "devDependencies": {

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { getSettings } from '@/data/settings';
+// import { getSettings } from '@/data/settings';
 
 interface Props {
   timestamp: number,
 }
 
 const props = defineProps<Props>();
-const settings = getSettings();
+// const settings = getSettings();
 
 function datetime() {
   const date = new Date(props.timestamp * 1000);
@@ -15,7 +15,6 @@ function datetime() {
     timeStyle: 'short',
   };
 
-  console.log(props.timestamp);
   return Intl.DateTimeFormat(navigator.language, options).format(date);
 }
 </script>

@@ -1,7 +1,10 @@
 <script setup lang="ts">
-import type { GridPosition } from '@/data/api'
-import ResultsGraph from './ResultsGraph.vue'
-import KeysList from './KeysList.vue'
+import type { GridPosition } from '@/data/api';
+import { ref } from 'vue';
+import ChartGraph from './ChartGraph.vue';
+import KeysList from './KeysList.vue';
+
+let busy = ref(false);
 
 function getGridStyle(position?: GridPosition) {
   if (!position) {
@@ -18,7 +21,7 @@ function getGridStyle(position?: GridPosition) {
 <main class="container-fluid">
   <div class="main-grid">
     <KeysList :style="getGridStyle()" />
-    <ResultsGraph />
+    <ChartGraph :loading="busy" />
     <div></div>
     <div></div>
   </div>

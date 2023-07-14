@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import DateTime from '@/components/DateTime.vue';
 import { getData, type View } from '@/data/api';
+import router from '@/router';
 import { onMounted, ref } from 'vue';
 
 let views = ref<View[] | null>([]);
@@ -32,12 +33,18 @@ onMounted(async () => {
       <tr v-else-if="!views.length">
         <td colspan="3">No results</td>
       </tr>
-      <tr v-else v-for="view in views">
+      <tr v-else v-for="view in views" :key="view.id" @click="router.push({ name: 'view', params: { id: view.id } })">
         <td>{{ view.id }}</td>
         <td><DateTime :timestamp="view.created" /></td>
-        <td><RouterLink :to="{ name: 'view', params: { id: view.id } }">{{ view?.data?.name }}</RouterLink></td>
+        <td>{{ view?.data?.name }}</td>
       </tr>
     </tbody>
   </table>
 </main>
 </template>
+
+<style scoped>
+tr {
+  cursor: pointer;
+}
+</style>
