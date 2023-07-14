@@ -1,10 +1,21 @@
 <script setup lang="ts">
-import type { GridPosition } from '@/data/api';
-import { ref } from 'vue';
+import type { GridPosition, View } from '@/data/api';
 import ChartGraph from './ChartGraph.vue';
 import KeysList from './KeysList.vue';
 
-let busy = ref(false);
+interface Props {
+  view?: View | null,
+  busy: boolean,
+  invalid: boolean,
+}
+
+const props = withDefaults(
+  defineProps<Props>(), {
+    view: null,
+    busy: false,
+    invalid: false,
+  }
+);
 
 function getGridStyle(position?: GridPosition) {
   if (!position) {
@@ -21,7 +32,9 @@ function getGridStyle(position?: GridPosition) {
 <main class="container-fluid">
   <div class="main-grid">
     <KeysList :style="getGridStyle()" />
-    <ChartGraph :loading="busy" />
+    <div class="box">
+      <ChartGraph :loading="busy" />
+    </div>
     <div></div>
     <div></div>
   </div>
@@ -31,8 +44,8 @@ function getGridStyle(position?: GridPosition) {
 <style scoped>
 .main-grid {
   display: grid;
-  grid-template-columns: repeat(20, 1fr);
-  grid-template-rows: repeat(20, 1fr);
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   grid-column-gap: var(--grid-spacing-horizontal);
   grid-row-gap: var(--grid-spacing-vertical);
 }
