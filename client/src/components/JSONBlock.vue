@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+
 
 export type JSONValue =
   | string
@@ -44,16 +46,17 @@ enum JSONType {
 }
 
 interface JSONBranch {
-  type: JSONValue,
+  type: JSONType,
   indent: number,
   name: string | null,
   value: string | number | boolean | null,
   end: number | null,
   hasFollow: boolean,
-  open?: boolean,
+  canOpen?: boolean,
+  isOpen?: boolean,
 };
 
-function addBranch(tree: JSONBranch[], type: JSONValue, indent: number, name: string | null = null,
+function addBranch(tree: JSONBranch[], type: JSONType, indent: number, name: string | null = null,
   value: string | number | boolean | null = null, end: number | null = null ) {
   tree.push({type, indent, name, value, end, hasFollow: false });
 }
@@ -67,7 +70,8 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], tree: JSONB
   addBranch(tree, isArray ? JSONType.ArrayOpen : JSONType.ObjectOpen, indent, null, output);
   let start = tree.length - 1;
 
-  tree[start].open = true;
+  tree[start].canOpen = true;
+  tree[start].isOpen = true;
 
   if(props.inline) {
     output += ' ';
@@ -96,15 +100,15 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], tree: JSONB
     switch(type) {
       case 'string':
         rvalue = `<u>"${value}"</u>`;
-        addBranch(tree, type, indent + 1, treeName, value as string);
+        addBranch(tree, JSONType.String, indent + 1, treeName, value as string);
         break;
       case 'number':
         rvalue = `<i>${value}</i>`;
-        addBranch(tree, type, indent + 1, treeName, value as number);
+        addBranch(tree, JSONType.Number, indent + 1, treeName, value as number);
         break;
       case 'boolean':
         rvalue = `<strong><i>${value}</i></strong>`;
-        addBranch(tree, type, indent + 1, treeName, value as boolean);
+        addBranch(tree, JSONType.Boolean, indent + 1, treeName, value as boolean);
         break;
       case 'array':
         rvalue = getObject(value as JSONValue[], tree, indent + 1, space);
@@ -116,7 +120,7 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], tree: JSONB
         break;
       default:
         rvalue = `"${value}"`;
-        addBranch(tree, 'string', indent + 1, treeName, value as string);
+        addBranch(tree, JSONType.String, indent + 1, treeName, value as string);
         break;
     }
 
@@ -144,13 +148,29 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], tree: JSONB
 
 const jsonTree: JSONBranch[] = [];
 const json: string | null = props.json ? getObject(props.json, jsonTree) : null;
+
+if(jsonTree.length > 0) {
+  jsonTree[0].canOpen = false;
+}
+
+let codeTree = ref<JSONBranch[]>(jsonTree);
+
+function clickBranch(index: number) {
+  codeTree.value[index].isOpen = !codeTree.value[index].isOpen;
+}
+//
 </script>
 
 <template>
 <section v-if="json" :class="{ inline: props.inline }">
-  <code class="tree">
-    <div class="treeitem" v-for="(line, index) in jsonTree" v-bind:key="index" :class="{ 'is-open': line.open }" :style="{ 'margin-left': (line.indent * 2) + 'ch' }">
-      <span class="name" v-if="line.name !== null">"<b>{{ line.name }}"</b>: </span>
+  <pre v-if="props.inline"><code v-html="json"></code></pre>
+  <code class="tree" v-else>
+    <div class="treeitem"
+      v-for="(line, index) in codeTree" v-bind:key="index"
+      :class="{ 'can-open': line.canOpen, 'is-open': line.isOpen }"
+      :style="{ 'margin-left': ((line.indent - (line.canOpen ? 1 : 0)) * 2 * 14) + 'px' }"
+      @click="clickBranch(index)">
+      <span class="name" v-if="line.name !== null" :style="{ 'padding-left': line.canOpen ? '1ch' : 0 }">"<b>{{ line.name }}"</b>: </span>
       <template v-if="line.value !== null">
         <span class="value" v-if="line.type === JSONType.String"><u>"{{ line.value }}"</u></span>
         <span class="value" v-else-if="line.type === JSONType.Number"><i>{{ line.value }}</i></span>
@@ -160,7 +180,6 @@ const json: string | null = props.json ? getObject(props.json, jsonTree) : null;
       <span class="follow" v-if="line.hasFollow">,</span>
     </div>
   </code>
-  <!--<pre><code v-html="json"></code></pre>-->
 </section>
 </template>
 
@@ -210,7 +229,19 @@ section.inline > pre > code {
   */
 }
 
-.is-open {
-  font-weight: bold;
+.can-open {
+  cursor: pointer;
+}
+
+.can-open:before {
+  content: "▸";
+}
+
+.can-open.is-open:before {
+  content: "▾";
+}
+
+.treeitem > span {
+  display: inline-block;
 }
 </style>

@@ -1,14 +1,13 @@
 <script setup lang="ts">
-// import { getSettings } from '@/data/settings';
+import { computed } from 'vue';
 
 interface Props {
   timestamp: number,
 }
 
 const props = defineProps<Props>();
-// const settings = getSettings();
 
-function datetime() {
+const datetime = computed(() => {
   const date = new Date(props.timestamp * 1000);
   const options: Intl.DateTimeFormatOptions = {
     dateStyle: 'medium',
@@ -16,9 +15,9 @@ function datetime() {
   };
 
   return Intl.DateTimeFormat(navigator.language, options).format(date);
-}
+});
 </script>
 
 <template>
-<span>{{ datetime() }}</span>
+<span>{{ datetime }}</span>
 </template>
