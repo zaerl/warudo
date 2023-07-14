@@ -227,7 +227,7 @@ int warudo_get_keys(warudo *config) {
             FCGX_PutS(",", config->request.out);
         }
 
-        FCGX_FPrintF(config->request.out, "{\"name\":\"%s\",\"count\":%lld}", key_name, key_count);
+        FCGX_FPrintF(config->request.out, "{\"name\":\"%s\",\"value\":%lld}", key_name, key_count);
         ++count;
     }
 

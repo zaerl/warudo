@@ -45,6 +45,11 @@ export interface View {
   };
 }
 
+export interface Key {
+  name: string,
+  value: number,
+}
+
 export async function getData<T>(
   type: GetDataType = 'entries',
   search: SearchBarParams = {}

@@ -1,53 +1,55 @@
-<script setup lang="ts">
-import { PieChart } from 'echarts/charts';
-import { LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components';
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
+<script setup lang='ts'>
+import type { ECOption } from '@/charts';
 import { ref } from 'vue';
 import VChart from 'vue-echarts';
 
-use([
-  CanvasRenderer,
-  PieChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent
-]);
+interface Props {
+  title: string,
+  legend: boolean,
+}
 
-// provide(THEME_KEY, 'dark');
+const props = withDefaults(
+  defineProps<Props>(), {
+    title: 'Test',
+    busy: false,
+    invalid: false,
+    legend: true,
+  }
+);
 
-const option = ref({
+const option = ref<ECOption>({
   title: {
-    text: "Traffic Sources",
-    left: "center"
+    text: props.title,
+    left: 'center'
   },
   tooltip: {
-    trigger: "item",
-    formatter: "{a} <br/>{b} : {c} ({d}%)"
+    trigger: 'item',
+    formatter: '{a} <br/>{b} : {c} ({d}%)'
   },
   legend: {
-    orient: "vertical",
-    left: "left",
-    data: ["Direct", "Email", "Ad Networks", "Video Ads", "Search Engines"]
+    show: props.legend,
+    orient: 'vertical',
+    left: 'left',
+    data: ['Direct', 'Email', 'Ad Networks', 'Video Ads', 'Search Engines']
   },
   series: [
     {
-      name: "Traffic Sources",
-      type: "pie",
-      radius: "55%",
-      center: ["50%", "60%"],
+      name: 'Traffic Sources',
+      type: 'pie',
+      radius: '55%',
+      center: props.title !== '' || props.legend ? ['50%', '60%'] : ['50%', '50%'],
       data: [
-        { value: 335, name: "Direct" },
-        { value: 310, name: "Email" },
-        { value: 234, name: "Ad Networks" },
-        { value: 135, name: "Video Ads" },
-        { value: 1548, name: "Search Engines" }
+        { value: 335, name: 'Direct' },
+        { value: 310, name: 'Email' },
+        { value: 234, name: 'Ad Networks' },
+        { value: 135, name: 'Video Ads' },
+        { value: 1548, name: 'Search Engines' }
       ],
       emphasis: {
         itemStyle: {
           shadowBlur: 10,
           shadowOffsetX: 0,
-          shadowColor: "rgba(0, 0, 0, 0.5)"
+          shadowColor: 'rgba(0, 0, 0, 0.5)'
         }
       }
     }
@@ -56,7 +58,7 @@ const option = ref({
 </script>
 
 <template>
-<v-chart class="chart" :option="option" autoresize />
+<v-chart class='chart' :option='option' :loading='props.busy' autoresize />
 </template>
 
 <style scoped>

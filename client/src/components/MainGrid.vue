@@ -33,7 +33,7 @@ function getGridStyle(position?: GridPosition) {
   <div class="main-grid">
     <KeysList :style="getGridStyle()" />
     <div class="box">
-      <ChartGraph :loading="busy" />
+      <ChartGraph />
     </div>
     <div></div>
     <div></div>
@@ -44,8 +44,8 @@ function getGridStyle(position?: GridPosition) {
 <style scoped>
 .main-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
   grid-column-gap: var(--grid-spacing-horizontal);
   grid-row-gap: var(--grid-spacing-vertical);
 }
