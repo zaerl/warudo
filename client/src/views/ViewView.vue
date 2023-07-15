@@ -25,7 +25,6 @@ onMounted(async () => {
   busy.value = false;
   invalid.value = entry.value === null;
 });
-
 </script>
 
 <template>

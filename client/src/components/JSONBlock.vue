@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-
 export type JSONValue =
   | string
   | number
@@ -12,12 +11,14 @@ export type JSONValue =
 interface Props {
   json: { [x: string]: JSONValue } | null,
   inline: boolean,
+  spaces: number,
 }
 
 const props = withDefaults(
   defineProps<Props>(), {
     inline: false,
     json: null,
+    spaces: 2,
   }
 );
 
@@ -158,6 +159,34 @@ let codeTree = ref<JSONBranch[]>(jsonTree);
 function clickBranch(index: number) {
   codeTree.value[index].isOpen = !codeTree.value[index].isOpen;
 }
+
+function itemStyle(item: JSONBranch) {
+  let indent = item.indent * props.spaces;
+
+  if(item.canOpen) {
+    --indent;
+  }
+
+  indent *= 14;
+
+  return {
+    'margin-left': indent + 'px',
+  };
+}
+
+function itemClasses(item: JSONBranch) {
+  return {
+    'can-open': item.canOpen,
+    'is-open': item.isOpen,
+  };
+}
+
+function itemNameStyle(item: JSONBranch) {
+  return {
+    'padding-left': item.canOpen ? '5px' : 0
+  };
+}
+
 //
 </script>
 
@@ -167,10 +196,11 @@ function clickBranch(index: number) {
   <code class="tree" v-else>
     <div class="treeitem"
       v-for="(line, index) in codeTree" v-bind:key="index"
-      :class="{ 'can-open': line.canOpen, 'is-open': line.isOpen }"
-      :style="{ 'margin-left': ((line.indent - (line.canOpen ? 1 : 0)) * 2 * 14) + 'px' }"
+      :class="itemClasses(line)"
+      :style="itemStyle(line)"
       @click="clickBranch(index)">
-      <span class="name" v-if="line.name !== null" :style="{ 'padding-left': line.canOpen ? '1ch' : 0 }">"<b>{{ line.name }}"</b>: </span>
+      <span class="tree-expand"></span>
+      <span class="name" v-if="line.name !== null" :style="itemNameStyle(line)">"<b>{{ line.name }}"</b>: </span>
       <template v-if="line.value !== null">
         <span class="value" v-if="line.type === JSONType.String"><u>"{{ line.value }}"</u></span>
         <span class="value" v-else-if="line.type === JSONType.Number"><i>{{ line.value }}</i></span>
@@ -229,19 +259,38 @@ section.inline > pre > code {
   */
 }
 
+.tree .value {
+  padding-left: 7px;
+}
+
 .can-open {
   cursor: pointer;
 }
 
-.can-open:before {
+/*.can-open.is-open > .tree-expand:before {
+  content: "▾";
+}*/
+
+.name, .value {
+  display: inline-block;
+}
+
+.tree-expand {
+  display: none;
+  transform: rotate(0);
+  transition: 0.3s ease-in-out,-webkit-transform .3s ease-in-out;
+}
+
+.can-open .tree-expand {
+  display: inline-block;
+}
+
+.is-open .tree-expand {
+  transform: rotate(90deg);
+}
+
+.tree-expand:before {
   content: "▸";
 }
 
-.can-open.is-open:before {
-  content: "▾";
-}
-
-.treeitem > span {
-  display: inline-block;
-}
 </style>
