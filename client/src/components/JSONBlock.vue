@@ -232,8 +232,8 @@ function itemNameStyle(item: JSONBranch) {
 
 <template>
 <section v-if="json" :class="{ inline: props.inline }">
-  <pre><code v-html="json"></code></pre>
-  <code class="tree">
+  <pre v-if="props.inline"><code v-html="json"></code></pre>
+  <code v-else class="tree">
     <div class="treeitem"
       v-for="(item, index) in codeTree" v-bind:key="index"
       :class="itemClasses(item)"
