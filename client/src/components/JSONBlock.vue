@@ -50,16 +50,18 @@ interface JSONBranch {
   type: JSONType,
   indent: number,
   name: string | null,
+  rvalue: string | number | boolean | null,
   value: string | number | boolean | null,
   end: number | null,
   hasFollow: boolean,
-  canOpen?: boolean,
-  isOpen?: boolean,
+  isParent?: boolean,
+  isClosed?: boolean,
+  hideLevel: number | null,
 };
 
 function addBranch(tree: JSONBranch[], type: JSONType, indent: number, name: string | null = null,
   value: string | number | boolean | null = null, end: number | null = null ) {
-  tree.push({type, indent, name, value, end, hasFollow: false });
+  tree.push({type, indent, name, rvalue: null, value, end, hasFollow: false, isClosed: false, hideLevel: null });
 }
 
 function getObject(object: { [x: string]: JSONValue } | JSONValue[], tree: JSONBranch[], indent = 0, space = 2): string {
@@ -71,8 +73,9 @@ function getObject(object: { [x: string]: JSONValue } | JSONValue[], tree: JSONB
   addBranch(tree, isArray ? JSONType.ArrayOpen : JSONType.ObjectOpen, indent, null, output);
   let start = tree.length - 1;
 
-  tree[start].canOpen = true;
-  tree[start].isOpen = true;
+  tree[start].isParent = true;
+  tree[start].rvalue = isArray ? ']' : '}';
+  // tree[start].isClosed = true;
 
   if(props.inline) {
     output += ' ';
@@ -151,39 +154,76 @@ const jsonTree: JSONBranch[] = [];
 const json: string | null = props.json ? getObject(props.json, jsonTree) : null;
 
 if(jsonTree.length > 0) {
-  jsonTree[0].canOpen = false;
+  jsonTree[0].isParent = false;
 }
 
 let codeTree = ref<JSONBranch[]>(jsonTree);
 
 function clickBranch(index: number) {
-  codeTree.value[index].isOpen = !codeTree.value[index].isOpen;
+  if(!codeTree.value[index].isParent) {
+    return;
+  }
+
+  const parent = codeTree.value[index];
+  const isClosed = parent.isClosed;
+
+  if(index + 1 >= codeTree.value.length) {
+    return;
+  }
+
+  parent.isClosed = !isClosed;
+
+  if(isClosed) {
+    // Open all children.
+    for(let i = index + 1; i < (parent.end as number); ++i) {
+      if(codeTree.value[i].hideLevel === parent.indent + 1) {
+        codeTree.value[i].hideLevel = null;
+      }
+    }
+
+    if(codeTree.value[parent.end as number].hideLevel === parent.indent) {
+      codeTree.value[parent.end as number].hideLevel = null;
+    }
+  } else {
+    // Close all children.
+    for(let i = index + 1; i <= (parent.end as number); ++i) {
+      if(codeTree.value[i].hideLevel === null) {
+        codeTree.value[i].hideLevel = i === parent.end ? parent.indent : parent.indent + 1; // codeTree.value[i].indent;
+      }
+    }
+  }
 }
 
 function itemStyle(item: JSONBranch) {
-  let indent = item.indent * props.spaces;
+  let indent = item.indent;
 
-  if(item.canOpen) {
-    --indent;
+  if(item.isParent) {
+    indent -= 1;
   }
 
-  indent *= 14;
+  indent *= props.spaces;
 
   return {
-    'margin-left': indent + 'px',
+    'margin-left': indent + 'em',
   };
 }
 
 function itemClasses(item: JSONBranch) {
-  return {
-    'can-open': item.canOpen,
-    'is-open': item.isOpen,
+  const classes: { [name: string]: boolean | number } = {
+    'is-child': !item.isParent,
+    'is-parent': item.isParent as boolean,
+    'is-closed': item.isClosed as boolean,
+    'is-hidden': item.hideLevel !== null && item.indent >= item.hideLevel,
   };
+
+  classes[`level-${item.indent}`] = true;
+
+  return classes;
 }
 
 function itemNameStyle(item: JSONBranch) {
   return {
-    'padding-left': item.canOpen ? '5px' : 0
+    'padding-left': item.isParent ? '6px' : 0
   };
 }
 
@@ -192,22 +232,23 @@ function itemNameStyle(item: JSONBranch) {
 
 <template>
 <section v-if="json" :class="{ inline: props.inline }">
-  <pre v-if="props.inline"><code v-html="json"></code></pre>
-  <code class="tree" v-else>
+  <pre><code v-html="json"></code></pre>
+  <code class="tree">
     <div class="treeitem"
-      v-for="(line, index) in codeTree" v-bind:key="index"
-      :class="itemClasses(line)"
-      :style="itemStyle(line)"
+      v-for="(item, index) in codeTree" v-bind:key="index"
+      :class="itemClasses(item)"
+      :style="itemStyle(item)"
       @click="clickBranch(index)">
-      <span class="tree-expand"></span>
-      <span class="name" v-if="line.name !== null" :style="itemNameStyle(line)">"<b>{{ line.name }}"</b>: </span>
-      <template v-if="line.value !== null">
-        <span class="value" v-if="line.type === JSONType.String"><u>"{{ line.value }}"</u></span>
-        <span class="value" v-else-if="line.type === JSONType.Number"><i>{{ line.value }}</i></span>
-        <span class="value" v-else-if="line.type === JSONType.Boolean"><strong><i>{{ line.value }}</i></strong></span>
-        <span class="value" v-else>{{ line.value }}</span>
+      <!--<span class="tree-expand"></span>-->
+      <span class="name" v-if="item.name !== null" :style="itemNameStyle(item)">"<b>{{ item.name }}</b>: </span>
+      <template v-if="item.value !== null">
+        <span class="value" v-if="item.type === JSONType.String"><u>"{{ item.value }}"</u></span>
+        <span class="value" v-else-if="item.type === JSONType.Number"><i>{{ item.value }}</i></span>
+        <span class="value" v-else-if="item.type === JSONType.Boolean"><strong><i>{{ item.value }}</i></strong></span>
+        <span class="value" v-else>{{ item.value }}</span>
+        <span v-if="item.isParent" class="hellip"><em>&nbsp;&hellip;&nbsp;</em>{{ item.rvalue }}</span>
       </template>
-      <span class="follow" v-if="line.hasFollow">,</span>
+      <span class="follow" v-if="item.hasFollow">,</span>
     </div>
   </code>
 </section>
@@ -259,15 +300,7 @@ section.inline > pre > code {
   */
 }
 
-.tree .value {
-  padding-left: 7px;
-}
-
-.can-open {
-  cursor: pointer;
-}
-
-/*.can-open.is-open > .tree-expand:before {
+/*.is-parent.is-closed > .tree-expand:before {
   content: "▾";
 }*/
 
@@ -275,22 +308,61 @@ section.inline > pre > code {
   display: inline-block;
 }
 
-.tree-expand {
+.treeitem .value {
+  padding-left: 7px;
+}
+
+.treeitem.level-0 .value {
+  padding-left: 0;
+}
+
+.treeitem {
+  display: block;
+}
+
+.treeitem.is-hidden {
   display: none;
-  transform: rotate(0);
+}
+
+.is-parent {
+  cursor: pointer;
+}
+.is-parent::before {
+  background-image: var(--icon-chevron);
+  content: "";
+  width: 21px;
+  height: 21px;
+  display: block;
+  float: left;
+  color: var(--code-color);
+  /*-webkit-margin-start: calc(var(--spacing, 1rem) * 0.5);
+  margin-inline-start: calc(var(--spacing, 1rem) * 0.5);
+  margin-left: 3px;*/
+  background-position: right center;
+  background-size: 21px auto;
+  background-repeat: no-repeat;
   transition: 0.3s ease-in-out,-webkit-transform .3s ease-in-out;
 }
 
-.can-open .tree-expand {
+.is-parent.is-closed::before {
+  transform: rotate(-90deg);
+}
+
+.is-parent::before {
+  -webkit-transform: rotate(0);
+  transform: rotate(0);
+}
+
+.is-child.is-closed {
+  display: none;
+}
+
+.hellip {
+  display: none;
+}
+
+.is-closed .hellip {
   display: inline-block;
-}
-
-.is-open .tree-expand {
-  transform: rotate(90deg);
-}
-
-.tree-expand:before {
-  content: "▸";
 }
 
 </style>
