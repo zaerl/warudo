@@ -73,6 +73,8 @@ int warudo_init(const char *filename, warudo **config) {
     pdb->query_limit = 0;
     pdb->query_key = NULL;
     pdb->query_value = NULL;
+    pdb->query_orderby = NULL;
+    pdb->query_sort = NULL;
 
     // Environment variables
     char* access_origin = getenv("WARUDO_CORS");
@@ -111,6 +113,8 @@ int warudo_parse_query_string(char* query_string, warudo* config) {
                 else ZA_GET_QUERY_INT_VALUE(parameter, multi, value, length_1)
                 else ZA_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
                 else ZA_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
+                else ZA_GET_QUERY_STRING_VALUE(parameter, orderby, value, length_1)
+                else ZA_GET_QUERY_STRING_VALUE(parameter, sort, value, length_1)
             }
         }
 
@@ -134,6 +138,8 @@ int warudo_accept_connection(warudo *config) {
     ZA_FREE_QUERY_ULLINT_VALUE(multi, WARUDO_DEFAULT_QUERY_MULTI)
     ZA_FREE_QUERY_STRING_VALUE(key)
     ZA_FREE_QUERY_STRING_VALUE(value)
+    ZA_FREE_QUERY_STRING_VALUE(orderby)
+    ZA_FREE_QUERY_STRING_VALUE(sort)
 
     int accepted = FCGX_Accept_r(&config->request);
 

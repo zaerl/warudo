@@ -1,10 +1,15 @@
 export type GetDataType = 'keys' | 'entries' | 'dashboards'
 
+export type OrderBy = 'id' | 'created' | 'modified' | null;
+export type Sort = 'asc' | 'desc' | null;
+
 export interface SearchBarParams {
   id?: number;
   limit?: number;
   key?: string;
   value?: string;
+  orderby?: OrderBy;
+  sort?: Sort;
 }
 
 export enum ViewItemTypes {
@@ -59,7 +64,7 @@ export async function getData<T>(
   const params = new URLSearchParams(search as unknown as Record<string, string>);
 
   try {
-    const response = await fetch(`http://localhost:6252/app/${type}?${params}`);console.log(response);
+    const response = await fetch(`http://localhost:6252/app/${type}?${params}`);
 
     if (!response.ok) {
       throw new Error('Network response was not ok');

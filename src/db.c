@@ -7,9 +7,11 @@
 
 #define WARUDO_DB_RET_CALL(CALL, RET) \
     if(CALL != RET) { \
-    fprintf(stderr, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
-    sqlite3_finalize(stmt); \
-    return WARUDO_DB_ERROR; } \
+        fprintf(stderr, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
+        sqlite3_finalize(stmt); \
+        if(must_free) sqlite3_free((void*)query); \
+        return WARUDO_DB_ERROR; \
+    } \
 
 #define WARUDO_DB_CALL(CALL) WARUDO_DB_RET_CALL(CALL, SQLITE_OK)
 
@@ -50,10 +52,11 @@ int warudo_db_init(const char *filename, warudo* config) {
 }
 
 int warudo_load_columns(warudo* config) {
-    const char* table_info_sql = "PRAGMA table_info('" WARUDO_ENTRIES_TABLE "');";
+    int must_free = 0;
+    char* query = "PRAGMA table_info('" WARUDO_ENTRIES_TABLE "');";
     sqlite3_stmt* stmt;
 
-    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, table_info_sql, -1, &stmt, NULL));
+    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
     fprintf(stderr, "Column names for table '%s':\n", WARUDO_ENTRIES_TABLE);
 
@@ -77,7 +80,8 @@ int warudo_load_columns(warudo* config) {
 
 int warudo_add_entry(int entry_type, warudo *config) {
     sqlite3_stmt* stmt;
-    const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
+    int must_free = 0;
+    char* query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
         "INSERT INTO dashboards(data) VALUES(json(?));";
 
     long int length = warudo_content_length(config);
@@ -92,7 +96,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
         return WARUDO_READ_ERROR;
     }
 
-    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
+    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
     WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
     WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
@@ -104,7 +108,8 @@ int warudo_add_entry(int entry_type, warudo *config) {
 
 int warudo_add_entries(int entry_type, warudo *config) {
     sqlite3_stmt* stmt;
-    const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
+    int must_free = 0;
+    char* query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
         "INSERT INTO dashboards(data) VALUES(json(?));";
 
     long int length = warudo_content_length(config);
@@ -119,7 +124,7 @@ int warudo_add_entries(int entry_type, warudo *config) {
         return WARUDO_READ_ERROR;
     }
 
-    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, sql, -1, &stmt, NULL));
+    WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
     WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
     WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
@@ -130,7 +135,8 @@ int warudo_add_entries(int entry_type, warudo *config) {
 }
 
 int warudo_get_entries(int entry_type, warudo *config) {
-    const char *query;
+    int must_free = 0;
+    char *query;
     sqlite3_stmt *stmt;
     int rc;
     int count = 0;
@@ -138,16 +144,21 @@ int warudo_get_entries(int entry_type, warudo *config) {
     int has_search = !config->query_id && config->query_key != NULL && config->query_value != NULL;
 
     if(has_search) {
-        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries WHERE data ->> ? = ? LIMIT ? OFFSET ?;" :
-            "SELECT id, created, modified, data FROM dashboards WHERE data ->> ? = ? LIMIT ? OFFSET ?;";
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries WHERE data ->> ? = ? ORDER BY %q %q LIMIT ? OFFSET ?;" :
+            "SELECT id, created, modified, data FROM dashboards WHERE data ->> ? = ? ORDER BY %q %q LIMIT ? OFFSET ?;";
         limit_index = 3;
     } else if(config->query_id) {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries WHERE id = ?;" :
             "SELECT id, created, modified, data FROM dashboards WHERE id= ?;";
     } else {
-        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries LIMIT ? OFFSET ?;" :
-            "SELECT id, created, modified, data FROM dashboards LIMIT ? OFFSET ?;";
+        query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries ORDER BY %q %q LIMIT ? OFFSET ?;" :
+            "SELECT id, created, modified, data FROM dashboards ORDER BY %q %q LIMIT ? OFFSET ?;";
         limit_index = 1;
+    }
+
+    if(limit_index) {
+        query = sqlite3_mprintf(query, config->query_orderby ? config->query_orderby : "id", config->query_sort ? config->query_sort : "ASC");
+        must_free = 1;
     }
 
     WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
@@ -199,13 +210,19 @@ int warudo_get_entries(int entry_type, warudo *config) {
     }
 
     FCGX_PutS("]", config->request.out);
+
     sqlite3_finalize(stmt);
+
+    if(must_free) {
+        sqlite3_free(query);
+    }
 
     return WARUDO_OK;
 }
 
 int warudo_get_keys(warudo *config) {
-    const char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WARUDO_ENTRIES_TABLE ", json_tree(data) GROUP BY key;";
+    int must_free = 0;
+    char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WARUDO_ENTRIES_TABLE ", json_tree(data) GROUP BY key;";
     int rc;
     int count = 0;
     sqlite3_stmt *stmt;

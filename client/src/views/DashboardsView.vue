@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import DateTime from '@/components/DateTime.vue';
+import TableHeaderState, { type TableHeader } from '@/components/TableHeaderState.vue';
 import TableRowState from '@/components/TableRowState.vue';
-import { getData, type Dashboard } from '@/data/api';
+import { getData, type Dashboard, type OrderBy, type Sort } from '@/data/api';
 import router from '@/router';
 import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
@@ -10,12 +11,27 @@ let dashboards = ref<Dashboard[] | null>([]);
 let busy = ref(true);
 let invalid = ref(false);
 let search = ref('');
+let orderBy = ref<OrderBy>(null);
+let sort = ref<Sort>(null);
+let headers = ref<TableHeader[]>([
+  {
+    key: 'id',
+    name: '#',
+  },
+  {
+    key: 'created',
+    name: 'Created',
+  },
+  {
+    key: 'data',
+    name: 'Data',
+  },
+]);
 
 async function fetchData() {
   busy.value = true;
   const query = search.value !== '' ? { key: 'any', value: search.value } : undefined;
   dashboards.value = await getData<Dashboard[]>('dashboards', query );
-  console.log(dashboards.value);
   busy.value = false;
   invalid.value = dashboards.value === null;
 }
@@ -26,13 +42,7 @@ fetchData();
 <template>
 <main class="container">
   <table>
-    <thead>
-      <tr>
-        <td>#</td>
-        <td>Created</td>
-        <td>Name</td>
-      </tr>
-    </thead>
+    <TableHeaderState :headers="headers" :sort="sort" :order-by="orderBy" />
     <tbody>
       <TableRowState :busy="busy" :invalid="invalid" :count="dashboards?.length ?? 0" :columns="3" />
       <tr v-for="dashboard in dashboards" :key="dashboard.id" @click="router.push({ name: 'dashboard', params: { id: dashboard.id } })">

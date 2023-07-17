@@ -109,6 +109,8 @@ struct warudo {
     ZA_QUERY_VALUE(unsigned int, multi)
     ZA_QUERY_VALUE(const char*, key)
     ZA_QUERY_VALUE(const char*, value)
+    ZA_QUERY_VALUE(const char*, orderby)
+    ZA_QUERY_VALUE(const char*, sort)
 };
 
 typedef struct warudo warudo;
