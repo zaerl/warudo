@@ -53,7 +53,7 @@ export interface Key {
 }
 
 export async function getData<T>(
-  type: GetDataType = 'entries',
+  type: GetDataType,
   search: SearchBarParams = {}
 ): Promise<T | null> {
   const params = new URLSearchParams(search as unknown as Record<string, string>);

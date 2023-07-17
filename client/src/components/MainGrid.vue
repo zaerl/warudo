@@ -32,7 +32,9 @@ function getGridStyle() {
 <template>
 <main class="container-fluid">
   <div class="grid" :style="getGridStyle()">
-    <KeysList />
+    <div>
+      <KeysList :type="'keys'" />
+    </div>
     <div class="box">
       <ChartGraph />
     </div>
