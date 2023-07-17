@@ -56,12 +56,12 @@ interface JSONBranch {
   hasFollow: boolean,
   isParent?: boolean,
   isClosed?: boolean,
-  hideLevel: number | null,
+  hiddenBy: number | null,
 };
 
 function addBranch(tree: JSONBranch[], type: JSONType, indent: number, name: string | null = null,
   value: string | number | boolean | null = null, end: number | null = null ) {
-  tree.push({type, indent, name, rvalue: null, value, end, hasFollow: false, isClosed: false, hideLevel: null });
+  tree.push({type, indent, name, rvalue: null, value, end, hasFollow: false, isClosed: false, hiddenBy: null });
 }
 
 function getObject(object: { [x: string]: JSONValue } | JSONValue[], tree: JSONBranch[], indent = 0, space = 2): string {
@@ -175,20 +175,20 @@ function clickBranch(index: number) {
 
   if(isClosed) {
     // Open all children.
-    for(let i = index + 1; i < (parent.end as number); ++i) {
-      if(codeTree.value[i].hideLevel === parent.indent + 1) {
-        codeTree.value[i].hideLevel = null;
+    for(let i = index + 1; i <= (parent.end as number); ++i) {
+      if(codeTree.value[i].hiddenBy === index) {
+        codeTree.value[i].hiddenBy = null;
       }
-    }
+    }/*
 
     if(codeTree.value[parent.end as number].hideLevel === parent.indent) {
       codeTree.value[parent.end as number].hideLevel = null;
-    }
+    }*/
   } else {
     // Close all children.
     for(let i = index + 1; i <= (parent.end as number); ++i) {
-      if(codeTree.value[i].hideLevel === null) {
-        codeTree.value[i].hideLevel = i === parent.end ? parent.indent : parent.indent + 1; // codeTree.value[i].indent;
+      if(codeTree.value[i].hiddenBy === null) {
+        codeTree.value[i].hiddenBy = index;
       }
     }
   }
@@ -213,7 +213,7 @@ function itemClasses(item: JSONBranch) {
     'is-child': !item.isParent,
     'is-parent': item.isParent as boolean,
     'is-closed': item.isClosed as boolean,
-    'is-hidden': item.hideLevel !== null && item.indent >= item.hideLevel,
+    'is-hidden': item.hiddenBy !== null,
   };
 
   classes[`level-${item.indent}`] = true;
