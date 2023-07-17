@@ -21,7 +21,7 @@ const props = defineProps<Props>();
         <RouterLink to="/">List</RouterLink>
       </li>
       <li>
-        <RouterLink to="/views">Views</RouterLink>
+        <RouterLink to="/dashboards">Dashboards</RouterLink>
       </li>
       <li>
         <RouterLink to="/settings">Settings</RouterLink>

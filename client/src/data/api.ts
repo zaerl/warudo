@@ -1,4 +1,4 @@
-export type GetDataType = 'keys' | 'entries' | 'views'
+export type GetDataType = 'keys' | 'entries' | 'dashboards'
 
 export interface SearchBarParams {
   id?: number;
@@ -33,7 +33,7 @@ export interface Entry {
   data: EntryData;
 }
 
-export interface View {
+export interface Dashboard {
   id: number;
   created: number;
   modified: number;
@@ -59,7 +59,12 @@ export async function getData<T>(
   const params = new URLSearchParams(search as unknown as Record<string, string>);
 
   try {
-    const response = await fetch(`http://localhost:6252/app/${type}?${params}`);
+    const response = await fetch(`http://localhost:6252/app/${type}?${params}`);console.log(response);
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
     const data = await response.json();
 
     return data;

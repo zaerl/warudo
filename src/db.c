@@ -78,7 +78,7 @@ int warudo_load_columns(warudo* config) {
 int warudo_add_entry(int entry_type, warudo *config) {
     sqlite3_stmt* stmt;
     const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
-        "INSERT INTO views(data) VALUES(json(?));";
+        "INSERT INTO dashboards(data) VALUES(json(?));";
 
     long int length = warudo_content_length(config);
 
@@ -105,7 +105,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
 int warudo_add_entries(int entry_type, warudo *config) {
     sqlite3_stmt* stmt;
     const char* sql = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
-        "INSERT INTO views(data) VALUES(json(?));";
+        "INSERT INTO dashboards(data) VALUES(json(?));";
 
     long int length = warudo_content_length(config);
 
@@ -139,14 +139,14 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
     if(has_search) {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries WHERE data ->> ? = ? LIMIT ? OFFSET ?;" :
-            "SELECT id, created, modified, data FROM views WHERE data ->> ? = ? LIMIT ? OFFSET ?;";
+            "SELECT id, created, modified, data FROM dashboards WHERE data ->> ? = ? LIMIT ? OFFSET ?;";
         limit_index = 3;
     } else if(config->query_id) {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries WHERE id = ?;" :
-            "SELECT id, created, modified, data FROM views WHERE id= ?;";
+            "SELECT id, created, modified, data FROM dashboards WHERE id= ?;";
     } else {
         query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "SELECT id, created, data FROM entries LIMIT ? OFFSET ?;" :
-            "SELECT id, created, modified, data FROM views LIMIT ? OFFSET ?;";
+            "SELECT id, created, modified, data FROM dashboards LIMIT ? OFFSET ?;";
         limit_index = 1;
     }
 

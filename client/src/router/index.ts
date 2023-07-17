@@ -1,5 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
-// import EntriesView from '../views/EntriesView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,27 +20,27 @@ const router = createRouter({
       },
     },
     {
-      path: '/views',
-      name: 'views',
-      component: () => import('../views/ViewsView.vue'),
+      path: '/dashboards',
+      name: 'dashboards',
+      component: () => import('../views/DashboardsView.vue'),
       meta: {
-        title: 'Views',
+        title: 'Dashboards',
       },
     },
     {
-      path: '/new-view',
-      name: 'new-view',
-      component: () => import('../views/NewViewView.vue'),
+      path: '/new-dashboard',
+      name: 'new-dashboard',
+      component: () => import('../views/NewDashboardView.vue'),
       meta: {
-        title: 'New View',
+        title: 'New Dashboard',
       },
     },
     {
-      path: '/views/:id',
-      name: 'view',
-      component: () => import('../views/ViewView.vue'),
+      path: '/dashboards/:id',
+      name: 'dashboard',
+      component: () => import('../views/DashboardView.vue'),
       meta: {
-        title: 'View',
+        title: 'Dashboards',
       },
     },
     {
@@ -55,6 +54,9 @@ const router = createRouter({
     {
       path: '/:notFound',
       component: () => import('../views/NotFoundView.vue'),
+      meta: {
+        title: '404 :(',
+      },
     }
   ]
 });

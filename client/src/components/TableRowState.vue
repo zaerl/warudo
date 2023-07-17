@@ -14,7 +14,7 @@ const props = defineProps<Props>();
   <td :colspan="props.columns" :aria-busy="props.busy"></td>
 </tr>
 <tr v-if="invalid">
-  <td :colspan="props.columns" :aria-invalid="props.busy">Can't catch data from server</td>
+  <td class="invalid" :colspan="props.columns" :aria-invalid="props.invalid">Can't catch data from server</td>
 </tr>
 <tr v-if="!props.busy && !props.invalid && !props.count">
   <td class="no-results" :colspan="props.columns">No results</td>
@@ -22,7 +22,7 @@ const props = defineProps<Props>();
 </template>
 
 <style scoped>
-td.no-results {
+td.no-results, td.invalid {
   text-align: center;
 }
 </style>

@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import type { View } from '@/data/api';
+import type { Dashboard } from '@/data/api';
 import ChartGraph from './ChartGraph.vue';
 import KeysList from './KeysList.vue';
 
 interface Props {
-  view?: View | null,
+  dashboard?: Dashboard | null,
   busy: boolean,
   invalid: boolean,
 }
 
 const props = withDefaults(
   defineProps<Props>(), {
-    view: null,
+    dashboard: null,
     busy: false,
     invalid: false,
   }
@@ -20,9 +20,9 @@ const props = withDefaults(
 function getGridStyle() {
   let style: { [name: string]: string } = {};
 
-  if(props.view?.data.templateColumns && props.view?.data.templateRows) {
-    style['grid-template-columns'] = props.view.data.templateColumns;
-    style['grid-template-rows'] = props.view.data.templateRows;
+  if(props.dashboard?.data.templateColumns && props.dashboard?.data.templateRows) {
+    style['grid-template-columns'] = props.dashboard.data.templateColumns;
+    style['grid-template-rows'] = props.dashboard.data.templateRows;
   }
 
   return style;

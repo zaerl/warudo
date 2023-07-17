@@ -155,7 +155,7 @@ int warudo_accept_connection(warudo *config) {
         config->page = WARUDO_PAGE_APP;
     } else if(script_name != NULL && strcmp(script_name, "/app/keys") == 0) {
         config->page = WARUDO_PAGE_APP_KEYS;
-    } else if(script_name != NULL && strcmp(script_name, "/app/views") == 0) {
+    } else if(script_name != NULL && strcmp(script_name, "/app/dashboards") == 0) {
         config->page = WARUDO_PAGE_APP_VIEWS;
     } else {
         config->page = WARUDO_PAGE_NOT_FOUND;
