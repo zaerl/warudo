@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GridPosition, View } from '@/data/api';
+import type { View } from '@/data/api';
 import ChartGraph from './ChartGraph.vue';
 import KeysList from './KeysList.vue';
 
@@ -17,36 +17,34 @@ const props = withDefaults(
   }
 );
 
-function getGridStyle(position?: GridPosition) {
-  if (!position) {
-    return {}
+function getGridStyle() {
+  let style: { [name: string]: string } = {};
+
+  if(props.view?.data.templateColumns && props.view?.data.templateRows) {
+    style['grid-template-columns'] = props.view.data.templateColumns;
+    style['grid-template-rows'] = props.view.data.templateRows;
   }
 
-  return {
-    'grid-area': `${position.rowStart} / ${position.columnStart} | ${position.rowEnd} / ${position.columnEnd}`
-  }
+  return style;
 }
 </script>
 
 <template>
 <main class="container-fluid">
-  <div class="main-grid">
-    <KeysList :style="getGridStyle()" />
+  <div class="grid" :style="getGridStyle()">
+    <KeysList />
     <div class="box">
       <ChartGraph />
     </div>
-    <div></div>
-    <div></div>
   </div>
 </main>
 </template>
 
 <style scoped>
-.main-grid {
+/*.main-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(0%, 1fr));
   grid-column-gap: var(--grid-spacing-horizontal);
   grid-row-gap: var(--grid-spacing-vertical);
-}
+}*/
 </style>

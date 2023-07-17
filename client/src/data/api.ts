@@ -39,6 +39,8 @@ export interface View {
   modified: number;
   data: {
     name: string;
+    templateColumns: string;
+    templateRows: string;
     rows: number;
     columns: number;
     items: ViewItem[];

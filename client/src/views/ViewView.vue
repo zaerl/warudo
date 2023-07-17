@@ -24,6 +24,7 @@ onMounted(async () => {
 
   busy.value = false;
   invalid.value = entry.value === null;
+  document.title = route.meta.title + ' - ' + entry.value?.data.name;
 });
 </script>
 

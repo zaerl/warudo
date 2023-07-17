@@ -3,6 +3,7 @@ import DateTime from '@/components/DateTime.vue';
 import { getData, type View } from '@/data/api';
 import router from '@/router';
 import { onMounted, ref } from 'vue';
+import { RouterLink } from 'vue-router';
 
 let views = ref<View[] | null>([]);
 let busy = ref(true);
@@ -31,7 +32,7 @@ onMounted(async () => {
         <td colspan="3">Can't catch data from server</td>
       </tr>
       <tr v-else-if="!views.length">
-        <td colspan="3">No results</td>
+        <td colspan="3">No results.</td>
       </tr>
       <tr v-else v-for="view in views" :key="view.id" @click="router.push({ name: 'view', params: { id: view.id } })">
         <td>{{ view.id }}</td>
@@ -40,6 +41,9 @@ onMounted(async () => {
       </tr>
     </tbody>
   </table>
+  <div>
+    <RouterLink to="/new-view" role="button" class="outline">Create a new view</RouterLink>
+  </div>
 </main>
 </template>
 

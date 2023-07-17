@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import router from '@/router';
 import { RouterLink } from 'vue-router';
 
 interface Props {
@@ -14,7 +13,7 @@ const props = defineProps<Props>();
   <nav>
     <ul>
       <li class="main-title">
-        <span @click="router.push({ name: 'entries' })">{{ props.name }}</span>
+        <RouterLink to="/">{{ props.name }}</RouterLink>
       </li>
     </ul>
     <ul>
