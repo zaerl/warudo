@@ -1,25 +1,29 @@
 <script setup lang="ts">
 import DateTime from '@/components/DateTime.vue';
+import TableRowState from '@/components/TableRowState.vue';
 import { getData, type View } from '@/data/api';
 import router from '@/router';
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 
 let views = ref<View[] | null>([]);
 let busy = ref(true);
 let invalid = ref(false);
+let search = ref('');
 
-onMounted(async () => {
-  views.value = await getData<View[]>('views');
-
+async function fetchData() {
+  busy.value = true;
+  const query = search.value !== '' ? { key: 'any', value: search.value } : undefined;
+  views.value = await getData<View[]>('views', query );
   busy.value = false;
-  invalid.value = views.value === null;
-});
+}
+
+fetchData();
 </script>
 
 <template>
 <main class="container">
-  <table :aria-busy="busy" :aria-invalid="invalid">
+  <table>
     <thead>
       <tr>
         <td>#</td>
@@ -28,13 +32,8 @@ onMounted(async () => {
       </tr>
     </thead>
     <tbody>
-      <tr v-if="invalid || !views">
-        <td colspan="3">Can't catch data from server</td>
-      </tr>
-      <tr v-else-if="!views.length">
-        <td colspan="3">No results.</td>
-      </tr>
-      <tr v-else v-for="view in views" :key="view.id" @click="router.push({ name: 'view', params: { id: view.id } })">
+      <TableRowState :busy="busy" :invalid="invalid" :count="views?.length ?? 0" :columns="3" />
+      <tr v-for="view in views" :key="view.id" @click="router.push({ name: 'view', params: { id: view.id } })">
         <td>{{ view.id }}</td>
         <td><DateTime :timestamp="view.created" /></td>
         <td>{{ view?.data?.name }}</td>
