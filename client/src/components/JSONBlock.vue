@@ -179,11 +179,7 @@ function clickBranch(index: number) {
       if(codeTree.value[i].hiddenBy === index) {
         codeTree.value[i].hiddenBy = null;
       }
-    }/*
-
-    if(codeTree.value[parent.end as number].hideLevel === parent.indent) {
-      codeTree.value[parent.end as number].hideLevel = null;
-    }*/
+    }
   } else {
     // Close all children.
     for(let i = index + 1; i <= (parent.end as number); ++i) {
@@ -239,7 +235,6 @@ function itemNameStyle(item: JSONBranch) {
       :class="itemClasses(item)"
       :style="itemStyle(item)"
       @click="clickBranch(index)">
-      <!--<span class="tree-expand"></span>-->
       <span class="name" v-if="item.name !== null" :style="itemNameStyle(item)">"<b>{{ item.name }}</b>: </span>
       <template v-if="item.value !== null">
         <span class="value" v-if="item.type === JSONType.String"><u>"{{ item.value }}"</u></span>
