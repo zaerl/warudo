@@ -12,6 +12,7 @@ export type ECOption = ComposeOption<
   TooltipComponentOption
 >;
 
+
 export function initCharts() {
   use([
     CanvasRenderer,
@@ -21,5 +22,3 @@ export function initCharts() {
     TooltipComponent,
   ]);
 }
-
-// provide(THEME_KEY, 'dark');

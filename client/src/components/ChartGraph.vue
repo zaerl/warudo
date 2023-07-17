@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import type { ECOption } from '@/charts';
 import { getData, type Key } from '@/data/api';
-import { onMounted, ref } from 'vue';
+import { getSettings } from '@/data/settings';
+import { getMainTheme, type DocumentTheme } from '@/data/theme';
+import { computed, onMounted, ref } from 'vue';
 import VChart from 'vue-echarts';
+
+const settings = ref(getSettings());
 
 interface Props {
   title: string,
@@ -32,8 +36,12 @@ const option = ref<ECOption>({
     show: props.legend,
     orient: 'vertical',
     left: 'left',
-  }
+  },
 });
+
+const theme = computed((): DocumentTheme => {
+  return getMainTheme(settings.value.preferredTheme);
+})
 
 onMounted(async () => {
   keys = await getData<Key[]>('keys') as Key[];
@@ -49,13 +57,13 @@ onMounted(async () => {
         radius: '55%',
         center: props.title !== '' || props.legend ? ['50%', '60%'] : ['50%', '50%'],
         data: keys,
-        emphasis: {
+        /*emphasis: {
           itemStyle: {
             shadowBlur: 10,
             shadowOffsetX: 0,
             shadowColor: 'rgba(0, 0, 0, 0.5)'
           }
-        }
+        }*/
       }
     ];
 
@@ -68,7 +76,7 @@ onMounted(async () => {
 </script>
 
 <template>
-<v-chart class="chart" :option="option" :loading="busy" autoresize />
+<v-chart class="chart" :option="option" :loading="busy" :theme="theme" autoresize />
 </template>
 
 <style scoped>
