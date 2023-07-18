@@ -31,7 +31,13 @@ function headerName(header: TableHeader) {
 <template>
 <thead>
   <tr>
-    <td v-for="(header) in props.headers" :key="header.key" @click="$emit('sort', header)">{{ headerName(header) }}</td>
+    <th v-for="(header) in props.headers" :key="header.key" @click="$emit('sort', header)">{{ headerName(header) }}</th>
   </tr>
 </thead>
 </template>
+
+<style scoped>
+th {
+  cursor: pointer;
+}
+</style>

@@ -6,6 +6,7 @@ import TableHeaderState, { type TableHeader } from '@/components/TableHeaderStat
 import TableRowState from '@/components/TableRowState.vue';
 import type { Entry, OrderBy, SearchBarParams, Sort } from '@/data/api';
 import { getData } from '@/data/api';
+import { defaultHeaders, getQuery } from '@/data/table';
 import router from '@/router';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -13,65 +14,36 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
 
 let entries = ref<Entry[] | null>([]);
+let search = ref('');
 let busy = ref(true);
 let invalid = ref(false);
-let search = ref('');
-let orderBy = ref<OrderBy>(null);
-let sort = ref<Sort>(null);
-let headers = ref<TableHeader[]>([
-  {
-    key: 'id',
-    name: '#',
-  },
-  {
-    key: 'created',
-    name: 'Created',
-  },
-  {
-    key: 'data',
-    name: 'Data',
-  },
-]);
+let headers = ref<TableHeader[]>(defaultHeaders());
 
 async function fetchData() {
   busy.value = true;
-  let query: SearchBarParams = {};
+  invalid.value = false;
 
-  if(search.value !== '') {
-    query.key = 'any';
-    query.value = search.value;
-  }
-
-  if(sort.value !== null) {
-    query.sort = sort.value;
-  }
-
-  if(orderBy.value !== null) {
-    query.orderby = orderBy.value;
-  }
+  const query = getQuery(search.value, route.query);
 
   entries.value = await getData<Entry[]>('entries', query );
   busy.value = false;
-
-  router.replace({ ...route, query: query as any });
+  invalid.value = entries.value === null;
 }
 
-watch(orderBy, fetchData);
-watch(sort, fetchData);
+watch(route, fetchData, { immediate: true });
 watch(search, fetchData);
 
-fetchData();
-
 function onSort(header: TableHeader) {
-  orderBy.value = header.key as OrderBy;
+  let query: SearchBarParams = {};
+  query.orderby = header.key as OrderBy;
 
-  if(sort.value === null) {
-    sort.value = 'asc';
+  if(typeof route.query.sort === 'undefined') {
+    query.sort = 'asc';
   } else {
-    sort.value = sort.value === 'asc' ? 'desc' : 'asc';
+    query.sort = route.query.sort === 'asc' ? 'desc' : 'asc';
   }
 
-  orderBy.value = header.key as OrderBy;
+  router.replace({ ...route, query: query as any  });
 }
 </script>
 
@@ -79,7 +51,7 @@ function onSort(header: TableHeader) {
 <SearchBar v-model="search" />
 <main class="container-fluid">
   <table>
-    <TableHeaderState :headers="headers" :sort="sort" :order-by="orderBy" @sort="onSort" />
+    <TableHeaderState :headers="headers" :sort="(route.query.sort as Sort)" :order-by="(route.query.orderby as OrderBy)" @sort="onSort" />
     <tbody>
       <TableRowState :busy="busy" :invalid="invalid" :count="entries?.length ?? 0" :columns="3" />
       <tr v-for="entry in entries" :key="entry.id" @click="router.push({ name: 'entry', params: { id: entry.id } })">

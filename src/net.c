@@ -96,6 +96,19 @@ int warudo_header(const char* status, const char* content_type, warudo* config) 
     return WARUDO_OK;
 }
 
+int warudo_ok(warudo* config) {
+    warudo_header("200 OK", "application/json", config);
+
+    return WARUDO_OK;
+}
+
+int warudo_created(unsigned long long int id, warudo* config) {
+    warudo_header("200 OK", "application/json", config);
+    FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", id);
+
+    return WARUDO_OK;
+}
+
 int warudo_not_allowed(const char* allowed, warudo* config) {
     warudo_status("405 Method Not Allowed", config);
     FCGX_FPrintF(config->request.out, "Allow: %s\r\n", allowed);

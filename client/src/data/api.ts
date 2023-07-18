@@ -10,6 +10,7 @@ export interface SearchBarParams {
   value?: string;
   orderby?: OrderBy;
   sort?: Sort;
+  search?: string;
 }
 
 export enum ViewItemTypes {
@@ -74,12 +75,6 @@ export async function getData<T>(
 
     return data;
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.log(error.message);
-    } else {
-      console.log(error);
-    }
-
     return null;
   }
 }

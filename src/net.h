@@ -7,6 +7,10 @@ char* warudo_escape_html(const char* input);
 
 int warudo_header(const char* status, const char* content_type, warudo* config);
 
+int warudo_ok(warudo* config);
+
+int warudo_created(unsigned long long int id, warudo* config);
+
 int warudo_not_allowed(const char* allowed, warudo* config);
 
 int warudo_page_not_found(warudo* config);

@@ -3,6 +3,7 @@
 #include <string.h>
 #include "warudo.h"
 #include "config.h"
+#include "db.h"
 #include "net.h"
 
 #define WARUDO_DB_RET_CALL(CALL, RET) \
@@ -10,6 +11,7 @@
         fprintf(stderr, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
         sqlite3_finalize(stmt); \
         if(must_free) sqlite3_free((void*)query); \
+        warudo_bad_request("Failed to get data.", config); \
         return WARUDO_DB_ERROR; \
     } \
 
@@ -100,6 +102,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
     WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
     WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
+    warudo_created(warudo_last_insert_rowid(config), config);
     sqlite3_finalize(stmt);
     free(json);
 
@@ -128,6 +131,7 @@ int warudo_add_entries(int entry_type, warudo *config) {
     WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
     WARUDO_DB_RET_CALL(sqlite3_step(stmt), SQLITE_DONE);
 
+    warudo_created(warudo_last_insert_rowid(config), config);
     sqlite3_finalize(stmt);
     free(json);
 
@@ -175,6 +179,7 @@ int warudo_get_entries(int entry_type, warudo *config) {
         WARUDO_DB_CALL(sqlite3_bind_int64(stmt, limit_index + 1, config->query_offset));
     }
 
+    warudo_ok(config);
     FCGX_PutS("[", config->request.out);
 
     if(entry_type == WARUDO_ENTRY_TYPE_DATA) {
@@ -210,7 +215,6 @@ int warudo_get_entries(int entry_type, warudo *config) {
     }
 
     FCGX_PutS("]", config->request.out);
-
     sqlite3_finalize(stmt);
 
     if(must_free) {
@@ -229,6 +233,7 @@ int warudo_get_keys(warudo *config) {
 
     WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
+    warudo_ok(config);
     FCGX_PutS("[", config->request.out);
 
     while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
