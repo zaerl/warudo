@@ -3,8 +3,8 @@ import type { ECOption } from '@/charts';
 import { getData, type Key } from '@/data/api';
 import { getMainTheme, type DocumentTheme } from '@/data/theme';
 import { useSettingsStore } from '@/stores/settings';
-import { computed, onMounted, ref } from 'vue';
-import VChart from 'vue-echarts';
+import { computed, onMounted, provide, ref } from 'vue';
+import VChart, { THEME_KEY } from 'vue-echarts';
 
 const settingsStore = useSettingsStore();
 
@@ -38,6 +38,13 @@ const option = ref<ECOption>({
     left: 'left',
   },
 });
+
+const rootStyles = getComputedStyle(document.documentElement);
+
+const loadingOptions = {
+  text: '',
+  maskColor: rootStyles.getPropertyValue('--card-background-color'),
+};
 
 const theme = computed((): DocumentTheme => {
   return getMainTheme(settingsStore.settings.preferredTheme);
@@ -76,7 +83,7 @@ onMounted(async () => {
 </script>
 
 <template>
-<v-chart class="chart" :option="option" :loading="busy" :theme="theme" autoresize />
+<v-chart class="chart" :option="option" :loading-options="loadingOptions" :loading="busy" :theme="theme" autoresize />
 </template>
 
 <style scoped>

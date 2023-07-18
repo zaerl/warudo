@@ -3,7 +3,7 @@ import { PieChart } from 'echarts/charts';
 import type { LegendComponentOption, TooltipComponentOption } from 'echarts/components';
 import { LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components';
 import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
+import { SVGRenderer } from 'echarts/renderers';
 
 export type ECOption = ComposeOption<
   LegendComponentOption |
@@ -12,10 +12,9 @@ export type ECOption = ComposeOption<
   TooltipComponentOption
 >;
 
-
 export function initCharts() {
   use([
-    CanvasRenderer,
+    SVGRenderer,
     LegendComponent,
     PieChart,
     TitleComponent,
