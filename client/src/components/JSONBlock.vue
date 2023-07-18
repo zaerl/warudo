@@ -11,7 +11,7 @@ export type JSONValue =
 interface Props {
   json: { [x: string]: JSONValue } | null,
   inline: boolean,
-  spaces: number,
+  spaces?: number,
 }
 
 const props = withDefaults(

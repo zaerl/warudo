@@ -8,8 +8,8 @@ export interface TableHeader {
 
 interface Props {
   headers: TableHeader[],
-  orderBy: OrderBy,
-  sort: Sort,
+  orderBy?: OrderBy,
+  sort?: Sort,
 }
 
 const props = defineProps<Props>();
