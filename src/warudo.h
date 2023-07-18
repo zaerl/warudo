@@ -12,7 +12,7 @@
 #define WARUDO_MAX_COLUMNS 64
 #define WARUDO_SOCKET_PATH ":6251"
 #define WARUDO_TIMING 1
-#define WARUDO_VIEWS_TABLE "dashboards"
+#define WARUDO_DASHBOARDS_TABLE "dashboards"
 
 #ifdef WARUDO_TIMING
 #include <time.h>

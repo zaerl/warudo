@@ -23,8 +23,8 @@ let headers = ref<TableHeader[]>([
     name: 'Created',
   },
   {
-    key: 'data',
-    name: 'Data',
+    key: 'name',
+    name: 'Name',
   },
 ]);
 

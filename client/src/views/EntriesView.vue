@@ -8,6 +8,9 @@ import type { Entry, OrderBy, SearchBarParams, Sort } from '@/data/api';
 import { getData } from '@/data/api';
 import router from '@/router';
 import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 let entries = ref<Entry[] | null>([]);
 let busy = ref(true);
@@ -30,7 +33,7 @@ let headers = ref<TableHeader[]>([
   },
 ]);
 
-async function fetchData() {console.log('fetchData');
+async function fetchData() {
   busy.value = true;
   let query: SearchBarParams = {};
 
@@ -49,6 +52,8 @@ async function fetchData() {console.log('fetchData');
 
   entries.value = await getData<Entry[]>('entries', query );
   busy.value = false;
+
+  router.replace({ ...route, query: query as any });
 }
 
 watch(orderBy, fetchData);
@@ -59,7 +64,6 @@ fetchData();
 
 function onSort(header: TableHeader) {
   orderBy.value = header.key as OrderBy;
-  console.log(header);
 
   if(sort.value === null) {
     sort.value = 'asc';

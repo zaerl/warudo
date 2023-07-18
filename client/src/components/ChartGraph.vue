@@ -57,13 +57,13 @@ onMounted(async () => {
         radius: '55%',
         center: props.title !== '' || props.legend ? ['50%', '60%'] : ['50%', '50%'],
         data: keys,
-        /*emphasis: {
+        emphasis: {
           itemStyle: {
             shadowBlur: 10,
             shadowOffsetX: 0,
             shadowColor: 'rgba(0, 0, 0, 0.5)'
           }
-        }*/
+        }
       }
     ];
 
