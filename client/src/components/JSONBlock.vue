@@ -222,8 +222,6 @@ function itemNameStyle(item: JSONBranch) {
     'padding-left': item.isParent ? '6px' : 0
   };
 }
-
-//
 </script>
 
 <template>

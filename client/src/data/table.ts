@@ -1,7 +1,7 @@
 import type { OrderBy, SearchBarParams, Sort } from "./api";
 
 export function getQuery(search: string, query: SearchBarParams) {
-  let ret: SearchBarParams = {};
+  const ret: SearchBarParams = {};
 
   if(typeof search == 'string' && search.length > 0) {
     ret.key = 'any';
