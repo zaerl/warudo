@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { ECOption } from '@/charts';
 import { getData, type Key } from '@/data/api';
-import { getSettings } from '@/data/settings';
 import { getMainTheme, type DocumentTheme } from '@/data/theme';
+import { useSettingsStore } from '@/stores/settings';
 import { computed, onMounted, ref } from 'vue';
 import VChart from 'vue-echarts';
 
-const settings = ref(getSettings());
+const settingsStore = useSettingsStore();
 
 interface Props {
   title: string,
@@ -40,7 +40,7 @@ const option = ref<ECOption>({
 });
 
 const theme = computed((): DocumentTheme => {
-  return getMainTheme(settings.value.preferredTheme);
+  return getMainTheme(settingsStore.settings.preferredTheme);
 })
 
 onMounted(async () => {

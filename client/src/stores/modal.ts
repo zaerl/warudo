@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
-import { ref } from "vue";
+import { acceptHMRUpdate, defineStore } from 'pinia';
+import { ref } from 'vue';
 
 export const useModalStore = defineStore('modal', () => {
   const isOpen = ref(false);
@@ -27,3 +27,7 @@ export const useModalStore = defineStore('modal', () => {
     close,
   };
 });
+
+if(import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useModalStore, import.meta.hot));
+}

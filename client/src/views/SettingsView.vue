@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { getSettings, saveSettings } from '@/data/settings';
 import { setMainTheme } from '@/data/theme';
-import { ref } from 'vue';
+import { useSettingsStore } from '@/stores/settings';
 
-const settings = ref(getSettings());
+const settingsStore = useSettingsStore();
 
 function save() {
-  saveSettings(settings.value);
-  setMainTheme(settings.value.preferredTheme);
+  settingsStore.save();
+  setMainTheme(settingsStore.settings.preferredTheme);
 }
 </script>
 
@@ -18,7 +17,7 @@ function save() {
     <form>
       <div class="grid">
         <label for="theme">Theme
-          <select name="theme" id="theme" v-model="settings.preferredTheme">
+          <select name="theme" id="theme" v-model="settingsStore.settings.preferredTheme">
             <option value="auto">Sync with system</option>
             <option value="light">Light</option>
             <option value="dark">Dark</option>

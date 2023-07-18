@@ -6,7 +6,6 @@ const modalStore = useModalStore();
 function confirm() {
   modalStore.close();
 }
-console.log(modalStore);
 </script>
 
 <template>

@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { RouterView } from 'vue-router';
+import ModalDialog from './components/ModalDialog.vue';
 import PageFooter from './components/PageFooter.vue';
 import PageNav from './components/PageNav.vue';
-import { getSettings } from './data/settings';
 import { setMainTheme } from './data/theme';
-import ModalDialog from './components/ModalDialog.vue';
+import { useSettingsStore } from './stores/settings';
 
-const settings = ref(getSettings());
+const settingsStore = useSettingsStore();
 
-setMainTheme(settings.value.preferredTheme);
+setMainTheme(settingsStore.settings.preferredTheme);
 
 </script>
 

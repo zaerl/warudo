@@ -22,8 +22,6 @@ int page_app(int entry_type, warudo* config) {
 
 int page_app_keys(warudo* config) {
     if(config->request_method == WARUDO_REQUEST_GET) {
-        warudo_header("200 OK", "application/json", config);
-
         return warudo_get_keys(config);
     }
 
