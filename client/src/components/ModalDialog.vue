@@ -1,45 +1,35 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useModalStore } from '@/stores/modal';
 
-const isOpen = ref(false);
-const emit = defineEmits(['cancel', 'confirm']);
-
-function closeDialog() {
-  isOpen.value = false;
-  emit('cancel');
-}
+const modalStore = useModalStore();
 
 function confirm() {
-  isOpen.value = false;
-  emit('confirm');
+  modalStore.close();
 }
+console.log(modalStore);
 </script>
 
 <template>
-<dialog :open="isOpen">
+<dialog :open="modalStore.isOpen">
   <article>
     <header>
-        <a aria-label="Close" class="close" @click="closeDialog"></a>
-        Confirm?
+        <a aria-label="Close" class="close" @click="modalStore.close"></a>
+        {{ modalStore.title }}
     </header>
-    <p>
-      Cras sit amet maximus risus.
-      Pellentesque sodales odio sit amet augue finibus pellentesque.
-      Nullam finibus risus non semper euismod.
-    </p>
+    <p>{{ modalStore.description }}</p>
     <footer>
       <a
         href=""
         role="button"
         class="secondary"
-        @click.prevent="closeDialog">
-        Cancel
+        @click.prevent="modalStore.close">
+        {{ modalStore.cancelButton }}
       </a>
       <a
         href=""
         role="button"
         @click.prevent="confirm">
-        Confirm
+        {{ modalStore.confirmButton }}
       </a>
     </footer>
   </article>

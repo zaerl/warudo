@@ -8,6 +8,7 @@ import type { Entry, OrderBy, SearchBarParams, Sort } from '@/data/api';
 import { getData } from '@/data/api';
 import { defaultHeaders, getQuery } from '@/data/table';
 import router from '@/router';
+import { useModalStore } from '@/stores/modal';
 import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
