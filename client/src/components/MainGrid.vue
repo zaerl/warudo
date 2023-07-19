@@ -5,8 +5,8 @@ import KeysList from './KeysList.vue';
 
 interface Props {
   dashboard?: Dashboard | null,
-  busy: boolean,
-  invalid: boolean,
+  busy?: boolean,
+  invalid?: boolean,
 }
 
 const props = withDefaults(
