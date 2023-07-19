@@ -3,14 +3,14 @@ import type { ECOption } from '@/charts';
 import { getData, type Key } from '@/data/api';
 import { getMainTheme, type DocumentTheme } from '@/data/theme';
 import { useSettingsStore } from '@/stores/settings';
-import { computed, onMounted, provide, ref } from 'vue';
-import VChart, { THEME_KEY } from 'vue-echarts';
+import { computed, onMounted, ref } from 'vue';
+import VChart from 'vue-echarts';
 
 const settingsStore = useSettingsStore();
 
 interface Props {
-  title: string,
-  legend: boolean,
+  title?: string,
+  legend?: boolean,
 }
 
 const props = withDefaults(

@@ -10,7 +10,7 @@ export type JSONValue =
 
 interface Props {
   json: { [x: string]: JSONValue } | null,
-  inline: boolean,
+  inline?: boolean,
   spaces?: number,
 }
 

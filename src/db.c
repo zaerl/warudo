@@ -168,6 +168,9 @@ int warudo_get_entries(int entry_type, warudo *config) {
     WARUDO_DB_CALL(sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
     if(has_search) {
+        warudo_url_decode(config->query_key);
+        warudo_url_decode(config->query_value);
+
         WARUDO_DB_CALL(sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC));
         WARUDO_DB_CALL(sqlite3_bind_text(stmt, 2, config->query_value, strlen(config->query_value), SQLITE_STATIC));
     } else if(config->query_id) {

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -71,6 +72,29 @@ char* warudo_escape_html(const char* input) {
     escaped[j] = '\0';
 
     return escaped;
+}
+
+void warudo_url_decode(const char* input) {
+    char* dest = (char*)input;
+    char a, b;
+
+    while(*input) {
+        if((*input == '%') && ((a = input[1]) && (b = input[2])) && (isxdigit(a) && isxdigit(b))) {
+            if(a >= 'a') a -= 'a'-'A';
+            if(a >= 'A') a -= ('A' - 10);
+            else a -= '0';
+
+            if(b >= 'a') b -= 'a'-'A';
+            if(b >= 'A') b -= ('A' - 10);
+            else b -= '0';
+            *dest++ = 16 * a + b;
+            input += 3;
+        } else {
+            *dest++ = *input++;
+        }
+    }
+
+    *dest = '\0';
 }
 
 int warudo_status(const char* status, warudo* config) {

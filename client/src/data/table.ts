@@ -4,8 +4,14 @@ export function getQuery(search: string, query: SearchBarParams) {
   const ret: SearchBarParams = {};
 
   if(typeof search == 'string' && search.length > 0) {
-    ret.key = 'any';
-    ret.value = search;
+    const split = search.split(/\s+/);
+
+    if(split.length >= 2 && split[0].length > 0 && split[1].length > 0) {
+      ret.key = split[0].startsWith('$.') ? split[0] : '$.' + split[0];
+      split.shift();
+
+      ret.value = split.join(' ');
+    }
   }
 
   if(typeof query === 'undefined') {
