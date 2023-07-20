@@ -166,7 +166,7 @@ int warudo_get_entries(int entry_type, warudo *config) {
      */
 
     if(has_search) {
-        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ? AS TEXT) = ? ORDER BY %q %q LIMIT ? OFFSET ?;", table_name, order_by, sort);
+        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ? AS TEXT) LIKE ? ORDER BY %q %q LIMIT ? OFFSET ?;", table_name, order_by, sort);
         limit_index = 3;
     } else if(config->query_id) {
         query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE id = ?;", table_name);
