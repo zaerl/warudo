@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { useModalStore } from '@/stores/modal';
-import { storeToRefs } from 'pinia';
-import { ref, watch } from 'vue';
-
-const modalStore = useModalStore();
+import { ref } from 'vue';
+import ModalDialog from './ModalDialog.vue';
 
 interface Filter {
   id: number,
@@ -22,28 +19,24 @@ const props = withDefaults(
 );
 
 let filters = ref<Filter[]>([]);
-const { confirmed } = storeToRefs(modalStore);
+let isModalOpen = ref(false);
 
 defineEmits(['update:modelValue']);
 
-watch(confirmed, () => {
-  console.log('confirmed', confirmed.value);
+function onClose(confirmed: boolean) {
+  isModalOpen.value = false;
 
-  if(confirmed.value) {
+  if(confirmed) {
     filters.value.push({
       id: filters.value.length + 1,
       key: 'key',
       value: 'value',
     });
   }
-});
+}
 
 function addFilter() {
-  modalStore.title = 'Add filter';
-  modalStore.cancelButton = 'Cancel';
-  modalStore.confirmButton = 'Add';
-
-  modalStore.open('Add a filter to your search query.');
+  isModalOpen.value = true;
 }
 
 function selectFilter(index: number) {
@@ -52,6 +45,13 @@ function selectFilter(index: number) {
 </script>
 
 <template>
+<ModalDialog
+  title="Add filter"
+  confirm-button="Add"
+  :is-open="isModalOpen"
+  @close="onClose">
+hello
+</ModalDialog>
 <div id="search" class="container-fluid">
   <input
     type="search"

@@ -1,34 +1,58 @@
 <script setup lang="ts">
-import { useModalStore } from '@/stores/modal';
 
-const modalStore = useModalStore();
+const emit = defineEmits(['close']);
+
+interface Props {
+  isOpen?: boolean,
+  title?: string,
+  description?: string,
+  cancelButton?: string,
+  confirmButton?: string,
+}
+
+const props = withDefaults(
+  defineProps<Props>(), {
+    isOpen: false,
+    title: '',
+    description: '',
+    cancelButton: 'Cancel',
+    confirmButton: 'Confirm',
+  }
+);
+
+function close() {
+  emit('close', false);
+}
+
+function confirm() {
+  emit('close', true);
+}
+
 </script>
 
 <template>
-<dialog :open="modalStore.isOpen">
+<dialog :open="props.isOpen">
   <article>
     <header>
-        <a aria-label="Close" class="close" @click="modalStore.close"></a>
-        {{ modalStore.title }}
+        <a aria-label="Close" class="close" @click="close"></a>
+        {{ props.title }}
     </header>
-    <p>{{ modalStore.description }}</p>
+    <slot>{{ props.description }}</slot>
     <footer>
       <a
         href=""
         role="button"
         class="secondary"
-        @click.prevent="modalStore.close">
-        {{ modalStore.cancelButton }}
+        @click.prevent="close">
+        {{ props.cancelButton }}
       </a>
       <a
         href=""
         role="button"
-        @click.prevent="modalStore.confirm">
-        {{ modalStore.confirmButton }}
+        @click.prevent="confirm">
+        {{ props.confirmButton }}
       </a>
     </footer>
   </article>
 </dialog>
 </template>
-
-<style scoped></style>
