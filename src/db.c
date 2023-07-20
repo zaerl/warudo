@@ -164,7 +164,6 @@ int warudo_get_entries(int entry_type, warudo *config) {
      * Regular
      * SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ? OFFSET ?;
      */
-
     if(has_search) {
         query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ? AS TEXT) LIKE ? ORDER BY %q %q LIMIT ? OFFSET ?;", table_name, order_by, sort);
         limit_index = 3;

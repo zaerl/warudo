@@ -3,15 +3,20 @@ export type GetDataType = 'keys' | 'entries' | 'dashboards'
 export type OrderBy = 'id' | 'created' | 'modified' | null;
 export type Sort = 'asc' | 'desc' | null;
 
-export interface SearchBarParams {
-  id?: number;
-  limit?: number;
+export interface SearchParams {
   key?: string;
   value?: string;
+}
+
+export interface OrderByParams {
+  id?: number;
+  limit?: number;
   orderby?: OrderBy;
   sort?: Sort;
   search?: string;
 }
+
+export type SearchBarParams = OrderByParams & SearchParams;
 
 export enum ViewItemTypes {
   List,
@@ -36,6 +41,7 @@ interface EntryData {
 export interface Entry {
   id: number;
   created: number;
+  modified: number;
   data: EntryData;
 }
 

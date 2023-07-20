@@ -222,6 +222,14 @@ function itemNameStyle(item: JSONBranch) {
     'padding-left': item.isParent ? '6px' : 0
   };
 }
+
+async function copyToClipboard() {
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(props.json, null, props.spaces));
+  } catch(e) {
+    console.error(e);
+  }
+}
 </script>
 
 <template>
@@ -244,6 +252,7 @@ function itemNameStyle(item: JSONBranch) {
       <span class="follow" v-if="item.hasFollow">,</span>
     </div>
   </code>
+  <a href="" role="button" class="outline" @click.prevent="copyToClipboard">Copy to clipboard</a>
 </section>
 </template>
 

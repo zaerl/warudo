@@ -17,7 +17,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   try {
-    let loaded = localStorage.getItem('settings');
+    const loaded = localStorage.getItem('settings');
     parsed = loaded ? JSON.parse(loaded) : null;
   } catch(e) {
     console.warn('Failed to parse settings from localStorage');
