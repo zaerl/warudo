@@ -2,10 +2,6 @@
 import { useModalStore } from '@/stores/modal';
 
 const modalStore = useModalStore();
-
-function confirm() {
-  modalStore.close();
-}
 </script>
 
 <template>
@@ -27,7 +23,7 @@ function confirm() {
       <a
         href=""
         role="button"
-        @click.prevent="confirm">
+        @click.prevent="modalStore.confirm">
         {{ modalStore.confirmButton }}
       </a>
     </footer>

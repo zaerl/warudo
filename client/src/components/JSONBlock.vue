@@ -252,7 +252,7 @@ async function copyToClipboard() {
       <span class="follow" v-if="item.hasFollow">,</span>
     </div>
   </code>
-  <a href="" role="button" class="outline" @click.prevent="copyToClipboard">Copy to clipboard</a>
+  <a v-if="!props.inline" href="" role="button" class="outline" @click.prevent="copyToClipboard">Copy to clipboard</a>
 </section>
 </template>
 
