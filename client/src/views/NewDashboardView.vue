@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MainGrid from '@/components/MainGrid.vue';
-import SearchBar from '@/components/SearchBar.vue';
+import SearchBar from '@/components/search/SearchBar.vue';
 </script>
 
 <template>

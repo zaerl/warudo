@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import ModalDialog from './ModalDialog.vue';
+import ModalDialog from '../ModalDialog.vue';
+import SearchFilters from './SearchFilters.vue';
 
 interface Filter {
   id: number,
@@ -39,7 +40,7 @@ function addFilter() {
   isModalOpen.value = true;
 }
 
-function selectFilter(index: number) {
+function selectFilter(_index: number) {
   addFilter();
 }
 </script>
@@ -67,13 +68,16 @@ hello
     </svg>
     Add filter
   </a>
-  <a
+  <SearchFilters
+    :filters="filters"
+    @select-filter="selectFilter" />
+  <!--<a
     v-for="(filter, index) in filters"
     v-bind:key="filter.id"
     @click.prevent="selectFilter(index)"
     href=""
     role="button"
-    class="contrast outline filter">{{ filter.key }}: {{ filter.value }}</a>
+    class="contrast outline filter">{{ filter.key }}: {{ filter.value }}</a>-->
 </div>
 </template>
 

@@ -56,3 +56,9 @@ function confirm() {
   </article>
 </dialog>
 </template>
+
+<style scoped>
+.close {
+  cursor: pointer;
+}
+</style>

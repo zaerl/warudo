@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DateTime from '@/components/DateTime.vue';
 import JSONBlock from '@/components/JSONBlock.vue';
-import SearchBar from '@/components/SearchBar.vue';
+import SearchBar from '@/components/search/SearchBar.vue';
 import TableHeaderState, { type TableHeader } from '@/components/TableHeaderState.vue';
 import TableRowState from '@/components/TableRowState.vue';
 import type { Entry, OrderBy, SearchBarParams, Sort } from '@/data/api';
