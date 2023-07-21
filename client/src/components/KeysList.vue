@@ -5,13 +5,27 @@ import { onMounted, ref } from 'vue';
 
 interface Props {
   type: GetDataType,
+  showCounts?: boolean,
+  modelValue?: string,
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(
+  defineProps<Props>(), {
+    type: 'keys',
+    showCounts: false,
+    modelValue: '',
+  }
+);
+
+defineEmits(['update:modelValue']);
 
 let busy = ref(true);
 let invalid = ref(false);
 let keys = ref<Key[] | null>([]);
+
+function keyName(key: Key) {
+  return props.showCounts ? `${key.name} ${key.value}` : key.name;
+}
 
 onMounted(async () => {
   keys.value = await getData<Key[]>(props.type);
@@ -25,8 +39,15 @@ onMounted(async () => {
 <select v-if="invalid" :aria-invalid="invalid" id="keys-list">
   <option>Can't catch data from server</option>
 </select>
-<select v-else :aria-busy="busy" id="keys-list">
-  <option v-bind:key="key.name" v-for="key in keys" :value="key.name">{{ key.name }} ({{ key.value }})</option>
+<select
+  v-else
+  required
+  :aria-busy="busy"
+  id="keys-list"
+  :value="props.modelValue"
+  @input="$emit('update:modelValue', ($event?.target as HTMLSelectElement)?.value)">
+  <option disabled value="">Please select one key</option>
+  <option v-bind:key="key.name" v-for="key in keys" :value="key.name">{{ keyName(key) }}</option>
 </select>
 </template>
 

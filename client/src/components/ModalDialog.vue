@@ -4,6 +4,7 @@ const emit = defineEmits(['close']);
 
 interface Props {
   isOpen?: boolean,
+  isDisabled?: true | null,
   title?: string,
   description?: string,
   cancelButton?: string,
@@ -12,6 +13,7 @@ interface Props {
 
 const props = withDefaults(
   defineProps<Props>(), {
+    isDisabled: true,
     isOpen: false,
     title: '',
     description: '',
@@ -33,10 +35,8 @@ function confirm() {
 <template>
 <dialog :open="props.isOpen">
   <article>
-    <header>
-        <a aria-label="Close" class="close" @click="close"></a>
-        {{ props.title }}
-    </header>
+    <a aria-label="Close" class="close" @click="close"></a>
+    <h3>{{ props.title }}{{ props.isDisabled ? 'sì' : 'no' }}</h3>
     <slot>{{ props.description }}</slot>
     <footer>
       <a
@@ -47,8 +47,9 @@ function confirm() {
         {{ props.cancelButton }}
       </a>
       <a
-        href=""
+        href="#"
         role="button"
+        :disabled="props.isDisabled"
         @click.prevent="confirm">
         {{ props.confirmButton }}
       </a>
