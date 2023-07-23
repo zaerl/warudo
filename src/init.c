@@ -140,6 +140,8 @@ int warudo_accept_connection(warudo *config) {
     ZA_FREE_QUERY_STRING_VALUE(value)
     ZA_FREE_QUERY_STRING_VALUE(orderby)
     ZA_FREE_QUERY_STRING_VALUE(sort)
+    // ZA_FREE_QUERY_STRING_VALUES(keys)
+    // ZA_FREE_QUERY_STRING_VALUES(values)
 
     int accepted = FCGX_Accept_r(&config->request);
 

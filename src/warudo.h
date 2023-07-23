@@ -3,6 +3,7 @@
 
 #define WARUDO_VERSION "0.1.0"
 
+// Configurations
 #define WARUDO_BUFFLEN 8192
 #define WARUDO_CONFIG_FILE "warudo.conf"
 #define WARUDO_CORS NULL
@@ -13,6 +14,7 @@
 #define WARUDO_SOCKET_PATH ":6251"
 #define WARUDO_TIMING 1
 #define WARUDO_DASHBOARDS_TABLE "dashboards"
+#define WARUDO_MAX_QUERY_KEYS 16
 
 #ifdef WARUDO_TIMING
 #include <time.h>
@@ -38,22 +40,25 @@
 #define WARUDO_READ_ERROR 11
 #define WARUDO_SOCKER_ERROR 12
 
+// HTTP request methods
+#define WARUDO_REQUEST_UNKNOWN 0
+#define WARUDO_REQUEST_GET 1
+#define WARUDO_REQUEST_POST 2
+
 // HTTP codes
 #define WARUDO_HTTP_BAD_REQUEST 400
 #define WARUDO_HTTP_NOT_FOUND 404
 #define WARUDO_HTTP_NOT_ALLOWED 405
 #define WARUDO_HTTP_INTERNAL_ERROR 500
 
+// Pages
 #define WARUDO_PAGE_NOT_FOUND 0
 #define WARUDO_PAGE_ROOT 1
 #define WARUDO_PAGE_APP 2
 #define WARUDO_PAGE_APP_KEYS 3
 #define WARUDO_PAGE_APP_VIEWS 4
 
-#define WARUDO_REQUEST_UNKNOWN 0
-#define WARUDO_REQUEST_GET 1
-#define WARUDO_REQUEST_POST 2
-
+// Tables
 #define WARUDO_ENTRY_TYPE_DATA 0
 #define WARUDO_ENTRY_TYPE_VIEW 1
 
@@ -74,8 +79,12 @@
 #define ZA_FREE_QUERY_STRING_VALUE(NAME) if(config->query_##NAME != NULL) free((void*)config->query_##NAME); \
     config->query_##NAME = NULL; \
     config->query_valid_##NAME = 0;
+// #define ZA_FREE_QUERY_STRING_VALUES(NAME) for(int i = 0; i < config->query_valid_##NAME; ++i) { free((void*)config->query_##NAME[i]); \
+//  config->query_##NAME[i] = NULL; } \
+//  config->query_valid_##NAME = 0;
 
 #define ZA_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
+// #define ZA_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
 
 struct warudo_column {
     char* name;
@@ -111,6 +120,8 @@ struct warudo {
     ZA_QUERY_VALUE(const char*, value)
     ZA_QUERY_VALUE(const char*, orderby)
     ZA_QUERY_VALUE(const char*, sort)
+    // ZA_QUERY_VALUES(const char*, keys, WARUDO_MAX_QUERY_KEYS)
+    // ZA_QUERY_VALUES(const char*, values, WARUDO_MAX_QUERY_KEYS)
 };
 
 typedef struct warudo warudo;
