@@ -14,6 +14,7 @@ extern char **environ;
 #endif
 
 // /opt/homebrew/opt/nginx/bin/nginx -g "daemon off;"
+// /opt/homebrew/opt/lighttpd/bin/lighttpd -D -f /opt/homebrew/etc/lighttpd/lighttpd.conf
 // make && ./bin/warudo"
 int main(void) {
     warudo *config;
