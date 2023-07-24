@@ -52,6 +52,7 @@ Mkfile.old
 dkms.conf
 
 bin/warudo
+obj
 stress-test
 warudo.db
 warudo.db-shm
