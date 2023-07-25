@@ -1,39 +1,49 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c11
+CFLAGS = -Wall -Wextra -pedantic
 LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib
 LDLIBS = -lfcgi
 FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include
 
-SRCDIR = src
+SRC_DIR = src
+BUILD_DIR = build
+BIN_DIR = bin
 OBJDIR = obj
-BINDIR = bin
 DBS = *.db *.db-shm *.db-wal
 
+# Get all the src/ sub-directories
+SUBDIRS := $(shell find $(SRC_DIR) -type d)
+
 # Get all .c files from src/ directory
-SRCS = $(wildcard $(SRCDIR)/*.c)
+SRCS = $(shell find $(SRC_DIR) -type f -name "*.c")
 
 # Generate corresponding .o file names
-OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
+OBJS = $(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(SRCS:.c=.o))
+
+# Subdirectories to create in the build directory
+BUILD_SUBDIRS := $(foreach dir,$(SUBDIRS),$(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(dir)))
 
 # Define the final executable name
-TARGET = $(BINDIR)/warudo
+TARGET = $(BIN_DIR)/warudo
 
-all: $(TARGET)
+all: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TARGET)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(BUILD_SUBDIRS):
+	mkdir -p $@
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	$(CC) $(CFLAGS) -c -I$(FCGI_INCLUDE_PATH) $< -o $@
-
-$(OBJDIR):
-	mkdir -p $(OBJDIR)
 
 stress-test:
 	$(CC) $(CFLAGS) -o stress-test stress-test.c -L/opt/homebrew/opt/curl/lib -lcurl
 
 clean:
-	rm -rf $(OBJDIR) $(BINDIR)/* ${DBS}
+	rm -rf $(BUILD_DIR) $(TARGET) ${DBS}
 
 .PHONY: all clean
 

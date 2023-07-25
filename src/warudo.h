@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 #include <fcgiapp.h>
-#include "sqlite3.h"
+#include "sqlite3/sqlite3.h"
 
 // Success code
 #define WARUDO_OK 0
