@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -pedantic
-LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib -lfcgi
+CFLAGS = -Wall -Wextra -pedantic -std=c11
+LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib
 LDLIBS = -lfcgi
 FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include
 

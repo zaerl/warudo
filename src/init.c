@@ -47,7 +47,7 @@ int warudo_init(const char *filename, warudo **config) {
     if(socket == -1) {
         warudo_close(pdb);
 
-        return WARUDO_SOCKER_ERROR;
+        return WARUDO_SOCKET_ERROR;
     }
 
     pdb->socket = socket;

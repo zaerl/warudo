@@ -1,6 +1,14 @@
 #ifndef WARUDO_H
 #define WARUDO_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+#error "Windows is not supported"
+#endif
+
 #define WARUDO_VERSION "0.1.0"
 
 // Configurations
@@ -38,7 +46,7 @@
 #define WARUDO_FCGI_INIT_ERROR 9
 #define WARUDO_INIT_REQUEST_ERROR 10
 #define WARUDO_READ_ERROR 11
-#define WARUDO_SOCKER_ERROR 12
+#define WARUDO_SOCKET_ERROR 12
 
 // HTTP request methods
 #define WARUDO_REQUEST_UNKNOWN 0
@@ -153,5 +161,9 @@ int warudo_end_time(warudo *config, double ms, const char* message);
 
 // Close the system
 int warudo_close(warudo *config);
+
+#ifdef __cplusplus
+}  /* End of the 'extern "C"' block */
+#endif
 
 #endif /* WARUDO_H */
