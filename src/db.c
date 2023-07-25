@@ -32,12 +32,12 @@ int warudo_db_init(const char *filename, warudo* config) {
 
     const char *sql =
         "CREATE TABLE IF NOT EXISTS " WARUDO_ENTRIES_TABLE "("
-        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "id INTEGER PRIMARY KEY, "
         "created INTEGER DEFAULT (UNIXEPOCH()), "
         "modified INTEGER DEFAULT (UNIXEPOCH()), "
         "data TEXT NOT NULL);"
         "CREATE TABLE IF NOT EXISTS " WARUDO_DASHBOARDS_TABLE "("
-        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+        "id INTEGER PRIMARY KEY, "
         "created INTEGER DEFAULT (UNIXEPOCH()), "
         "modified INTEGER DEFAULT (UNIXEPOCH()), "
         "data TEXT NOT NULL);"
