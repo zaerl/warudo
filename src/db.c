@@ -5,10 +5,11 @@
 #include "config.h"
 #include "db.h"
 #include "net.h"
+#include "log.h"
 
 #define WARUDO_DB_RET_CALL(STMT, CALL, RET) \
     if(CALL != RET) { \
-        fprintf(stderr, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
+        warudo_log_error(config, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
         sqlite3_finalize(STMT); \
         if(must_free) sqlite3_free((void*)query); \
         warudo_bad_request("Failed to get data.", config); \
@@ -27,7 +28,7 @@ int warudo_db_init(const char *filename, warudo* config) {
     const char* query = NULL;
 
     if(rc != SQLITE_OK) {
-        fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(config->db));
+        warudo_log_error(config, "Can't open database: %s\n", sqlite3_errmsg(config->db));
 
         return WARUDO_DB_OPEN_ERROR;
     }
@@ -49,7 +50,7 @@ int warudo_db_init(const char *filename, warudo* config) {
     rc = sqlite3_exec(config->db, sql, 0, 0, &error_msg);
 
     if(rc != SQLITE_OK) {
-        fprintf(stderr, "SQL error: %s\n", error_msg);
+        warudo_log_error(config, "SQL error: %s\n", error_msg);
 
         return WARUDO_DB_OPEN_ERROR;
     }
@@ -68,7 +69,7 @@ int warudo_load_columns(warudo* config) {
 
     WARUDO_DB_CALL(stmt, sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
-    fprintf(stderr, "Column names for table '%s':\n", WARUDO_ENTRIES_TABLE);
+    warudo_log_info(config, "Column names for table '%s':\n", WARUDO_ENTRIES_TABLE);
 
     while(sqlite3_step(stmt) == SQLITE_ROW) {
         const char* name = (const char*)sqlite3_column_text(stmt, 1);
@@ -80,7 +81,7 @@ int warudo_load_columns(warudo* config) {
     }
 
     for(unsigned int i = 0; i < config->columns_count; ++i) {
-        fprintf(stderr, "%s: %s\n", config->columns[i].name, config->columns[i].type);
+        warudo_log_info(config, "%s: %s\n", config->columns[i].name, config->columns[i].type);
     }
 
     sqlite3_finalize(stmt);

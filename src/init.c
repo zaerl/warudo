@@ -9,6 +9,7 @@
 #include "config.h"
 #include "warudo.h"
 #include "db.h"
+#include "log.h"
 
 int warudo_init(const char *filename, warudo **config) {
     warudo *pdb;
@@ -79,19 +80,25 @@ int warudo_init(const char *filename, warudo **config) {
     pdb->access_origin = WARUDO_DEFAULT_CORS;
     pdb->log_level = WARUDO_DEFAULT_LOG_LEVEL;
 
-    char* env = getenv("WARUDO_CORS");
-
-    if(env != NULL) {
-        printf("Access origin %s\n", env);
-        pdb->access_origin = env;
-    }
-
-    env = getenv("WARUDO_LOG_LEVEL");
+    char* env = getenv("WARUDO_LOG_LEVEL");
 
     if(env != NULL) {
         int log_level = atoi(env);
-        printf("Log level %u\n", log_level);
         pdb->log_level = log_level;
+        warudo_log_info(pdb, "Log level %u\n", log_level);
+    }
+
+    warudo_log_info(pdb, "Starting warudo %s\n", WARUDO_VERSION);
+
+    if(env != NULL) {
+        warudo_log_info(pdb, "Log level: %u\n", pdb->log_level);
+    }
+
+    env = getenv("WARUDO_CORS");
+
+    if(env != NULL) {
+        warudo_log_info(pdb, "Access origin: \"%s\"\n", env);
+        pdb->access_origin = env;
     }
 
     *config = pdb;
@@ -227,7 +234,7 @@ int warudo_end_time(warudo *config, double ms, const char* message) {
     time_taken += (end.tv_nsec - config->start.tv_nsec) / 1000000.0;
 
     if(ms && time_taken > ms) {
-        fprintf(stderr, "%llu: %llu time %.0lf ms %s\n", config->timing_count,
+        warudo_log_info(config, "%llu: %llu time %.0lf ms %s\n", config->timing_count,
             config->timing_end_count, time_taken, message ? message : "");
     }
 

@@ -28,13 +28,11 @@ int main(void) {
         return ret;
     }
 
-    printf("Starting warudo %s\n", WARUDO_VERSION);
-
     while(warudo_accept_connection(config) >= 0) {
         /*char** envp = config->request.envp;
 
         while(*envp) {
-            fprintf(stderr, "%s\n", *envp);
+            warudo_log_debug(config, "%s\n", *envp);
             ++envp;
         }*/
         if(config->page == WARUDO_PAGE_APP) {
@@ -54,7 +52,7 @@ int main(void) {
         if(ret == 0) {
             warudo_log_info(config, "Accepted request %llu\n", config->requests_count);
         } else {
-            fprintf(stderr, "Failed to accept request %llu. Code %d\n", config->requests_count, ret);
+            warudo_log_error(config, "Failed to accept request %llu. Code %d\n", config->requests_count, ret);
         }
     }
 
