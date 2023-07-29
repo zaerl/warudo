@@ -14,15 +14,22 @@ extern "C" {
 // Configurations
 #define WARUDO_BUFFLEN 8192
 #define WARUDO_CONFIG_FILE "warudo.conf"
-#define WARUDO_CORS NULL
 #define WARUDO_DB_FILE "warudo.db"
 #define WARUDO_ENTRIES_TABLE "entries"
-#define WARUDO_LOG_LEVEL 1
 #define WARUDO_MAX_COLUMNS 64
 #define WARUDO_SOCKET_PATH ":6251"
 #define WARUDO_TIMING 1
 #define WARUDO_DASHBOARDS_TABLE "dashboards"
 #define WARUDO_MAX_QUERY_KEYS 16
+
+#define WARUDO_LOG_LEVEL_NO_LOG 0
+#define WARUDO_LOG_LEVEL_ERROR 1
+#define WARUDO_LOG_LEVEL_INFO 1
+#define WARUDO_LOG_LEVEL_DEBUG 2
+
+// Environment variables
+#define WARUDO_DEFAULT_CORS NULL
+#define WARUDO_DEFAULT_LOG_LEVEL WARUDO_LOG_LEVEL_NO_LOG
 
 #ifdef WARUDO_TIMING
 #include <time.h>
@@ -103,13 +110,19 @@ typedef struct warudo_column warudo_column;
 
 struct warudo {
     sqlite3 *db;
+    sqlite3_stmt* insert_stmt;
+    sqlite3_stmt* insert_dashboard_stmt;
+
+    // Environment variables
+    const char* access_origin;
+    unsigned int log_level;
+
     FCGX_Request request;
     int socket;
     int page;
     int request_method;
     const char* script_name;
     const char* query_string;
-    const char* access_origin;
     warudo_column columns[WARUDO_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;

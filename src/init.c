@@ -21,7 +21,6 @@ int warudo_init(const char *filename, warudo **config) {
     pdb->timing_count = 0;
     pdb->timing_end_count = 0;
 #endif
-    pdb->access_origin = WARUDO_CORS;
 
     // Load database
     res = warudo_db_init(filename, pdb);
@@ -77,11 +76,22 @@ int warudo_init(const char *filename, warudo **config) {
     pdb->query_sort = NULL;
 
     // Environment variables
-    char* access_origin = getenv("WARUDO_CORS");
+    pdb->access_origin = WARUDO_DEFAULT_CORS;
+    pdb->log_level = WARUDO_DEFAULT_LOG_LEVEL;
 
-    if(access_origin != NULL) {
-        printf("Access origin %s\n", access_origin);
-        pdb->access_origin = access_origin;
+    char* env = getenv("WARUDO_CORS");
+
+    if(env != NULL) {
+        printf("Access origin %s\n", env);
+        pdb->access_origin = env;
+    }
+
+    env = getenv("WARUDO_LOG_LEVEL");
+
+    if(env != NULL) {
+        int log_level = atoi(env);
+        printf("Log level %u\n", log_level);
+        pdb->log_level = log_level;
     }
 
     *config = pdb;

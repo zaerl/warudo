@@ -30,6 +30,12 @@ int main(void) {
     printf("Starting warudo %s\n", WARUDO_VERSION);
 
     while(warudo_accept_connection(config) >= 0) {
+        /*char** envp = config->request.envp;
+
+        while(*envp) {
+            fprintf(stderr, "%s\n", *envp);
+            ++envp;
+        }*/
         if(config->page == WARUDO_PAGE_APP) {
             ret = page_app(WARUDO_ENTRY_TYPE_DATA, config);
         } else if(config->page == WARUDO_PAGE_APP_KEYS) {
