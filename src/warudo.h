@@ -81,25 +81,25 @@ extern "C" {
 #define WARUDO_DEFAULT_QUERY_LIMIT 100
 #define WARUDO_DEFAULT_QUERY_MULTI 0
 
-#define ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && \
+#define WARUDO_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && \
     strncmp(KEY, #IDX, LENGTH_1) == 0) { \
     config->query_##IDX = FN; \
     config->query_valid_##IDX = 1; }
-#define ZA_GET_QUERY_ULLINT_VALUE(KEY, IDX, VALUE, LENGTH_1) ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, strtoll(VALUE, NULL, 10), LENGTH_1)
-#define ZA_GET_QUERY_INT_VALUE(KEY, IDX, VALUE, LENGTH_1) ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, strtol(VALUE, NULL, 10), LENGTH_1)
-#define ZA_GET_QUERY_STRING_VALUE(KEY, IDX, VALUE, LENGTH_1) ZA_GET_QUERY_VALUE(KEY, IDX, VALUE, strdup(VALUE), LENGTH_1)
+#define WARUDO_GET_QUERY_ULLINT_VALUE(KEY, IDX, VALUE, LENGTH_1) WARUDO_GET_QUERY_VALUE(KEY, IDX, VALUE, strtoll(VALUE, NULL, 10), LENGTH_1)
+#define WARUDO_GET_QUERY_INT_VALUE(KEY, IDX, VALUE, LENGTH_1) WARUDO_GET_QUERY_VALUE(KEY, IDX, VALUE, strtol(VALUE, NULL, 10), LENGTH_1)
+#define WARUDO_GET_QUERY_STRING_VALUE(KEY, IDX, VALUE, LENGTH_1) WARUDO_GET_QUERY_VALUE(KEY, IDX, VALUE, strdup(VALUE), LENGTH_1)
 
-#define ZA_FREE_QUERY_ULLINT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
-#define ZA_FREE_QUERY_INT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
-#define ZA_FREE_QUERY_STRING_VALUE(NAME) if(config->query_##NAME != NULL) free((void*)config->query_##NAME); \
+#define WARUDO_FREE_QUERY_ULLINT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
+#define WARUDO_FREE_QUERY_INT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
+#define WARUDO_FREE_QUERY_STRING_VALUE(NAME) if(config->query_##NAME != NULL) free((void*)config->query_##NAME); \
     config->query_##NAME = NULL; \
     config->query_valid_##NAME = 0;
-// #define ZA_FREE_QUERY_STRING_VALUES(NAME) for(int i = 0; i < config->query_valid_##NAME; ++i) { free((void*)config->query_##NAME[i]); \
+// #define WARUDO_FREE_QUERY_STRING_VALUES(NAME) for(int i = 0; i < config->query_valid_##NAME; ++i) { free((void*)config->query_##NAME[i]); \
 //  config->query_##NAME[i] = NULL; } \
 //  config->query_valid_##NAME = 0;
 
-#define ZA_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
-// #define ZA_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
+#define WARUDO_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
+// #define WARUDO_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
 
 struct warudo_column {
     char* name;
@@ -133,16 +133,16 @@ struct warudo {
 #endif
 
     // Query string
-    ZA_QUERY_VALUE(unsigned long long int, id)
-    ZA_QUERY_VALUE(unsigned long long int, offset)
-    ZA_QUERY_VALUE(unsigned int, limit)
-    ZA_QUERY_VALUE(unsigned int, multi)
-    ZA_QUERY_VALUE(const char*, key)
-    ZA_QUERY_VALUE(const char*, value)
-    ZA_QUERY_VALUE(const char*, orderby)
-    ZA_QUERY_VALUE(const char*, sort)
-    // ZA_QUERY_VALUES(const char*, keys, WARUDO_MAX_QUERY_KEYS)
-    // ZA_QUERY_VALUES(const char*, values, WARUDO_MAX_QUERY_KEYS)
+    WARUDO_QUERY_VALUE(unsigned long long int, id)
+    WARUDO_QUERY_VALUE(unsigned long long int, offset)
+    WARUDO_QUERY_VALUE(unsigned int, limit)
+    WARUDO_QUERY_VALUE(unsigned int, multi)
+    WARUDO_QUERY_VALUE(const char*, key)
+    WARUDO_QUERY_VALUE(const char*, value)
+    WARUDO_QUERY_VALUE(const char*, orderby)
+    WARUDO_QUERY_VALUE(const char*, sort)
+    // WARUDO_QUERY_VALUES(const char*, keys, WARUDO_MAX_QUERY_KEYS)
+    // WARUDO_QUERY_VALUES(const char*, values, WARUDO_MAX_QUERY_KEYS)
 };
 
 typedef struct warudo warudo;

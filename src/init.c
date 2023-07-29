@@ -117,14 +117,14 @@ int warudo_parse_query_string(char* query_string, warudo* config) {
             char* value = delimiter + 1;
 
             if(value != NULL) {
-                ZA_GET_QUERY_ULLINT_VALUE(parameter, limit, value, length_1)
-                else ZA_GET_QUERY_INT_VALUE(parameter, offset, value, length_1)
-                else ZA_GET_QUERY_ULLINT_VALUE(parameter, id, value, length_1)
-                else ZA_GET_QUERY_INT_VALUE(parameter, multi, value, length_1)
-                else ZA_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
-                else ZA_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
-                else ZA_GET_QUERY_STRING_VALUE(parameter, orderby, value, length_1)
-                else ZA_GET_QUERY_STRING_VALUE(parameter, sort, value, length_1)
+                WARUDO_GET_QUERY_ULLINT_VALUE(parameter, limit, value, length_1)
+                else WARUDO_GET_QUERY_INT_VALUE(parameter, offset, value, length_1)
+                else WARUDO_GET_QUERY_ULLINT_VALUE(parameter, id, value, length_1)
+                else WARUDO_GET_QUERY_INT_VALUE(parameter, multi, value, length_1)
+                else WARUDO_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
+                else WARUDO_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
+                else WARUDO_GET_QUERY_STRING_VALUE(parameter, orderby, value, length_1)
+                else WARUDO_GET_QUERY_STRING_VALUE(parameter, sort, value, length_1)
             }
         }
 
@@ -142,16 +142,16 @@ int warudo_accept_connection(warudo *config) {
     ++config->requests_count;
 
     // Query string
-    ZA_FREE_QUERY_ULLINT_VALUE(id, 0)
-    ZA_FREE_QUERY_INT_VALUE(limit, WARUDO_DEFAULT_QUERY_LIMIT)
-    ZA_FREE_QUERY_ULLINT_VALUE(offset, 0)
-    ZA_FREE_QUERY_ULLINT_VALUE(multi, WARUDO_DEFAULT_QUERY_MULTI)
-    ZA_FREE_QUERY_STRING_VALUE(key)
-    ZA_FREE_QUERY_STRING_VALUE(value)
-    ZA_FREE_QUERY_STRING_VALUE(orderby)
-    ZA_FREE_QUERY_STRING_VALUE(sort)
-    // ZA_FREE_QUERY_STRING_VALUES(keys)
-    // ZA_FREE_QUERY_STRING_VALUES(values)
+    WARUDO_FREE_QUERY_ULLINT_VALUE(id, 0)
+    WARUDO_FREE_QUERY_INT_VALUE(limit, WARUDO_DEFAULT_QUERY_LIMIT)
+    WARUDO_FREE_QUERY_ULLINT_VALUE(offset, 0)
+    WARUDO_FREE_QUERY_ULLINT_VALUE(multi, WARUDO_DEFAULT_QUERY_MULTI)
+    WARUDO_FREE_QUERY_STRING_VALUE(key)
+    WARUDO_FREE_QUERY_STRING_VALUE(value)
+    WARUDO_FREE_QUERY_STRING_VALUE(orderby)
+    WARUDO_FREE_QUERY_STRING_VALUE(sort)
+    // WARUDO_FREE_QUERY_STRING_VALUES(keys)
+    // WARUDO_FREE_QUERY_STRING_VALUES(values)
 
     int accepted = FCGX_Accept_r(&config->request);
 
