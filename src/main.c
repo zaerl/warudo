@@ -5,6 +5,7 @@
 
 #include "config.h"
 #include "db.h"
+#include "log.h"
 #include "net.h"
 
 #ifdef _WIN32
@@ -51,7 +52,7 @@ int main(void) {
         warudo_after_connection(config);
 
         if(ret == 0) {
-            fprintf(stderr, "Accepted request %llu\n", config->requests_count);
+            warudo_log_info(config, "Accepted request %llu\n", config->requests_count);
         } else {
             fprintf(stderr, "Failed to accept request %llu. Code %d\n", config->requests_count, ret);
         }

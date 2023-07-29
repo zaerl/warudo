@@ -24,8 +24,8 @@ extern "C" {
 
 #define WARUDO_LOG_LEVEL_NO_LOG 0
 #define WARUDO_LOG_LEVEL_ERROR 1
-#define WARUDO_LOG_LEVEL_INFO 1
-#define WARUDO_LOG_LEVEL_DEBUG 2
+#define WARUDO_LOG_LEVEL_INFO 2
+#define WARUDO_LOG_LEVEL_DEBUG 3
 
 // Environment variables
 #define WARUDO_DEFAULT_CORS NULL
@@ -115,7 +115,7 @@ struct warudo {
 
     // Environment variables
     const char* access_origin;
-    unsigned int log_level;
+    int log_level;
 
     FCGX_Request request;
     int socket;
