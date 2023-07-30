@@ -117,32 +117,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
 }
 
 int warudo_add_entries(int entry_type, warudo *config) {
-    sqlite3_stmt* stmt;
-    int must_free = 0;
-    char* query = entry_type == WARUDO_ENTRY_TYPE_DATA ? "INSERT INTO entries(data) VALUES(json(?));" :
-        "INSERT INTO dashboards(data) VALUES(json(?));";
-
-    long int length = warudo_content_length(config);
-
-    if(length <= 0) {
-        return WARUDO_EMPTY_CONTENT_ERROR;
-    }
-
-    char* json = warudo_read_content(config, length);
-
-    if(json == NULL) {
-        return WARUDO_READ_ERROR;
-    }
-
-    WARUDO_DB_CALL(stmt, sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
-    WARUDO_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
-    WARUDO_DB_RET_CALL(stmt, sqlite3_step(stmt), SQLITE_DONE);
-
-    warudo_created(warudo_last_insert_rowid(config), config);
-    sqlite3_finalize(stmt);
-    free(json);
-
-    return WARUDO_OK;
+    return warudo_add_entry(entry_type, config);
 }
 
 int warudo_get_entries(int entry_type, warudo *config) {
