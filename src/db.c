@@ -234,6 +234,11 @@ int warudo_get_keys(warudo *config) {
     return WARUDO_OK;
 }
 
+/*int warudo_add_index(const char* name, warudo *config) {
+    char *query = "ALTER TABLE " WARUDO_ENTRIES_TABLE " ADD COLUMN ? TEXT;"
+        "AS JSON_EXTRACT(data, '$.%q') AS %q;";
+}*/
+
 unsigned long long int warudo_last_insert_rowid(warudo *config) {
     return sqlite3_last_insert_rowid(config->db);
 }
