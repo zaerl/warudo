@@ -112,6 +112,7 @@ struct warudo {
     sqlite3 *db;
     sqlite3_stmt* insert_stmt;
     sqlite3_stmt* insert_dashboard_stmt;
+    sqlite3_stmt* add_index_stmt;
 
     // Environment variables
     const char* access_origin;

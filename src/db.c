@@ -55,8 +55,9 @@ int warudo_db_init(const char *filename, warudo* config) {
         return WARUDO_DB_OPEN_ERROR;
     }
 
-    WARUDO_DB_CALL(config->insert_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WARUDO_ENTRIES_TABLE "(data) VALUES(json(?));", -1, &config->insert_stmt, NULL));
-    WARUDO_DB_CALL(config->insert_dashboard_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WARUDO_DASHBOARDS_TABLE "(data) VALUES(json(?));", -1, &config->insert_dashboard_stmt, NULL));
+    WARUDO_DB_CALL(config->insert_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WARUDO_ENTRIES_TABLE "(data) VALUES(json(?1));", -1, &config->insert_stmt, NULL));
+    WARUDO_DB_CALL(config->insert_dashboard_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WARUDO_DASHBOARDS_TABLE "(data) VALUES(json(?1));", -1, &config->insert_dashboard_stmt, NULL));
+    // WARUDO_DB_CALL(config->add_index_stmt, sqlite3_prepare_v2(config->db, "ALTER TABLE " WARUDO_ENTRIES_TABLE " add column ?1 TEXT as (json_extract(value, ?2));", -1, &config->add_index_stmt, NULL));
 
     // return warudo_load_columns(config);
     return WARUDO_OK;
@@ -116,6 +117,33 @@ int warudo_add_entry(int entry_type, warudo *config) {
     return WARUDO_OK;
 }
 
+/*int warudo_add_index(const char *filename, warudo* config) {
+    int must_free = 0;
+    const char* query = NULL;
+    sqlite3_stmt* stmt = entry_type == WARUDO_ENTRY_TYPE_DATA ? config->insert_stmt : config->insert_dashboard_stmt;
+    sqlite3_reset(stmt);
+
+    long int length = warudo_content_length(config);
+
+    if(length <= 0) {
+        return WARUDO_EMPTY_CONTENT_ERROR;
+    }
+
+    char* json = warudo_read_content(config, length);
+
+    if(json == NULL) {
+        return WARUDO_READ_ERROR;
+    }
+
+    WARUDO_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
+    WARUDO_DB_RET_CALL(stmt, sqlite3_step(stmt), SQLITE_DONE);
+
+    warudo_created(warudo_last_insert_rowid(config), config);
+    free(json);
+
+    return WARUDO_OK;
+}*/
+
 int warudo_add_entries(int entry_type, warudo *config) {
     return warudo_add_entry(entry_type, config);
 }
@@ -135,21 +163,21 @@ int warudo_get_entries(int entry_type, warudo *config) {
     /*
      *
      * Has search
-     * SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ? AS TEXT) = ? ORDER BY %q %q LIMIT ? OFFSET ?;
+     * SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ?1 AS TEXT) = ?2 ORDER BY %q %q LIMIT ?3 OFFSET ?4;
      *
      * Has ID
-     * SELECT id, created, modified, data FROM %q WHERE id = ?;
+     * SELECT id, created, modified, data FROM %q WHERE id = ?1;
      *
      * Regular
-     * SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ? OFFSET ?;
+     * SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ?1 OFFSET ?2;
      */
     if(has_search) {
-        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ? AS TEXT) LIKE ? ORDER BY %q %q LIMIT ? OFFSET ?;", table_name, order_by, sort);
+        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ?1 AS TEXT) LIKE ?2 ORDER BY %q %q LIMIT ?3 OFFSET ?4;", table_name, order_by, sort);
         limit_index = 3;
     } else if(config->query_id) {
-        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE id = ?;", table_name);
+        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE id = ?5;", table_name);
     } else {
-        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ? OFFSET ?;", table_name, order_by, sort);
+        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ?1 OFFSET ?2;", table_name, order_by, sort);
         limit_index = 1;
     }
 
@@ -235,7 +263,7 @@ int warudo_get_keys(warudo *config) {
 }
 
 /*int warudo_add_index(const char* name, warudo *config) {
-    char *query = "ALTER TABLE " WARUDO_ENTRIES_TABLE " ADD COLUMN ? TEXT;"
+    char *query = "ALTER TABLE " WARUDO_ENTRIES_TABLE " ADD COLUMN ?1 TEXT;"
         "AS JSON_EXTRACT(data, '$.%q') AS %q;";
 }*/
 
