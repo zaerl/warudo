@@ -9,6 +9,14 @@ extern "C" {
 #error "Windows is not supported"
 #endif
 
+#ifndef MJB_EXTERN
+#define MJB_EXTERN extern
+#endif
+
+#ifndef MJB_EXPORT
+#define MJB_EXPORT __attribute__((visibility("default")))
+#endif
+
 #define WARUDO_VERSION "0.1.0"
 
 // Configurations
@@ -113,6 +121,7 @@ struct warudo {
     sqlite3_stmt* insert_stmt;
     sqlite3_stmt* insert_dashboard_stmt;
     sqlite3_stmt* add_index_stmt;
+    sqlite3_stmt* parse_json_stmt;
 
     // Environment variables
     const char* access_origin;

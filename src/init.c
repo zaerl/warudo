@@ -23,15 +23,6 @@ int warudo_init(const char *filename, warudo **config) {
     pdb->timing_end_count = 0;
 #endif
 
-    // Load database
-    res = warudo_db_init(filename, pdb);
-
-    if(res != WARUDO_OK) {
-        warudo_close(pdb);
-
-        return WARUDO_DB_INIT_ERROR;
-    }
-
     // Load FCGI
     res = FCGX_Init();
 
@@ -99,6 +90,15 @@ int warudo_init(const char *filename, warudo **config) {
     if(env != NULL) {
         warudo_log_info(pdb, "Access origin: \"%s\"\n", env);
         pdb->access_origin = env;
+    }
+
+    // Load database
+    res = warudo_db_init(filename, pdb);
+
+    if(res != WARUDO_OK) {
+        warudo_close(pdb);
+
+        return WARUDO_DB_INIT_ERROR;
     }
 
     *config = pdb;

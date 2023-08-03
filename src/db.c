@@ -10,7 +10,7 @@
 #define WARUDO_DB_RET_CALL(STMT, CALL, RET) \
     if(CALL != RET) { \
         warudo_log_error(config, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
-        sqlite3_finalize(STMT); \
+        if(must_finalize) sqlite3_finalize(STMT); \
         if(must_free) sqlite3_free((void*)query); \
         warudo_bad_request("Failed to get data.", config); \
         return WARUDO_DB_ERROR; \
@@ -22,10 +22,11 @@ int warudo_load_columns(warudo* config);
 
 int warudo_db_init(const char *filename, warudo* config) {
     // Load database
+    int must_free = 0;
+    int must_finalize = 0;
+    const char* query = NULL;
     char* error_msg = 0;
     int rc = sqlite3_open(filename, &config->db);
-    int must_free = 0;
-    const char* query = NULL;
 
     if(rc != SQLITE_OK) {
         warudo_log_error(config, "Can't open database: %s\n", sqlite3_errmsg(config->db));
@@ -57,7 +58,8 @@ int warudo_db_init(const char *filename, warudo* config) {
 
     WARUDO_DB_CALL(config->insert_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WARUDO_ENTRIES_TABLE "(data) VALUES(json(?1));", -1, &config->insert_stmt, NULL));
     WARUDO_DB_CALL(config->insert_dashboard_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WARUDO_DASHBOARDS_TABLE "(data) VALUES(json(?1));", -1, &config->insert_dashboard_stmt, NULL));
-    // WARUDO_DB_CALL(config->add_index_stmt, sqlite3_prepare_v2(config->db, "ALTER TABLE " WARUDO_ENTRIES_TABLE " add column ?1 TEXT as (json_extract(value, ?2));", -1, &config->add_index_stmt, NULL));
+    WARUDO_DB_CALL(config->add_index_stmt, sqlite3_prepare_v2(config->db, "ALTER TABLE " WARUDO_ENTRIES_TABLE " add column name TEXT as (json_extract(value, ?2));", -1, &config->add_index_stmt, NULL));
+    WARUDO_DB_CALL(config->parse_json_stmt, sqlite3_prepare_v2(config->db, "SELECT * FROM json_each(?1) WHERE type='true';", -1, &config->parse_json_stmt, NULL));
 
     // return warudo_load_columns(config);
     return WARUDO_OK;
@@ -65,6 +67,7 @@ int warudo_db_init(const char *filename, warudo* config) {
 
 int warudo_load_columns(warudo* config) {
     int must_free = 0;
+    int must_finalize = 1;
     char* query = "PRAGMA table_info('" WARUDO_ENTRIES_TABLE "');";
     sqlite3_stmt* stmt;
 
@@ -92,6 +95,7 @@ int warudo_load_columns(warudo* config) {
 
 int warudo_add_entry(int entry_type, warudo *config) {
     int must_free = 0;
+    int must_finalize = 0;
     const char* query = NULL;
     sqlite3_stmt* stmt = entry_type == WARUDO_ENTRY_TYPE_DATA ? config->insert_stmt : config->insert_dashboard_stmt;
     sqlite3_reset(stmt);
@@ -117,10 +121,53 @@ int warudo_add_entry(int entry_type, warudo *config) {
     return WARUDO_OK;
 }
 
-/*int warudo_add_index(const char *filename, warudo* config) {
+int warudo_parse_json(warudo* config) {
     int must_free = 0;
+    int must_finalize = 0;
     const char* query = NULL;
-    sqlite3_stmt* stmt = entry_type == WARUDO_ENTRY_TYPE_DATA ? config->insert_stmt : config->insert_dashboard_stmt;
+    int rc;
+    sqlite3_stmt* stmt = config->parse_json_stmt;
+    sqlite3_reset(stmt);
+
+    long int length = warudo_content_length(config);
+
+    if(length <= 0) {
+        return WARUDO_EMPTY_CONTENT_ERROR;
+    }
+
+    char* json = warudo_read_content(config, length);
+
+    if(json == NULL) {
+        return WARUDO_READ_ERROR;
+    }
+
+    WARUDO_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
+
+    while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        const char *key_name = (const char*)sqlite3_column_text(stmt, 0);
+
+        if(strcmp(key_name, "key") == 0) {
+            const char *value = (const char*)sqlite3_column_text(stmt, 2);
+
+            if(strcmp(key_name, "string") == 0) {
+                FCGX_PutS(value, config->request.out);
+            }
+
+            break;
+        }
+    }
+
+    warudo_created(warudo_last_insert_rowid(config), config);
+    free(json);
+
+    return WARUDO_OK;
+}
+
+int warudo_add_index(const char *filename, warudo* config) {
+    int must_free = 0;
+    int must_finalize = 0;
+    const char* query = NULL;
+    sqlite3_stmt* stmt = config->add_index_stmt;
     sqlite3_reset(stmt);
 
     long int length = warudo_content_length(config);
@@ -142,7 +189,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
     free(json);
 
     return WARUDO_OK;
-}*/
+}
 
 int warudo_add_entries(int entry_type, warudo *config) {
     return warudo_add_entry(entry_type, config);
@@ -150,6 +197,7 @@ int warudo_add_entries(int entry_type, warudo *config) {
 
 int warudo_get_entries(int entry_type, warudo *config) {
     int must_free = 1;
+    int must_finalize = 1;
     char *query;
     sqlite3_stmt *stmt;
     int rc;
@@ -229,6 +277,7 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
 int warudo_get_keys(warudo *config) {
     int must_free = 0;
+    int must_finalize = 1;
     char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WARUDO_ENTRIES_TABLE ", json_tree(data) GROUP BY key;";
     int rc;
     int count = 0;
@@ -288,6 +337,8 @@ int warudo_db_close(warudo *config) {
 
     sqlite3_finalize(config->insert_stmt);
     sqlite3_finalize(config->insert_dashboard_stmt);
+    sqlite3_finalize(config->add_index_stmt);
+    sqlite3_finalize(config->parse_json_stmt);
 
     return sqlite3_close(config->db) == SQLITE_OK ? WARUDO_OK : WARUDO_DB_CLOSE_ERROR;
 }

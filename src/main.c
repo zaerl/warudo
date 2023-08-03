@@ -16,15 +16,16 @@ extern char **environ;
 
 // /opt/homebrew/opt/nginx/bin/nginx -g "daemon off;"
 // /opt/homebrew/opt/lighttpd/bin/lighttpd -D -f /opt/homebrew/etc/lighttpd/lighttpd.conf
-// make && ./bin/warudo"
+// make && WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 bin/warudo
 int main(void) {
     warudo *config;
     int ret;
 
-    warudo_read_config();
+    // warudo_read_config();
     ret = warudo_init(WARUDO_DB_FILE, &config);
 
     if(ret != WARUDO_OK) {
+        warudo_log_error(config, "Failed to initialize\n", "");
         return ret;
     }
 

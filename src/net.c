@@ -15,6 +15,13 @@ extern char **environ;
 
 #include "warudo.h"
 
+#define WARUDO_CHECK_CONNECTION(request) \
+    if(request.in == NULL || \
+        request.out == NULL || \
+        request.err == NULL) { \
+        return WARUDO_FCGI_INIT_ERROR; \
+    }
+
 // Function to escape special characters in a string for HTML
 char* warudo_escape_html(const char* input) {
     size_t len = strlen(input);
@@ -98,12 +105,16 @@ void warudo_url_decode(const char* input) {
 }
 
 int warudo_status(const char* status, warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     FCGX_FPrintF(config->request.out, "Status: %s\r\n", status);
 
     return WARUDO_OK;
 }
 
 int warudo_content_type(const char* content_type, warudo *config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     if(config->access_origin != NULL) {
         FCGX_FPrintF(config->request.out, "Access-Control-Allow-Origin: %s\r\n", config->access_origin);
     }
@@ -114,6 +125,8 @@ int warudo_content_type(const char* content_type, warudo *config) {
 }
 
 int warudo_header(const char* status, const char* content_type, warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     warudo_status(status, config);
     warudo_content_type(content_type, config);
 
@@ -121,12 +134,16 @@ int warudo_header(const char* status, const char* content_type, warudo* config) 
 }
 
 int warudo_ok(warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     warudo_header("200 OK", "application/json", config);
 
     return WARUDO_OK;
 }
 
 int warudo_created(unsigned long long int id, warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     warudo_header("200 OK", "application/json", config);
     FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", id);
 
@@ -134,6 +151,8 @@ int warudo_created(unsigned long long int id, warudo* config) {
 }
 
 int warudo_not_allowed(const char* allowed, warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     warudo_status("405 Method Not Allowed", config);
     FCGX_FPrintF(config->request.out, "Allow: %s\r\n", allowed);
     warudo_content_type("text/type", config);
@@ -143,6 +162,8 @@ int warudo_not_allowed(const char* allowed, warudo* config) {
 }
 
 int warudo_server_error(const char* description, warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     warudo_header("500 Internal Server Error", "text/plain", config);
     FCGX_PutS(description, config->request.out);
 
@@ -150,6 +171,8 @@ int warudo_server_error(const char* description, warudo* config) {
 }
 
 int warudo_bad_request(const char* description, warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     warudo_header("400 Bad Request", "application/json", config);
     FCGX_FPrintF(config->request.out, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
 
@@ -157,6 +180,8 @@ int warudo_bad_request(const char* description, warudo* config) {
 }
 
 int warudo_page_not_found(warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
     warudo_header("404 Not Found", "text/plain", config);
     FCGX_PutS("Unknown.", config->request.out);
 
