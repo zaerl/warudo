@@ -4,6 +4,8 @@
 #include "warudo.h"
 
 int warudo_log(warudo *config, int level, const char *format, ...) {
+    CHECK_CONFIG
+
     if(level > config->log_level) {
         return 0;
     }

@@ -43,6 +43,7 @@ int main(int argc, const char *argv[]) {
     RUN_TEST(db)
     RUN_TEST(home)
     RUN_TEST(init)
+    RUN_TEST(log)
     RUN_TEST(warudo)
 
     int valid = tests_valid == tests_total;

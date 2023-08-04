@@ -20,6 +20,7 @@ DECLARE_TEST(app)
 DECLARE_TEST(db)
 DECLARE_TEST(home)
 DECLARE_TEST(init)
+DECLARE_TEST(log)
 DECLARE_TEST(warudo)
 
 typedef void (*warudo_test)(void);
