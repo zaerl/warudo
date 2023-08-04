@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include "sqlite3/sqlite3.h"
 
-#include "config.h"
 #include "db.h"
 #include "log.h"
 #include "net.h"
@@ -21,7 +20,6 @@ int main(void) {
     warudo *config;
     int ret;
 
-    // warudo_read_config();
     ret = warudo_init(WARUDO_DB_FILE, &config);
 
     if(ret != WARUDO_OK) {

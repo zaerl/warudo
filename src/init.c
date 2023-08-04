@@ -6,7 +6,6 @@
 #include <time.h>
 #endif
 
-#include "config.h"
 #include "warudo.h"
 #include "db.h"
 #include "log.h"
@@ -142,6 +141,10 @@ int warudo_parse_query_string(char* query_string, warudo* config) {
 }
 
 int warudo_accept_connection(warudo *config) {
+    if(!config) {
+        return WARUDO_ERROR;
+    }
+
     config->page = -1;
     config->request_method = WARUDO_REQUEST_UNKNOWN;
     config->script_name = NULL;
