@@ -2,6 +2,8 @@
 #include "../src/db.h"
 
 void test_db(void) {
+    INIT_TEST
+
     ASSERT_ERROR(warudo_db_close(NULL), "warudo_db_close NULL")
 
     ASSERT_ERROR(warudo_db_init(NULL, NULL), "warudo_db_init NULL")

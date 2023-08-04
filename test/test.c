@@ -4,9 +4,6 @@
  * This file is distributed under the MIT License. See LICENSE for details.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "test.h"
 
 static unsigned int tests_valid = 0;
@@ -37,9 +34,11 @@ void warudo_assert(int test, const char *message, int wait) {
 }
 
 int main(int argc, const char *argv[]) {
-    printf("\x1b[Warudo %s test\x1B[0m\n", WARUDO_VERSION);
+    printf("\x1b[WWarudo %s test\x1B[0m\n", WARUDO_VERSION);
     (void)argc;
     (void)argv;
+
+    #define RUN_TEST(NAME) test_##NAME();
 
     RUN_TEST(db)
     RUN_TEST(init)

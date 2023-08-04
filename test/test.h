@@ -2,6 +2,9 @@
 #define WARUDO_TEST_H
 
 #include "../src/warudo.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,8 +13,9 @@ extern "C" {
 #define ASSERT(TEST, MESSAGE) warudo_assert((TEST), MESSAGE, 0);
 #define ASSERT_ERROR(TEST, MESSAGE) warudo_assert((TEST) == WARUDO_ERROR, MESSAGE, 0);
 #define ASSERT_OK(TEST, MESSAGE) warudo_assert((TEST) == WARUDO_OK, MESSAGE, 0);
+
 #define DECLARE_TEST(NAME) void test_##NAME(void);
-#define RUN_TEST(NAME) test_##NAME();
+#define INIT_TEST printf("\x1b[34m%s\x1b[0m\n", __func__);
 
 DECLARE_TEST(db)
 DECLARE_TEST(init)

@@ -163,6 +163,9 @@ typedef struct warudo warudo;
 // Init the system
 int warudo_init(const char *filename, warudo **config);
 
+// Parse the query string
+int warudo_parse_query_string(char* query_string, warudo* config);
+
 // Accept a FCGI connection
 int warudo_accept_connection(warudo *config);
 

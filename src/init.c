@@ -11,6 +11,10 @@
 #include "log.h"
 
 int warudo_init(const char *filename, warudo **config) {
+    if(!config) {
+        return WARUDO_ERROR;
+    }
+
     warudo *pdb;
     int res;
 
@@ -106,6 +110,8 @@ int warudo_init(const char *filename, warudo **config) {
 }
 
 int warudo_parse_query_string(char* query_string, warudo* config) {
+    CHECK_CONFIG
+
     if(query_string == NULL) {
         return WARUDO_EMPTY_QUERY_STRING_ERROR;
     }
@@ -141,9 +147,7 @@ int warudo_parse_query_string(char* query_string, warudo* config) {
 }
 
 int warudo_accept_connection(warudo *config) {
-    if(!config) {
-        return WARUDO_ERROR;
-    }
+    CHECK_CONFIG
 
     config->page = -1;
     config->request_method = WARUDO_REQUEST_UNKNOWN;
@@ -210,6 +214,8 @@ int warudo_accept_connection(warudo *config) {
 }
 
 int warudo_after_connection(warudo *config) {
+    CHECK_CONFIG
+
     FCGX_Finish_r(&config->request);
 
 #ifdef WARUDO_TIMING
@@ -221,6 +227,8 @@ int warudo_after_connection(warudo *config) {
 
 #ifdef WARUDO_TIMING
 int warudo_start_time(warudo *config) {
+    CHECK_CONFIG
+
     ++config->timing_count;
     config->timing_end_count = 0;
     clock_gettime(CLOCK_MONOTONIC, &config->start);
@@ -229,6 +237,8 @@ int warudo_start_time(warudo *config) {
 }
 
 int warudo_end_time(warudo *config, double ms, const char* message) {
+    CHECK_CONFIG
+
     struct timespec end;
     clock_gettime(CLOCK_MONOTONIC, &end);
 
@@ -246,9 +256,7 @@ int warudo_end_time(warudo *config, double ms, const char* message) {
 #endif
 
 int warudo_close(warudo *config) {
-    if(!config) {
-        return WARUDO_OK;
-    }
+    CHECK_CONFIG
 
     FCGX_Free(&config->request, 1);
     warudo_db_close(config);
