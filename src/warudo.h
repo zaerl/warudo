@@ -110,6 +110,8 @@ extern "C" {
 #define WARUDO_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
 // #define WARUDO_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
 
+#define CHECK_CONFIG if(!config) return WARUDO_ERROR;
+
 struct warudo_column {
     char* name;
     char* type;

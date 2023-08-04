@@ -7,11 +7,14 @@
 extern "C" {
 #endif
 
-#define ASSERT(TEST, MESSAGE) warudo_assert(TEST, MESSAGE, 0);
-#define ASSERTO(TEST) warudo_assert(TEST, ##MESSAGE, 0);
+#define ASSERT(TEST, MESSAGE) warudo_assert((TEST), MESSAGE, 0);
+#define ASSERT_ERROR(TEST, MESSAGE) warudo_assert((TEST) == WARUDO_ERROR, MESSAGE, 0);
+#define ASSERT_OK(TEST, MESSAGE) warudo_assert((TEST) == WARUDO_OK, MESSAGE, 0);
 #define DECLARE_TEST(NAME) void test_##NAME(void);
 #define RUN_TEST(NAME) test_##NAME();
 
+DECLARE_TEST(db)
+DECLARE_TEST(init)
 DECLARE_TEST(warudo)
 
 typedef void (*warudo_test)(void);

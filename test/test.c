@@ -41,6 +41,8 @@ int main(int argc, const char *argv[]) {
     (void)argc;
     (void)argv;
 
+    RUN_TEST(db)
+    RUN_TEST(init)
     RUN_TEST(warudo)
 
     int valid = tests_valid == tests_total;
