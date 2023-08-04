@@ -39,7 +39,9 @@ int main(int argc, const char *argv[]) {
 
     #define RUN_TEST(NAME) test_##NAME();
 
+    RUN_TEST(app)
     RUN_TEST(db)
+    RUN_TEST(home)
     RUN_TEST(init)
     RUN_TEST(warudo)
 

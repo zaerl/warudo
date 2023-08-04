@@ -7,6 +7,8 @@
 #include "db.h"
 
 int page_app(int entry_type, warudo* config) {
+    CHECK_CONFIG
+
     if(config->request_method == WARUDO_REQUEST_GET) {
         return warudo_get_entries(entry_type, config);
     } else if(config->request_method == WARUDO_REQUEST_POST) {
@@ -21,6 +23,8 @@ int page_app(int entry_type, warudo* config) {
 }
 
 int page_app_keys(warudo* config) {
+    CHECK_CONFIG
+
     if(config->request_method == WARUDO_REQUEST_GET) {
         return warudo_get_keys(config);
     }

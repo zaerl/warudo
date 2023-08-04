@@ -16,7 +16,9 @@ extern "C" {
 #define DECLARE_TEST(NAME) void test_##NAME(void);
 #define INIT_TEST printf("\x1b[34m%s\x1b[0m\n", __func__);
 
+DECLARE_TEST(app)
 DECLARE_TEST(db)
+DECLARE_TEST(home)
 DECLARE_TEST(init)
 DECLARE_TEST(warudo)
 
