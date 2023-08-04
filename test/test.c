@@ -1,5 +1,5 @@
 /**
- * The warudo library tests
+ * The warudo tests
  *
  * This file is distributed under the MIT License. See LICENSE for details.
  */
@@ -34,7 +34,6 @@ void warudo_assert(int test, const char *message, int wait) {
 }
 
 int main(int argc, const char *argv[]) {
-    printf("\x1b[WWarudo %s test\x1B[0m\n", WARUDO_VERSION);
     (void)argc;
     (void)argv;
 

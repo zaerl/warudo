@@ -1,7 +1,6 @@
 #ifndef WARUDO_TEST_H
 #define WARUDO_TEST_H
 
-#include "../src/warudo.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

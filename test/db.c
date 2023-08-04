@@ -1,5 +1,6 @@
-#include "test.h"
+#include "../src/warudo.h"
 #include "../src/db.h"
+#include "test.h"
 
 void test_db(void) {
     INIT_TEST
