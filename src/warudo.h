@@ -9,14 +9,6 @@ extern "C" {
 #error "Windows is not supported"
 #endif
 
-#ifndef MJB_EXTERN
-#define MJB_EXTERN extern
-#endif
-
-#ifndef MJB_EXPORT
-#define MJB_EXPORT __attribute__((visibility("default")))
-#endif
-
 #define WARUDO_VERSION "0.1.0"
 
 // Configurations
