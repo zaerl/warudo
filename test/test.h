@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../src/warudo.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -15,6 +17,7 @@ extern "C" {
 
 #define DECLARE_TEST(NAME) void test_##NAME(void);
 #define INIT_TEST printf("\x1b[34m%s\x1b[0m\n", __func__);
+#define MOCK_CONFIG warudo config;
 
 DECLARE_TEST(app)
 DECLARE_TEST(db)

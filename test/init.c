@@ -1,4 +1,3 @@
-#include "../src/warudo.h"
 #include "test.h"
 
 void test_init(void) {
