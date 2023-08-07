@@ -7,8 +7,9 @@
 #include "log.h"
 
 #define WARUDO_DB_RET_CALL(STMT, CALL, RET) \
-    if(CALL != RET) { \
-        warudo_log_error(config, "Failed to execute db query: %s\n", sqlite3_errmsg(config->db)); \
+    rc = CALL; \
+    if(rc != RET) { \
+        warudo_log_error(config, "Failed to execute db query: %d/%d %s\n", rc, RET, sqlite3_errmsg(config->db)); \
         if(must_finalize) sqlite3_finalize(STMT); \
         if(must_free) sqlite3_free((void*)query); \
         warudo_bad_request("Failed to get data.", config); \
@@ -25,9 +26,11 @@ int warudo_db_init(const char *filename, warudo* config) {
     // Load database
     int must_free = 0;
     int must_finalize = 0;
-    const char* query = NULL;
+    int rc;
     char* error_msg = 0;
-    int rc = sqlite3_open(filename, &config->db);
+    const char* query = NULL;
+
+    rc = sqlite3_open(filename, &config->db);
 
     if(rc != SQLITE_OK) {
         warudo_log_error(config, "Can't open database: %s\n", sqlite3_errmsg(config->db));
@@ -92,6 +95,7 @@ int warudo_load_columns(warudo* config) {
 
     int must_free = 0;
     int must_finalize = 1;
+    int rc;
     char* query = "PRAGMA table_info('" WARUDO_ENTRIES_TABLE "');";
     sqlite3_stmt* stmt;
 
@@ -128,8 +132,8 @@ int warudo_parse_json(warudo* config) {
 
     int must_free = 0;
     int must_finalize = 0;
-    const char* query = NULL;
     int rc;
+    const char* query = NULL;
     sqlite3_stmt* stmt = config->parse_json_stmt;
     sqlite3_reset(stmt);
 
@@ -172,6 +176,7 @@ int warudo_add_index(const char *filename, warudo* config) {
 
     int must_free = 0;
     int must_finalize = 0;
+    int rc;
     const char* query = NULL;
     sqlite3_stmt* stmt = config->add_index_stmt;
     sqlite3_reset(stmt);
@@ -202,6 +207,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
 
     int must_free = 0;
     int must_finalize = 0;
+    int rc;
     const char* query = NULL;
     sqlite3_stmt* stmt = entry_type == WARUDO_ENTRY_TYPE_DATA ? config->insert_stmt : config->insert_dashboard_stmt;
     sqlite3_reset(stmt);
@@ -238,9 +244,9 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
     int must_free = 1;
     int must_finalize = 1;
+    int rc;
     char *query;
     sqlite3_stmt *stmt;
-    int rc;
     int count = 0;
     int limit_index = 0;
     int has_search = !config->query_id && config->query_key != NULL && config->query_value != NULL;
@@ -262,8 +268,8 @@ int warudo_get_entries(int entry_type, warudo *config) {
     if(has_search) {
         query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ?1 AS TEXT) LIKE ?2 ORDER BY %q %q LIMIT ?3 OFFSET ?4;", table_name, order_by, sort);
         limit_index = 3;
-    } else if(config->query_id) {
-        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE id = ?5;", table_name);
+    } else if(config->query_id) {printf("boom %llu\n", config->query_id);
+        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE id = ?1;", table_name);
     } else {
         query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ?1 OFFSET ?2;", table_name, order_by, sort);
         limit_index = 1;
@@ -320,8 +326,8 @@ int warudo_get_keys(warudo *config) {
 
     int must_free = 0;
     int must_finalize = 1;
-    char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WARUDO_ENTRIES_TABLE ", json_tree(data) GROUP BY key;";
     int rc;
+    char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WARUDO_ENTRIES_TABLE ", json_tree(data) GROUP BY key;";
     int count = 0;
     sqlite3_stmt *stmt;
 
