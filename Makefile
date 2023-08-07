@@ -1,5 +1,6 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -pedantic -std=c99 -O2 -g
+DEBUG ?= 0
+CC = clang
+CFLAGS = -Wall -Wextra -pedantic -std=c99
 LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib
 LDLIBS = -lfcgi
 FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include
@@ -12,6 +13,15 @@ TEST_BUILD_DIR = test-build
 
 BIN_DIR = bin
 DBS = *.db *.db-shm *.db-wal
+
+FORMATTER = clang-format
+
+# Debug Settings
+ifeq ($(debug), 1)
+	CC := $(CC) -g -O0
+else
+	CC := $(CC) -Oz
+endif
 
 # Get all the src/ sub-directories
 SUBDIRS := $(shell find $(SRC_DIR) -type d)

@@ -268,7 +268,7 @@ int warudo_get_entries(int entry_type, warudo *config) {
     if(has_search) {
         query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ?1 AS TEXT) LIKE ?2 ORDER BY %q %q LIMIT ?3 OFFSET ?4;", table_name, order_by, sort);
         limit_index = 3;
-    } else if(config->query_id) {printf("boom %llu\n", config->query_id);
+    } else if(config->query_id) {
         query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE id = ?1;", table_name);
     } else {
         query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ?1 OFFSET ?2;", table_name, order_by, sort);
