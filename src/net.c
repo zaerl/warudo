@@ -85,32 +85,54 @@ char* warudo_escape_html(const char* input) {
     return escaped;
 }
 
-void warudo_url_decode(const char* input) {
-    char* dest = (char*)input;
-    char a, b;
+char* warudo_url_decode(const char* input) {
+    if(input == NULL) {
+        return NULL;
+    }
 
-    while(*input) {
-        if((*input == '%') && ((a = input[1]) && (b = input[2])) && (isxdigit(a) && isxdigit(b))) {
-            if(a >= 'a') a -= 'a'-'A';
-            if(a >= 'A') a -= ('A' - 10);
-            else a -= '0';
+    int decoded = 0;
+    char *decoded_url = malloc(strlen(input) + 1);
+    char hex_code[] = "00";
 
-            if(b >= 'a') b -= 'a'-'A';
-            if(b >= 'A') b -= ('A' - 10);
-            else b -= '0';
-            *dest++ = 16 * a + b;
-            input += 3;
-        } else {
-            *dest++ = *input++;
+    strcpy(decoded_url, input);
+
+    while(!decoded) {
+        decoded = 1;
+        unsigned long i;
+
+        for(i = 0; i < strlen(decoded_url); ++i) {
+            if(decoded_url[i] != '%') {
+                continue;
+            }
+
+            if(decoded_url[i + 1] == 0) {
+                return decoded_url;
+            }
+
+            if(isxdigit(decoded_url[i + 1]) && isxdigit(decoded_url[i + 2])) {
+                decoded = 0;
+
+                /* combine the next to numbers into one */
+                hex_code[0] = decoded_url[i + 1];
+                hex_code[1] = decoded_url[i + 2];
+
+                /* convert it to decimal */
+                long int x = strtol(hex_code, NULL, 16);
+
+                /* remove the hex */
+                memmove(&decoded_url[i + 1], &decoded_url[i + 3], strlen(&decoded_url[i + 3]) + 1);
+
+                decoded_url[i] = x;
+            }
         }
     }
 
-    *dest = '\0';
+    return decoded_url;
 }
 
 int is_valid_boundary(const char* boundary) {
     if(boundary == NULL) {
-        return NULL;
+        return 0;
     }
 
     int count = 0;

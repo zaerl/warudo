@@ -4,6 +4,10 @@
 void test_net(void) {
     INIT_TEST
 
+    ASSERT_NULL("NULL", warudo_url_decode, NULL)
+    ASSERT_FSTRING("valid simple string", "valid", warudo_url_decode, "valid")
+    ASSERT_FSTRING("valid full URL", "https://example.com/?ex=ex#ex=ex+ex", warudo_url_decode, "https%3A%2F%2Fexample.com%2F%3Fex%3Dex%23ex%3Dex%2Bex")
+
     ASSERT_NULL("NULL", warudo_escape_html, NULL)
     ASSERT_FSTRING("empty", "", warudo_escape_html, "")
     ASSERT_FSTRING("a-z", "a-z", warudo_escape_html, "a-z")

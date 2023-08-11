@@ -339,11 +339,14 @@ int warudo_get_entries(int entry_type, warudo *config) {
     WARUDO_DB_CALL(stmt, sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
     if(has_search) {
-        warudo_url_decode(config->query_key);
-        warudo_url_decode(config->query_value);
+        char* query_key = warudo_url_decode(config->query_key);
+        char* query_value = warudo_url_decode(config->query_value);
 
         WARUDO_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC));
         WARUDO_DB_CALL(stmt, sqlite3_bind_text(stmt, 2, config->query_value, strlen(config->query_value), SQLITE_STATIC));
+
+        free(query_key);
+        free(query_value);
     } else if(config->query_id) {
         WARUDO_DB_CALL(stmt, sqlite3_bind_int64(stmt, 1, config->query_id));
     }

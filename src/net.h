@@ -5,7 +5,7 @@
 
 char* warudo_escape_html(const char* input);
 
-void warudo_url_decode(const char* input);
+char* warudo_url_decode(const char* input);
 
 int is_valid_boundary(const char* boundary);
 
