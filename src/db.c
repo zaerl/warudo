@@ -18,7 +18,7 @@
 
 #define WARUDO_DB_CALL(STMT, CALL) WARUDO_DB_RET_CALL(STMT, CALL, SQLITE_OK)
 
-int warudo_load_columns(warudo* config);
+int warudo_load_columns(warudo* config);\
 
 int warudo_db_init(const char *filename, warudo* config) {
     CHECK_CONFIG
@@ -252,52 +252,86 @@ int warudo_add_entries(int entry_type, warudo *config) {
     char* input = warudo_read_content(config, length);
 
     if(input == NULL) {
-        return WARUDO_READ_ERROR;
+        goto error;
     }
 
     char* boundary = warudo_get_formdata_boundary(FCGX_GetParam("CONTENT_TYPE", config->request.envp));
 
     if(boundary == NULL) {
-        return WARUDO_READ_ERROR;
+        goto error;
     }
 
-    warudo_ok(config);
-    FCGX_PutS(input, config->request.out);
+    /*
+     * --{boundary}\r\n (2 + boundary_length + 2)
+     * Content-Disposition: form-data; name=".+"\r\n (38 + name + 1 + 2)
+     * \r\n (2)
+     * .+\r\n (content + 2)
+     * --{boundary}--\r\n (2 + boundary_length + 2 + 2)
+     *
+     * newlines = 10
+     * content disposition = 38 + 1 + 1
+     * {} = 2
+     * -- = 2
+     */
+    long int boundary_length = strlen(boundary);
 
-    /*char* substring = "--warudo";
-    int substring_length = 8;
-    char *repeating_part = strstr(input, substring);
-    int repeating_part_length = repeating_part - input + substring_length;
-
-    warudo_ok(config);
-    FCGX_PutS("\r\n", config->request.out);
-    FCGX_PutS(FCGX_GetParam("CONTENT_TYPE", config->request.envp), config->request.out);
-    FCGX_PutS("\r\n", config->request.out);
-    FCGX_PutS(input, config->request.out);
-
-    // FCGX_FPrintF(config->request.out, "%d", id);
-
-    while (token != NULL) {
-        printf("Substring: '%s'\n", token);
-        token = strtok_r(NULL, "192", &saveptr);
+    if(length < boundary_length * 2 + 54 || input[0] != '-' || input[1] != '-') {
+        return WARUDO_EMPTY_CONTENT_ERROR;
     }
 
-    char* saveptr;
-    const char* delimiter = "--warudo";
-    printf("json: %s\n", jsons);
-    char* json = strtok_r(jsons, delimiter, &saveptr);
-    printf("json: %s\n", json);
+    char* start = input + 2;
+    char* position = strstr(input, boundary);
 
-    while(json != NULL) {
-        WARUDO_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, json, -1, SQLITE_STATIC));
-        WARUDO_DB_RET_CALL(stmt, sqlite3_step(stmt), SQLITE_DONE);
+    if(position != start) {
+        goto error;
+    }
 
-        sqlite3_reset(stmt);
-        json = strtok_r(NULL, delimiter, &saveptr);
-    }*/
+    start += boundary_length;
+    position = strstr(start, "\r\nContent-Disposition: form-data; name=\"");
+
+    if(position != start) {
+        goto error;
+    }
+
+    start += 40;
+
+    position = strstr(start, "\"\r\n\r\n");
+
+    if(position == NULL) {
+        goto error;
+    }
+
+    start = position + 5;
+
+    position = strstr(start, boundary);
+
+    if(position == NULL || position < start + 4) {
+        goto error;
+    }
+
+    long int json_length = position - start;
+
+    if(start[json_length - 4] != '\r' || start[json_length - 3] != '\n' ||
+        start[json_length - 2] != '-' || start[json_length - 1] != '-') {
+        goto error;
+    }
+
+    json_length -= 4;
+
+    warudo_ok(config);
+    FCGX_PutStr(start, json_length, config->request.out);
+    FCGX_PutS(input, config->request.out);
+
     free(input);
 
     return WARUDO_OK;
+
+error:
+    if(input) {
+        free(input);
+    }
+
+    return WARUDO_READ_ERROR;
 }
 
 int warudo_get_entries(int entry_type, warudo *config) {
