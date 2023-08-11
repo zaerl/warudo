@@ -104,6 +104,27 @@ void warudo_url_decode(const char* input) {
     *dest = '\0';
 }
 
+int is_valid_boundary(const char* boundary) {
+    if(boundary == NULL) {
+        return NULL;
+    }
+
+    int count = 0;
+
+    while(*boundary) {
+        char c = *boundary;
+
+        if (!(c == '-' || c == '_' || isalnum(c))) {
+            return 0;
+        }
+
+        ++boundary;
+        ++count;
+    }
+
+    return count ? 1 : 0;
+}
+
 // multipart/form-data; boundary=random string
 char* warudo_get_formdata_boundary(char* content_type) {
     if(content_type == NULL || strlen(content_type) < 31) {
@@ -116,7 +137,13 @@ char* warudo_get_formdata_boundary(char* content_type) {
         return NULL;
     }
 
-    return content_type + 30;
+    boundary = content_type + 30;
+
+    if(!is_valid_boundary(boundary)) {
+        return NULL;
+    }
+
+    return boundary;
 }
 
 int warudo_status(const char* status, warudo* config) {

@@ -17,6 +17,10 @@ void warudo_assert(int test, int wait, const char *func_name, const char *descri
     const char* fail = "\x1B[31mFAIL\x1B[0m";
     int length = 80 - (strlen(func_name) + strlen(description) + (test ? 2 : 4) + 2);
 
+    if(length <= 0) {
+        length = 2;
+    }
+
     char spaces[length + 1];
     spaces[length] = '\0';
 
