@@ -24,6 +24,10 @@ extern char **environ;
 
 // Function to escape special characters in a string for HTML
 char* warudo_escape_html(const char* input) {
+    if(input == NULL) {
+        return NULL;
+    }
+
     size_t len = strlen(input);
     size_t escaped_len = len * 6 + 1;
     char* escaped = malloc(len);
