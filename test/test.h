@@ -11,9 +11,12 @@
 extern "C" {
 #endif
 
-#define ASSERT(TEST, MESSAGE) warudo_assert((TEST), MESSAGE, 0);
-#define ASSERT_ERROR(TEST, MESSAGE) warudo_assert((TEST) == WARUDO_ERROR, MESSAGE, 0);
-#define ASSERT_OK(TEST, MESSAGE) warudo_assert((TEST) == WARUDO_OK, MESSAGE, 0);
+#define ASSERT_INTERNAL(MESSAGE, TEST, RES, ...) warudo_assert((TEST(__VA_ARGS__)) == RES, 0, #TEST, MESSAGE);
+#define ASSERT(MESSAGE, RES, TEST, ...) ASSERT_INTERNAL(MESSAGE, RES, TEST, __VA_ARGS__)
+
+#define ASSERT_ERROR(MESSAGE, TEST, ...) ASSERT_INTERNAL(MESSAGE, TEST, WARUDO_ERROR, __VA_ARGS__)
+#define ASSERT_OK(MESSAGE, TEST, ...) ASSERT_INTERNAL(MESSAGE, TEST, WARUDO_OK, __VA_ARGS__)
+#define ASSERT_NULL(MESSAGE, TEST, ...) ASSERT_INTERNAL(MESSAGE, TEST, NULL, __VA_ARGS__)
 
 #define DECLARE_TEST(NAME) void test_##NAME(void);
 #define INIT_TEST printf("\x1b[34m%s\x1b[0m\n", __func__);
@@ -24,11 +27,12 @@ DECLARE_TEST(db)
 DECLARE_TEST(home)
 DECLARE_TEST(init)
 DECLARE_TEST(log)
+DECLARE_TEST(net)
 DECLARE_TEST(warudo)
 
 typedef void (*warudo_test)(void);
 
-void warudo_assert(int test, const char *message, int wait);
+void warudo_assert(int test, int wait, const char *func_name, const char *description);
 
 #ifdef __cplusplus
 }

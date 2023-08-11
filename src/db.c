@@ -236,7 +236,68 @@ int warudo_add_entry(int entry_type, warudo *config) {
 int warudo_add_entries(int entry_type, warudo *config) {
     CHECK_CONFIG
 
-    return warudo_add_entry(entry_type, config);
+    int must_free = 0;
+    int must_finalize = 0;
+    int rc;
+    const char* query = NULL;
+    sqlite3_stmt* stmt = entry_type == WARUDO_ENTRY_TYPE_DATA ? config->insert_stmt : config->insert_dashboard_stmt;
+    sqlite3_reset(stmt);
+
+    long int length = warudo_content_length(config);
+
+    if(length <= 0) {
+        return WARUDO_EMPTY_CONTENT_ERROR;
+    }
+
+    char* input = warudo_read_content(config, length);
+
+    if(input == NULL) {
+        return WARUDO_READ_ERROR;
+    }
+
+    char* boundary = warudo_get_formdata_boundary(FCGX_GetParam("CONTENT_TYPE", config->request.envp));
+
+    if(boundary == NULL) {
+        return WARUDO_READ_ERROR;
+    }
+
+    warudo_ok(config);
+    FCGX_PutS(input, config->request.out);
+
+    /*char* substring = "--warudo";
+    int substring_length = 8;
+    char *repeating_part = strstr(input, substring);
+    int repeating_part_length = repeating_part - input + substring_length;
+
+    warudo_ok(config);
+    FCGX_PutS("\r\n", config->request.out);
+    FCGX_PutS(FCGX_GetParam("CONTENT_TYPE", config->request.envp), config->request.out);
+    FCGX_PutS("\r\n", config->request.out);
+    FCGX_PutS(input, config->request.out);
+
+    // FCGX_FPrintF(config->request.out, "%d", id);
+
+    while (token != NULL) {
+        printf("Substring: '%s'\n", token);
+        token = strtok_r(NULL, "192", &saveptr);
+    }
+
+    char* saveptr;
+    const char* delimiter = "--warudo";
+    printf("json: %s\n", jsons);
+    char* json = strtok_r(jsons, delimiter, &saveptr);
+    printf("json: %s\n", json);
+
+    while(json != NULL) {
+        WARUDO_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, json, -1, SQLITE_STATIC));
+        WARUDO_DB_RET_CALL(stmt, sqlite3_step(stmt), SQLITE_DONE);
+
+        sqlite3_reset(stmt);
+        json = strtok_r(NULL, delimiter, &saveptr);
+    }*/
+    free(input);
+
+    return WARUDO_OK;
 }
 
 int warudo_get_entries(int entry_type, warudo *config) {

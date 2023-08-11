@@ -9,15 +9,26 @@
 static unsigned int tests_valid = 0;
 static unsigned int tests_total = 0;
 
-void warudo_assert(int test, const char *message, int wait) {
+void warudo_assert(int test, int wait, const char *func_name, const char *description) {
     ++tests_total;
     char enter = 0;
 
+    const char* ok = "\x1B[32mOK\x1B[0m";
+    const char* fail = "\x1B[31mFAIL\x1B[0m";
+    int length = 80 - (strlen(func_name) + strlen(description) + (test ? 2 : 4) + 2);
+
+    char spaces[length + 1];
+    spaces[length] = '\0';
+
+    for(int i = 0; i < length; i++) {
+        spaces[i] = ' ';
+    }
+
     if(test) {
-        printf("Test: %s \x1B[32mOK\x1B[0m\n", message);
+        printf("%s: %s%s%s\n", func_name, description, spaces, ok);
         ++tests_valid;
     } else {
-        printf("\x1B[31mTest: %s FAIL\x1B[0m\n", message);
+        printf("%s: %s%s%s\n", func_name, description, spaces, fail);
 
         if(wait) {
             printf("Press any key to continue... ");
@@ -44,6 +55,7 @@ int main(int argc, const char *argv[]) {
     RUN_TEST(home)
     RUN_TEST(init)
     RUN_TEST(log)
+    RUN_TEST(net)
     RUN_TEST(warudo)
 
     int valid = tests_valid == tests_total;

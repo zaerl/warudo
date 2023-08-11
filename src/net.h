@@ -7,6 +7,8 @@ char* warudo_escape_html(const char* input);
 
 void warudo_url_decode(const char* input);
 
+char* warudo_get_formdata_boundary(char* content_type);
+
 int warudo_status(const char* status, warudo* config);
 
 int warudo_content_type(const char* content_type, warudo *config);

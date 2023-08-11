@@ -4,5 +4,5 @@
 void test_log(void) {
     INIT_TEST
 
-    ASSERT_ERROR(warudo_log(NULL, 0, ""), "warudo_log NULL")
+    ASSERT_ERROR("NULL", warudo_log, NULL, 0, "")
 }

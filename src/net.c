@@ -104,6 +104,21 @@ void warudo_url_decode(const char* input) {
     *dest = '\0';
 }
 
+// multipart/form-data; boundary=random string
+char* warudo_get_formdata_boundary(char* content_type) {
+    if(content_type == NULL || strlen(content_type) < 31) {
+        return NULL;
+    }
+
+    char* boundary = strstr(content_type, "multipart/form-data; boundary=");
+
+    if(boundary == NULL || boundary != content_type) {
+        return NULL;
+    }
+
+    return content_type + 30;
+}
+
 int warudo_status(const char* status, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
