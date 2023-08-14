@@ -12,7 +12,7 @@
         warudo_log_error(config, "Failed to execute db query: %d/%d %s\n", rc, RET, sqlite3_errmsg(config->db)); \
         if(must_finalize) sqlite3_finalize(STMT); \
         if(must_free) sqlite3_free((void*)query); \
-        warudo_bad_request("Failed to get data.", config); \
+        if(must_output_error) warudo_bad_request("Failed to get data.", config); \
         return WARUDO_DB_ERROR; \
     } \
 
@@ -26,6 +26,7 @@ int warudo_db_init(const char *filename, warudo* config) {
     // Load database
     int must_free = 0;
     int must_finalize = 0;
+    int must_output_error = 1;
     int rc;
     char* error_msg = 0;
     const char* query = NULL;
@@ -95,6 +96,7 @@ int warudo_load_columns(warudo* config) {
 
     int must_free = 0;
     int must_finalize = 1;
+    int must_output_error = 1;
     int rc;
     char* query = "PRAGMA table_info('" WARUDO_ENTRIES_TABLE "');";
     sqlite3_stmt* stmt;
@@ -132,6 +134,7 @@ int warudo_parse_json(warudo* config) {
 
     int must_free = 0;
     int must_finalize = 0;
+    int must_output_error = 1;
     int rc;
     const char* query = NULL;
     sqlite3_stmt* stmt = config->parse_json_stmt;
@@ -176,6 +179,7 @@ int warudo_add_index(const char *filename, warudo* config) {
 
     int must_free = 0;
     int must_finalize = 0;
+    int must_output_error = 1;
     int rc;
     const char* query = NULL;
     sqlite3_stmt* stmt = config->add_index_stmt;
@@ -207,6 +211,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
 
     int must_free = 0;
     int must_finalize = 0;
+    int must_output_error = 1;
     int rc;
     const char* query = NULL;
     sqlite3_stmt* stmt = entry_type == WARUDO_ENTRY_TYPE_DATA ? config->insert_stmt : config->insert_dashboard_stmt;
@@ -233,17 +238,31 @@ int warudo_add_entry(int entry_type, warudo *config) {
     return WARUDO_OK;
 }
 
-int warudo_add_entries(int entry_type, warudo *config) {
+int warudo_formdata_callback(const char* input, long int length, warudo* config) {
     CHECK_CONFIG
 
     int must_free = 0;
     int must_finalize = 0;
+    int must_output_error = 0;
     int rc;
     const char* query = NULL;
-    int res = WARUDO_READ_ERROR;
-    sqlite3_stmt* stmt = entry_type == WARUDO_ENTRY_TYPE_DATA ? config->insert_stmt : config->insert_dashboard_stmt;
+    sqlite3_stmt* stmt = config->insert_stmt;
     sqlite3_reset(stmt);
 
+    if(input == NULL) {
+        return WARUDO_READ_ERROR;
+    }
+
+    WARUDO_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, input, length, SQLITE_STATIC));
+    WARUDO_DB_RET_CALL(stmt, sqlite3_step(stmt), SQLITE_DONE);
+
+    return WARUDO_OK;
+}
+
+int warudo_add_entries(int entry_type, warudo *config) {
+    CHECK_CONFIG
+
+    int count = 0;
     long int length = warudo_content_length(config);
 
     if(length <= 0) {
@@ -253,19 +272,21 @@ int warudo_add_entries(int entry_type, warudo *config) {
     char* input = warudo_read_content(length, config);
     char* boundary = warudo_get_formdata_boundary(FCGX_GetParam("CONTENT_TYPE", config->request.envp));
 
-    if(warudo_parse_formdata(input, length, boundary) != WARUDO_OK) {
-        goto error;
+    count = warudo_parse_formdata(input, length, boundary, &warudo_formdata_callback, config);
+
+    if(count == 0) {
+        warudo_bad_request("No entries created.", config);
+    } else {
+        // warudo_ok(config);
+        // FCGX_PutS(input, config->request.out);
+        warudo_multi_created(count, config);
     }
 
-    warudo_ok(config);
-    FCGX_PutS(input, config->request.out);
-
-error:
     if(input) {
         free(input);
     }
 
-    return res;
+    return count ? WARUDO_OK : WARUDO_EMPTY_CONTENT_ERROR;
 }
 
 int warudo_get_entries(int entry_type, warudo *config) {
@@ -273,6 +294,7 @@ int warudo_get_entries(int entry_type, warudo *config) {
 
     int must_free = 1;
     int must_finalize = 1;
+    int must_output_error = 1;
     int rc;
     char *query;
     sqlite3_stmt *stmt;
@@ -358,6 +380,7 @@ int warudo_get_keys(warudo *config) {
 
     int must_free = 0;
     int must_finalize = 1;
+    int must_output_error = 1;
     int rc;
     char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WARUDO_ENTRIES_TABLE ", json_tree(data) GROUP BY key;";
     int count = 0;

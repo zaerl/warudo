@@ -21,6 +21,8 @@ int warudo_ok(warudo* config);
 
 int warudo_created(unsigned long long int id, warudo* config);
 
+int warudo_multi_created(unsigned long int count, warudo* config);
+
 int warudo_not_allowed(const char* allowed, warudo* config);
 
 int warudo_server_error(const char* description, warudo* config);
@@ -35,6 +37,7 @@ long int warudo_content_length(warudo* config);
 
 char* warudo_read_content(long int length, warudo* config);
 
-int warudo_parse_formdata(const char* input, long int length, const char* boundary);
+int warudo_parse_formdata(const char* input, long int length, const char* boundary,
+    int (*callback)(const char*, long int, warudo*), warudo* config);
 
 #endif /* WARUDO_NET_H */

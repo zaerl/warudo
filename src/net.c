@@ -218,6 +218,15 @@ int warudo_created(unsigned long long int id, warudo* config) {
     return WARUDO_OK;
 }
 
+int warudo_multi_created(unsigned long int count, warudo* config) {
+    WARUDO_CHECK_CONNECTION(config->request);
+
+    warudo_header("200 OK", "application/json", config);
+    FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"count\":%lld}", count);
+
+    return WARUDO_OK;
+}
+
 int warudo_not_allowed(const char* allowed, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
@@ -299,11 +308,12 @@ char* warudo_read_content(long int length, warudo* config) {
     return data;
 }
 
-int warudo_parse_formdata(const char* input, long int length, const char* boundary) {
+int warudo_parse_formdata(const char* input, long int length, const char* boundary,
+    int (*callback)(const char*, long int, warudo*), warudo* config) {
     char *full_boundary = NULL;
-    int res = WARUDO_READ_ERROR;
+    int res = 0;
 
-    if(length == 0 || input == NULL || boundary == NULL) {
+    if(length == 0 || input == NULL || boundary == NULL || callback == NULL) {
         goto error;
     }
 
@@ -333,13 +343,14 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
         if(index && position != input + index) {
             int json_length = position - (input + index);
 
-            printf("FOUND JSON >>>%.*s<<<\n", json_length, input + index);
+            if((*callback)(input + index, json_length, config) == WARUDO_OK) {
+                ++res;
+            }
 
             if(length - ((position - input) + full_boundary_length) == 4) {
                 // --{boundary}--\r\n
                 //             ^^
                 if(strncmp(input + index + json_length + full_boundary_length, "--\r\n", 4) == 0) {
-                    res = WARUDO_OK;
                     break;
                 } else {
                     goto error;
