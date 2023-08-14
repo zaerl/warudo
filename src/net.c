@@ -299,6 +299,89 @@ char* warudo_read_content(long int length, warudo* config) {
     return data;
 }
 
-int warudo_parse_formdata(const char* formdata, const char* boundary, warudo* config) {
+int warudo_parse_formdata(const char* input, long int length, const char* boundary) {
+    char *full_boundary = NULL;
+    int res = WARUDO_READ_ERROR;
 
+    if(length == 0 || input == NULL || boundary == NULL) {
+        goto error;
+    }
+
+    long int index = 0;
+    long int boundary_length = strlen(boundary);
+    long int full_boundary_length = boundary_length + 2;
+    full_boundary = malloc(full_boundary_length + 1);
+
+    full_boundary[0] = '-';
+    full_boundary[1] = '-';
+    full_boundary[full_boundary_length] = '\0';
+
+    strcpy(full_boundary + 2, boundary);
+
+    // At least one entry
+    if(length < boundary_length * 2 + 54 || input[0] != '-' || input[1] != '-') {
+        return WARUDO_EMPTY_CONTENT_ERROR;
+    }
+
+    while(index < length) {
+        char* position = strstr(input + index, full_boundary);
+
+        if(position == NULL) {
+            goto error;
+        }
+
+        if(index && position != input + index) {
+            int json_length = position - (input + index);
+
+            printf("FOUND JSON >>>%.*s<<<\n", json_length, input + index);
+
+            if(length - ((position - input) + full_boundary_length) == 4) {
+                // --{boundary}--\r\n
+                //             ^^
+                if(strncmp(input + index + json_length + full_boundary_length, "--\r\n", 4) == 0) {
+                    res = WARUDO_OK;
+                    break;
+                } else {
+                    goto error;
+                }
+            }
+
+            index += json_length + full_boundary_length;
+        } else {
+            index += full_boundary_length;
+        }
+
+        position = strstr(input + index, "\r\nContent-Disposition: form-data; name=\"");
+
+        if(position == NULL || position != input + index) {
+            goto error;
+        }
+
+        index += 40;
+
+        // --{boundary}\r\n
+        // Content-Disposition: form-data; name="{field}"\r\n
+        //                                       ^^
+        position = strstr(input + index, "\"\r\n\r\n");
+
+        if(position == NULL) {
+            // printf("NO newlines\n");
+            goto error;
+        }
+
+        // --{boundary}\r\n
+        // Content-Disposition: form-data; name="{field}"\r\n
+        // \r\n
+        // \r\n
+        // {json}\r\n
+        // ^^
+        index += (position - (input + index)) + 5;
+    }
+
+error:
+    if(full_boundary) {
+        free(full_boundary);
+    }
+
+    return res;
 }

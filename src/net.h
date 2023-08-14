@@ -35,6 +35,6 @@ long int warudo_content_length(warudo* config);
 
 char* warudo_read_content(long int length, warudo* config);
 
-int warudo_parse_formdata(const char* formdata, const char* boundary, warudo* config);
+int warudo_parse_formdata(const char* input, long int length, const char* boundary);
 
 #endif /* WARUDO_NET_H */
