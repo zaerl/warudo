@@ -7,6 +7,7 @@ FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include
 
 SRC_DIR = src
 TEST_SRC_DIR = test
+TOOLS_DIR = tools
 
 BUILD_DIR = build
 TEST_BUILD_DIR = test-build
@@ -86,22 +87,3 @@ clean:
 	rm -rf $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET) ${DBS}
 
 .PHONY: all clean
-
-# stress-test:
-# 	$(CC) $(CFLAGS) -o stress-test stress-test.c -L/opt/homebrew/opt/curl/lib -lcurl
-
-#TARGET = warudo
-
-#$(TARGET): warudo.o
-#	$(CC) $(CFLAGS) -o $(TARGET) warudo.o -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS)
-
-#warudo.o: src/warudo.c
-#	$(CC) $(CFLAGS) -c -I$(FCGI_INCLUDE_PATH) src/warudo.c
-
-#sqlite3.o: src/sqlite3.c
-#	$(CC) $(CFLAGS) -c src/sqlite3.c
-
-#clean:
-#	rm -f $(TARGET) *.o
-
-#.PHONY: clean

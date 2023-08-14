@@ -143,7 +143,7 @@ int warudo_parse_json(warudo* config) {
         return WARUDO_EMPTY_CONTENT_ERROR;
     }
 
-    char* json = warudo_read_content(config, length);
+    char* json = warudo_read_content(length, config);
 
     if(json == NULL) {
         return WARUDO_READ_ERROR;
@@ -187,7 +187,7 @@ int warudo_add_index(const char *filename, warudo* config) {
         return WARUDO_EMPTY_CONTENT_ERROR;
     }
 
-    char* json = warudo_read_content(config, length);
+    char* json = warudo_read_content(length, config);
 
     if(json == NULL) {
         return WARUDO_READ_ERROR;
@@ -218,7 +218,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
         return WARUDO_EMPTY_CONTENT_ERROR;
     }
 
-    char* json = warudo_read_content(config, length);
+    char* json = warudo_read_content(length, config);
 
     if(json == NULL) {
         return WARUDO_READ_ERROR;
@@ -240,6 +240,8 @@ int warudo_add_entries(int entry_type, warudo *config) {
     int must_finalize = 0;
     int rc;
     const char* query = NULL;
+    char *full_boundary = NULL;
+    int res = WARUDO_READ_ERROR;
     sqlite3_stmt* stmt = entry_type == WARUDO_ENTRY_TYPE_DATA ? config->insert_stmt : config->insert_dashboard_stmt;
     sqlite3_reset(stmt);
 
@@ -249,7 +251,7 @@ int warudo_add_entries(int entry_type, warudo *config) {
         return WARUDO_EMPTY_CONTENT_ERROR;
     }
 
-    char* input = warudo_read_content(config, length);
+    char* input = warudo_read_content(length, config);
 
     if(input == NULL) {
         goto error;
@@ -262,76 +264,99 @@ int warudo_add_entries(int entry_type, warudo *config) {
     }
 
     /*
-     * --{boundary}\r\n (2 + boundary_length + 2)
-     * Content-Disposition: form-data; name=".+"\r\n (38 + name + 1 + 2)
-     * \r\n (2)
-     * .+\r\n (content + 2)
-     * --{boundary}--\r\n (2 + boundary_length + 2 + 2)
-     *
-     * newlines = 10
-     * content disposition = 38 + 1 + 1
-     * {} = 2
-     * -- = 2
+     * --{boundary}\r\n
+     * Content-Disposition: form-data; name=".+"\r\n
+     * \r\n
+     * \r\n
+     * {json}\r\n
+     * --{boundary}--\r\n
      */
     long int boundary_length = strlen(boundary);
+    long int full_boundary_length = boundary_length + 2;
+    full_boundary = malloc(full_boundary_length + 1);
 
+    full_boundary[0] = '-';
+    full_boundary[1] = '-';
+    full_boundary[full_boundary_length] = '\0';
+
+    strcpy(full_boundary + 2, boundary);
+
+    // At least on entry
     if(length < boundary_length * 2 + 54 || input[0] != '-' || input[1] != '-') {
         return WARUDO_EMPTY_CONTENT_ERROR;
     }
 
-    char* start = input + 2;
-    char* position = strstr(input, boundary);
+    char* start = input;
+    long int index = 0;
 
-    if(position != start) {
-        goto error;
+    while(index < length) {
+        char* position = strstr(start + index, full_boundary);
+
+        if(position == NULL) {
+            goto error;
+        }
+
+        if(index && position != start + index) {
+            long int json_length = position - (start + index);
+
+            printf("FOUND JSON >>>%.*s<<<\n", json_length, start + index);
+
+            if(length - ((position - start) + full_boundary_length) == 4) {
+                // --{boundary}--\r\n
+                //             ^^
+                if(strncmp(start + index + json_length + full_boundary_length, "--\r\n", 4) == 0) {
+                    res = WARUDO_OK;
+                    break;
+                } else {
+                    goto error;
+                }
+            }
+
+            index += json_length + full_boundary_length;
+        } else {
+            index += full_boundary_length;
+        }
+
+        position = strstr(start + index, "\r\nContent-Disposition: form-data; name=\"");
+
+        if(position == NULL || position != start + index) {
+            goto error;
+        }
+
+        index += 40;
+
+        // --{boundary}\r\n
+        // Content-Disposition: form-data; name="{field}"\r\n
+        //                                       ^^
+        position = strstr(start + index, "\"\r\n\r\n");
+
+        if(position == NULL) {
+            // printf("NO newlines\n");
+            goto error;
+        }
+
+        // --{boundary}\r\n
+        // Content-Disposition: form-data; name="{field}"\r\n
+        // \r\n
+        // \r\n
+        // {json}\r\n
+        // ^^
+        index += (position - (start + index)) + 5;
     }
-
-    start += boundary_length;
-    position = strstr(start, "\r\nContent-Disposition: form-data; name=\"");
-
-    if(position != start) {
-        goto error;
-    }
-
-    start += 40;
-
-    position = strstr(start, "\"\r\n\r\n");
-
-    if(position == NULL) {
-        goto error;
-    }
-
-    start = position + 5;
-
-    position = strstr(start, boundary);
-
-    if(position == NULL || position < start + 4) {
-        goto error;
-    }
-
-    long int json_length = position - start;
-
-    if(start[json_length - 4] != '\r' || start[json_length - 3] != '\n' ||
-        start[json_length - 2] != '-' || start[json_length - 1] != '-') {
-        goto error;
-    }
-
-    json_length -= 4;
 
     warudo_ok(config);
-    FCGX_PutStr(start, json_length, config->request.out);
     FCGX_PutS(input, config->request.out);
-
-    free(input);
-
-    return WARUDO_OK;
 
 error:
     if(input) {
         free(input);
     }
 
-    return WARUDO_READ_ERROR;
+    if(full_boundary) {
+        free(full_boundary);
+    }
+
+    return res;
 }
 
 int warudo_get_entries(int entry_type, warudo *config) {

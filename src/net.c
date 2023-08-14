@@ -285,7 +285,7 @@ long int warudo_content_length(warudo* config) {
 }
 
 
-char* warudo_read_content(warudo* config, long int length) {
+char* warudo_read_content(long int length, warudo* config) {
     long int len = length == 0 ? warudo_content_length(config) : length;
 
     if(len <= 0) {
@@ -297,4 +297,8 @@ char* warudo_read_content(warudo* config, long int length) {
     FCGX_GetStr(data, len, config->request.in);
 
     return data;
+}
+
+int warudo_parse_formdata(const char* formdata, const char* boundary, warudo* config) {
+
 }
