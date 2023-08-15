@@ -152,12 +152,12 @@ int is_valid_boundary(const char* boundary) {
 }
 
 // multipart/form-data; boundary=random string
-char* warudo_get_formdata_boundary(char* content_type) {
+const char* warudo_get_formdata_boundary(const char* content_type) {
     if(content_type == NULL || strlen(content_type) < 31) {
         return NULL;
     }
 
-    char* boundary = strstr(content_type, "multipart/form-data; boundary=");
+    const char* boundary = strstr(content_type, "multipart/form-data; boundary=");
 
     if(boundary == NULL || boundary != content_type) {
         return NULL;
@@ -311,14 +311,19 @@ char* warudo_read_content(long int length, warudo* config) {
 int warudo_parse_formdata(const char* input, long int length, const char* boundary,
     int (*callback)(const char*, long int, warudo*), warudo* config) {
     char *full_boundary = NULL;
+    long int index = 0;
     int res = 0;
 
-    if(length == 0 || input == NULL || boundary == NULL || callback == NULL) {
-        goto error;
+    if(!config || length == 0 || input == NULL || boundary == NULL || callback == NULL) {
+        return WARUDO_PARSER_EMPTY;
     }
 
-    long int index = 0;
     long int boundary_length = strlen(boundary);
+
+    if(boundary_length == 0) {
+        return WARUDO_PARSER_EMPTY_BOUNDARY;
+    }
+
     long int full_boundary_length = boundary_length + 2;
     full_boundary = malloc(full_boundary_length + 1);
 
@@ -329,14 +334,16 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
     strcpy(full_boundary + 2, boundary);
 
     // At least one entry
-    if(length < boundary_length * 2 + 54 || input[0] != '-' || input[1] != '-') {
-        return WARUDO_EMPTY_CONTENT_ERROR;
+    if(length < boundary_length * 2 + 54) {
+        res = WARUDO_PARSER_VOID;
+        goto error;
     }
 
     while(index < length) {
         char* position = strstr(input + index, full_boundary);
 
         if(position == NULL) {
+            res = WARUDO_PARSER_NO_BOUNDARY;
             goto error;
         }
 
@@ -353,6 +360,7 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
                 if(strncmp(input + index + json_length + full_boundary_length, "--\r\n", 4) == 0) {
                     break;
                 } else {
+                    res = WARUDO_PARSER_MISSING_END;
                     goto error;
                 }
             }
@@ -365,6 +373,7 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
         position = strstr(input + index, "\r\nContent-Disposition: form-data; name=\"");
 
         if(position == NULL || position != input + index) {
+            res = WARUDO_PARSER_MISSING_CONTENT;
             goto error;
         }
 
@@ -376,7 +385,7 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
         position = strstr(input + index, "\"\r\n\r\n");
 
         if(position == NULL) {
-            // printf("NO newlines\n");
+            res = WARUDO_PARSER_MISSING_BODY;
             goto error;
         }
 

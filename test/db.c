@@ -11,7 +11,7 @@ void test_db(void) {
     ASSERT_ERROR("NULL", warudo_add_index, "", NULL)
     ASSERT_ERROR("NULL", warudo_db_close, NULL)
     ASSERT_ERROR("NULL", warudo_load_columns, NULL)
-    ASSERT_ERROR("NULL", warudo_last_insert_rowid, NULL)
+    ASSERT("NULL", 0, warudo_last_insert_rowid, NULL)
 
     ASSERT_ERROR("NULL", warudo_add_entry, 0, NULL)
     ASSERT_ERROR("NULL", warudo_add_entries, 0, NULL)

@@ -124,7 +124,9 @@ int warudo_load_columns(warudo* config) {
 }
 
 unsigned long long int warudo_last_insert_rowid(warudo *config) {
-    CHECK_CONFIG
+    if(!config) {
+        return 0;
+    }
 
     return sqlite3_last_insert_rowid(config->db);
 }
@@ -177,6 +179,7 @@ int warudo_parse_json(warudo* config) {
 int warudo_add_index(const char *filename, warudo* config) {
     CHECK_CONFIG
 
+    (void)filename;
     int must_free = 0;
     int must_finalize = 0;
     int must_output_error = 1;
@@ -262,6 +265,7 @@ int warudo_formdata_callback(const char* input, long int length, warudo* config)
 int warudo_add_entries(int entry_type, warudo *config) {
     CHECK_CONFIG
 
+    (void)entry_type;
     int count = 0;
     long int length = warudo_content_length(config);
 
@@ -270,11 +274,11 @@ int warudo_add_entries(int entry_type, warudo *config) {
     }
 
     char* input = warudo_read_content(length, config);
-    char* boundary = warudo_get_formdata_boundary(FCGX_GetParam("CONTENT_TYPE", config->request.envp));
+    const char* boundary = warudo_get_formdata_boundary(FCGX_GetParam("CONTENT_TYPE", config->request.envp));
 
     count = warudo_parse_formdata(input, length, boundary, &warudo_formdata_callback, config);
 
-    if(count == 0) {
+    if(count <= 0) {
         warudo_bad_request("No entries created.", config);
     } else {
         // warudo_ok(config);

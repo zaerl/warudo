@@ -9,13 +9,35 @@
 static unsigned int tests_valid = 0;
 static unsigned int tests_total = 0;
 
-void warudo_assert(int test, int wait, const char *func_name, const char *description) {
+void warudo_assert(const char* type, int test, int wait, const char *func_name, const char *description);
+
+void warudo_assert_int(int result, int expected, int wait, const char *func_name, const char *description) {
+    int test = result == expected;
+
+    warudo_assert("int", test, wait, func_name, description);
+
+    if(!test) {
+        printf("Expected \x1B[32m%d\x1B[0m, got \x1B[31m%d\x1B[0m\n", expected, result);
+    }
+}
+
+void warudo_assert_string(char* result, char* expected, int wait, const char *func_name, const char *description) {
+    int test = strcmp(result, expected) == 0;
+
+    warudo_assert("string", test, wait, func_name, description);
+
+    if(!test) {
+        printf("Expected \"\x1B[32m%s\x1B[0m\", got \"\x1B[31m%d\x1B[0m\"\n", expected, result);
+    }
+}
+
+void warudo_assert(const char* type, int test, int wait, const char *func_name, const char *description) {
     ++tests_total;
     char enter = 0;
 
     const char* ok = "\x1B[32mOK\x1B[0m";
     const char* fail = "\x1B[31mFAIL\x1B[0m";
-    int length = 80 - (strlen(func_name) + strlen(description) + (test ? 2 : 4) + 2);
+    int length = 80 - (strlen(type) + strlen(func_name) + strlen(description) + (test ? 2 : 4) + 5);
 
     if(length <= 0) {
         length = 2;
@@ -29,10 +51,10 @@ void warudo_assert(int test, int wait, const char *func_name, const char *descri
     }
 
     if(test) {
-        printf("%s: %s%s%s\n", func_name, description, spaces, ok);
+        printf("[%s] %s: %s%s%s\n", type, func_name, description, spaces, ok);
         ++tests_valid;
     } else {
-        printf("%s: %s%s%s\n", func_name, description, spaces, fail);
+        printf("[%s] %s: %s%s%s\n", type, func_name, description, spaces, fail);
 
         if(wait) {
             printf("Press any key to continue... ");

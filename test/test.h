@@ -11,22 +11,22 @@
 extern "C" {
 #endif
 
-#define ASSERT_INTERNAL(MESSAGE, TEST, RES, ...) warudo_assert((TEST(__VA_ARGS__)) == RES, 0, #TEST, MESSAGE);
-#define ASSERT_STRING_INTERNAL(MESSAGE, TEST, MUST_FREE, RES, ...) \
-    buffer = TEST(__VA_ARGS__); \
-    warudo_assert((strcmp(buffer, RES)) == 0, 0, #TEST, MESSAGE); \
-    if (MUST_FREE) free(buffer);
+#define ASSERT(MESSAGE, EXPECTED, TEST_FUNC, ...) \
+    _Generic((0, EXPECTED), \
+        void*: warudo_assert_int((int)TEST_FUNC(__VA_ARGS__), (int)EXPECTED, 0, #TEST_FUNC, MESSAGE), \
+        int: warudo_assert_int(TEST_FUNC(__VA_ARGS__), EXPECTED, 0, #TEST_FUNC, MESSAGE), \
+        char*: warudo_assert_string(TEST_FUNC(__VA_ARGS__), EXPECTED, 0, #TEST_FUNC, MESSAGE), \
+        const char*: warudo_assert_string(TEST_FUNC(__VA_ARGS__), EXPECTED, 0, #TEST_FUNC, MESSAGE), \
+        default: warudo_assert_int(TEST_FUNC(__VA_ARGS__), EXPECTED, 0, #TEST_FUNC, MESSAGE) \
+    );
 
-#define ASSERT(MESSAGE, RES, TEST, ...) ASSERT_INTERNAL(MESSAGE, TEST, RES, __VA_ARGS__)
-#define ASSERT_STRING(MESSAGE, RES, TEST, ...) ASSERT_STRING_INTERNAL(MESSAGE, TEST, 0, RES, __VA_ARGS__)
-#define ASSERT_FSTRING(MESSAGE, RES, TEST, ...) ASSERT_STRING_INTERNAL(MESSAGE, TEST, 1, RES, __VA_ARGS__)
-
-#define ASSERT_ERROR(MESSAGE, TEST, ...) ASSERT_INTERNAL(MESSAGE, TEST, WARUDO_ERROR, __VA_ARGS__)
-#define ASSERT_OK(MESSAGE, TEST, ...) ASSERT_INTERNAL(MESSAGE, TEST, WARUDO_OK, __VA_ARGS__)
-#define ASSERT_NULL(MESSAGE, TEST, ...) ASSERT_INTERNAL(MESSAGE, TEST, NULL, __VA_ARGS__)
+#define ASSERT_ERROR(MESSAGE, TEST_FUNC, ...) ASSERT(MESSAGE, WARUDO_ERROR, TEST_FUNC, __VA_ARGS__)
+#define ASSERT_OK(MESSAGE, TEST_FUNC, ...) ASSERT(MESSAGE, WARUDO_OK, TEST_FUNC, __VA_ARGS__)
+#define ASSERT_NULL(MESSAGE, TEST_FUNC, ...) ASSERT(MESSAGE, NULL, TEST_FUNC, __VA_ARGS__)
 
 #define DECLARE_TEST(NAME) void test_##NAME(void);
-#define INIT_TEST printf("\x1b[34m%s\x1b[0m\n", __func__); char* buffer = NULL; (void*)buffer;
+#define INIT_TEST printf("\x1b[34m%s\x1b[0m\n", __func__);
+
 #define MOCK_CONFIG warudo config;
 
 DECLARE_TEST(app)
@@ -39,7 +39,8 @@ DECLARE_TEST(warudo)
 
 typedef void (*warudo_test)(void);
 
-void warudo_assert(int test, int wait, const char *func_name, const char *description);
+void warudo_assert_int(int result, int expected, int wait, const char *func_name, const char *description);
+void warudo_assert_string(char* result, char* expected, int wait, const char *func_name, const char *description);
 
 #ifdef __cplusplus
 }

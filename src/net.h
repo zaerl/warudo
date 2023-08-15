@@ -9,7 +9,7 @@ char* warudo_url_decode(const char* input);
 
 int is_valid_boundary(const char* boundary);
 
-char* warudo_get_formdata_boundary(char* content_type);
+const char* warudo_get_formdata_boundary(const char* content_type);
 
 int warudo_status(const char* status, warudo* config);
 
