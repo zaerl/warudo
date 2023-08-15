@@ -56,6 +56,7 @@ extern "C" {
 #define WARUDO_READ_ERROR -12
 #define WARUDO_SOCKET_ERROR -13
 
+// Parser error codes
 #define WARUDO_PARSER_EMPTY -14
 #define WARUDO_PARSER_EMPTY_BOUNDARY -15
 #define WARUDO_PARSER_VOID -16
@@ -63,6 +64,9 @@ extern "C" {
 #define WARUDO_PARSER_MISSING_END -18
 #define WARUDO_PARSER_MISSING_CONTENT -19
 #define WARUDO_PARSER_MISSING_BODY -20
+
+// Unknown error codes
+#define WARUDO_UNKNOWN_ERROR -21
 
 // HTTP request methods
 #define WARUDO_REQUEST_UNKNOWN 0

@@ -3,5 +3,5 @@
 void test_warudo(void) {
     INIT_TEST
 
-    ASSERT_ERROR("accept_connection", warudo_accept_connection, NULL)
+    ASSERT_CODE("accept_connection", WARUDO_ERROR, warudo_accept_connection, NULL)
 }

@@ -9,7 +9,7 @@ void test_net(void) {
     INIT_TEST
     MOCK_CONFIG
 
-    ASSERT_NULL("NULL", warudo_url_decode, NULL)
+    ASSERT("NULL", NULL, warudo_url_decode, NULL)
     ASSERT("valid simple string", "valid", warudo_url_decode, "valid")
     ASSERT("valid full URL", "https://example.com/?ex=ex#ex=ex+ex", warudo_url_decode, "https%3A%2F%2Fexample.com%2F%3Fex%3Dex%23ex%3Dex%2Bex")
 
@@ -24,17 +24,17 @@ void test_net(void) {
     ASSERT("valid umlaut = % @", "ö = % @", warudo_url_decode, "%C3%B6%20%3D%20%25%20%40")
     ASSERT("valid / ? # [ ]", " / ? # [ ]", warudo_url_decode, "%20%2F%20%3F%20%23%20%5B%20%5D")
 
-    ASSERT_NULL("NULL", warudo_escape_html, NULL)
+    ASSERT("NULL", NULL, warudo_escape_html, NULL)
     ASSERT("empty", "", warudo_escape_html, "")
     ASSERT("a-z", "a-z", warudo_escape_html, "a-z")
 
-    ASSERT_NULL("too short #1", warudo_get_formdata_boundary, "")
-    ASSERT_NULL("too short #2", warudo_get_formdata_boundary, "\r")
-    ASSERT_NULL("too short #3", warudo_get_formdata_boundary, "\r\n")
-    ASSERT_NULL("too short #4", warudo_get_formdata_boundary, "multipart/form-data; boundary=")
-    ASSERT_NULL("invalid", warudo_get_formdata_boundary, "application/json; charset=utf-8")
-    ASSERT_NULL("no \\n", warudo_get_formdata_boundary, "multipart/form-data; boundary=\n")
-    ASSERT_NULL("no $%&/", warudo_get_formdata_boundary, "multipart/form-data; boundary=$%&/")
+    ASSERT("too short #1", NULL, warudo_get_formdata_boundary, "")
+    ASSERT("too short #2", NULL, warudo_get_formdata_boundary, "\r")
+    ASSERT("too short #3", NULL, warudo_get_formdata_boundary, "\r\n")
+    ASSERT("too short #4", NULL, warudo_get_formdata_boundary, "multipart/form-data; boundary=")
+    ASSERT("invalid", NULL, warudo_get_formdata_boundary, "application/json; charset=utf-8")
+    ASSERT("no \\n", NULL, warudo_get_formdata_boundary, "multipart/form-data; boundary=\n")
+    ASSERT("no $%&/", NULL, warudo_get_formdata_boundary, "multipart/form-data; boundary=$%&/")
     ASSERT("valid", "a", warudo_get_formdata_boundary, "multipart/form-data; boundary=a")
     ASSERT("valid", "az-_", warudo_get_formdata_boundary, "multipart/form-data; boundary=az-_")
 
@@ -44,12 +44,12 @@ void test_net(void) {
     ASSERT("no $%&/", 0, is_valid_boundary, "$%&/")
     ASSERT("valid az-_", 1, is_valid_boundary, "az-_")
 
-    ASSERT("NULL all", WARUDO_PARSER_EMPTY, warudo_parse_formdata, NULL, 0, NULL, NULL, &config)
-    ASSERT("NULL boundady", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, NULL, NULL, &config)
-    ASSERT("empty boundady", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "", NULL, &config)
-    ASSERT("NULL callback", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "test", NULL, &config)
-    ASSERT("NULL config", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "test", internal_parse_formdata_callback, NULL)
-    ASSERT("too short #1", WARUDO_PARSER_VOID, warudo_parse_formdata, "test", 4, "test", internal_parse_formdata_callback, &config)
+    ASSERT_CODE("NULL all", WARUDO_PARSER_EMPTY, warudo_parse_formdata, NULL, 0, NULL, NULL, &config)
+    ASSERT_CODE("NULL boundady", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, NULL, NULL, &config)
+    ASSERT_CODE("empty boundady", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "", NULL, &config)
+    ASSERT_CODE("NULL callback", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "test", NULL, &config)
+    ASSERT_CODE("NULL config", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "test", internal_parse_formdata_callback, NULL)
+    ASSERT_CODE("too short #1", WARUDO_PARSER_VOID, warudo_parse_formdata, "test", 4, "test", internal_parse_formdata_callback, &config)
 
     const char* test = "0123456789"
         "0123456789"
@@ -60,6 +60,6 @@ void test_net(void) {
         "0123456789"
         "0123456789";
 
-    ASSERT("too short #2", WARUDO_PARSER_VOID, warudo_parse_formdata, test, 54, "b", internal_parse_formdata_callback, &config)
-    ASSERT("too short #3", WARUDO_PARSER_VOID, warudo_parse_formdata, test, 70, "b", internal_parse_formdata_callback, &config)
+    ASSERT_CODE("too short #2", WARUDO_PARSER_VOID, warudo_parse_formdata, test, 54, "b", internal_parse_formdata_callback, &config)
+    ASSERT_CODE("too short #3", WARUDO_PARSER_VOID, warudo_parse_formdata, test, 70, "b", internal_parse_formdata_callback, &config)
 }
