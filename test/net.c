@@ -61,5 +61,5 @@ void test_net(void) {
         "0123456789";
 
     ASSERT_CODE("too short #2", WARUDO_PARSER_VOID, warudo_parse_formdata, test, 54, "b", internal_parse_formdata_callback, &config)
-    ASSERT_CODE("too short #3", WARUDO_PARSER_VOID, warudo_parse_formdata, test, 70, "b", internal_parse_formdata_callback, &config)
+    ASSERT_CODE("too short #3", WARUDO_PARSER_NO_BOUNDARY, warudo_parse_formdata, test, 70, "b", internal_parse_formdata_callback, &config)
 }
