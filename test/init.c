@@ -1,6 +1,6 @@
 #include "test.h"
 
-void test_init(void) {
+void* test_init(void* arg) {
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_init, NULL, NULL)
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_accept_connection, NULL)
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_parse_query_string, NULL, NULL)
@@ -13,4 +13,6 @@ void test_init(void) {
 #endif
 
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_close, NULL)
+
+    return NULL;
 }

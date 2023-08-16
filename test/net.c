@@ -7,7 +7,7 @@ int internal_parse_formdata_callback(const char* input, long int length, warudo*
     return formdata_result;
 }
 
-void test_net(void) {
+void* test_net(void* arg) {
     MOCK_CONFIG
 
     ASSERT("NULL", NULL, warudo_url_decode, NULL)
@@ -72,4 +72,6 @@ void test_net(void) {
 
     test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{\"test\":\"test\"}\"}";
     ASSERT_CODE("minimal missing end", WARUDO_PARSER_NO_BOUNDARY, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+
+    return NULL;
 }

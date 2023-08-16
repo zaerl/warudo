@@ -1,7 +1,7 @@
 #include "../src/db.h"
 #include "test.h"
 
-void test_db(void) {
+void* test_db(void* arg) {
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_db_close, NULL)
 
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_db_init, NULL, NULL)
@@ -15,4 +15,6 @@ void test_db(void) {
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_add_entries, 0, NULL)
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_get_entries, 0, NULL)
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_get_keys, NULL)
+
+    return NULL;
 }

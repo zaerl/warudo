@@ -1,7 +1,7 @@
 DEBUG ?= 0
 CC = clang
 CFLAGS = -Wall -Wextra -pedantic -std=c11
-TEST_CFLAGS = -Wno-int-conversion -Wno-string-compare -Wno-format -Wno-pointer-to-int-cast -Wno-void-pointer-to-int-cast -Wno-incompatible-pointer-types-discards-qualifiers
+TEST_CFLAGS = -Wno-int-conversion -Wno-string-compare -Wno-format -Wno-pointer-to-int-cast -Wno-void-pointer-to-int-cast -Wno-incompatible-pointer-types-discards-qualifiers -Wno-unused-parameter
 LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib
 LDLIBS = -lfcgi
 FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include

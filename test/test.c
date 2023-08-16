@@ -4,6 +4,9 @@
  * This file is distributed under the MIT License. See LICENSE for details.
  */
 
+#include <pthread.h>
+#include <time.h>
+
 #include "test.h"
 #include "../src/code.h"
 
@@ -69,10 +72,15 @@ void warudo_assert(const char* type, int test, const char *func_name, const char
 }
 
 int main(int argc, const char *argv[]) {
-    (void)argc;
-    (void)argv;
+    struct timespec start, end;
+    double elapsed;
 
-    #define RUN_TEST(NAME) test_##NAME();
+    clock_gettime(CLOCK_MONOTONIC, &start);
+
+    #define RUN_TEST(NAME) \
+        pthread_t thread_##NAME; \
+        pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
+        pthread_join(thread_##NAME, NULL);
 
     RUN_TEST(app)
     RUN_TEST(code)
@@ -89,6 +97,11 @@ int main(int argc, const char *argv[]) {
     const char *color_code = valid ? "\x1B[32m" : "\x1B[31m";
 
     printf("\nTests valid/run: %s%d/%d\n\x1B[0m", color_code, tests_valid, tests_total);
+
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+
+    printf("Execution time: %.3f seconds\n", elapsed);
 
     return valid ? 0 : -1;
 }
