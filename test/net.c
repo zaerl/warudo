@@ -1,8 +1,10 @@
 #include "../src/net.h"
 #include "test.h"
 
-int internal_parse_formdata_callback(const char* input, long int length, warudo* config) {
+static int formdata_result = WARUDO_OK;
 
+int internal_parse_formdata_callback(const char* input, long int length, warudo* config) {
+    return formdata_result;
 }
 
 void test_net(void) {
@@ -62,4 +64,13 @@ void test_net(void) {
 
     ASSERT_CODE("too short #2", WARUDO_PARSER_VOID, warudo_parse_formdata, test, 54, "b", internal_parse_formdata_callback, &config)
     ASSERT_CODE("too short #3", WARUDO_PARSER_NO_BOUNDARY, warudo_parse_formdata, test, 70, "b", internal_parse_formdata_callback, &config)
+
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b--\r\n";
+    ASSERT("minimal valid", 1, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n\r\n--b--\r\n";
+    ASSERT("minimal valid", 1, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{\"test\":\"test\"}\"}";
+    ASSERT_CODE("minimal missing end", WARUDO_PARSER_NO_BOUNDARY, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
 }

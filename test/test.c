@@ -62,23 +62,10 @@ void warudo_assert(const char* type, int test, int wait, const char *func_name, 
         spaces[i] = ' ';
     }
 
+    printf("[%s] \x1b[34m%s\x1b[0m: %s%s%s\n", type, func_name, description, spaces, test ? ok : fail);
+
     if(test) {
-        printf("[%s] %s: %s%s%s\n", type, func_name, description, spaces, ok);
         ++tests_valid;
-    } else {
-        printf("[%s] %s: %s%s%s\n", type, func_name, description, spaces, fail);
-
-        if(wait) {
-            printf("Press any key to continue... ");
-
-            while(enter != '\r' && enter != '\n' && enter != 27) {
-                enter = getchar();
-
-                if(enter == 27) {
-                    exit(EXIT_SUCCESS);
-                }
-            }
-        }
     }
 }
 

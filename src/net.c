@@ -392,7 +392,6 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
         // --{boundary}\r\n
         // Content-Disposition: form-data; name="{field}"\r\n
         // \r\n
-        // \r\n
         // {json}\r\n
         // ^^
         index += (position - (input + index)) + 5;
