@@ -10,12 +10,12 @@
 static unsigned int tests_valid = 0;
 static unsigned int tests_total = 0;
 
-void warudo_assert(const char* type, int test, int wait, const char *func_name, const char *description);
+void warudo_assert(const char* type, int test, const char *func_name, const char *description);
 
-void warudo_assert_code(int result, int expected, int wait, const char *func_name, const char *description) {
+void warudo_assert_code(int result, int expected, const char *func_name, const char *description) {
     int test = result == expected;
 
-    warudo_assert("int", test, wait, func_name, description);
+    warudo_assert("int", test, func_name, description);
 
     if(!test) {
         printf("Expected \x1B[32m%s\x1B[0m, got \x1B[31m%s\x1B[0m\n\n",
@@ -23,29 +23,28 @@ void warudo_assert_code(int result, int expected, int wait, const char *func_nam
     }
 }
 
-void warudo_assert_int(int result, int expected, int wait, const char *func_name, const char *description) {
+void warudo_assert_int(int result, int expected, const char *func_name, const char *description) {
     int test = result == expected;
 
-    warudo_assert("int", test, wait, func_name, description);
+    warudo_assert("int", test, func_name, description);
 
     if(!test) {
         printf("Expected \x1B[32m%d\x1B[0m, got \x1B[31m%d\x1B[0m\n\n", expected, result);
     }
 }
 
-void warudo_assert_string(char* result, char* expected, int wait, const char *func_name, const char *description) {
+void warudo_assert_string(char* result, char* expected, const char *func_name, const char *description) {
     int test = strcmp(result, expected) == 0;
 
-    warudo_assert("string", test, wait, func_name, description);
+    warudo_assert("string", test, func_name, description);
 
     if(!test) {
         printf("Expected \"\x1B[32m%s\x1B[0m\", got \"\x1B[31m%d\x1B[0m\"\n\n", expected, result);
     }
 }
 
-void warudo_assert(const char* type, int test, int wait, const char *func_name, const char *description) {
+void warudo_assert(const char* type, int test, const char *func_name, const char *description) {
     ++tests_total;
-    char enter = 0;
 
     const char* ok = "\x1B[32mOK\x1B[0m";
     const char* fail = "\x1B[31mFAIL\x1B[0m";

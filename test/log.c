@@ -2,7 +2,5 @@
 #include "test.h"
 
 void test_log(void) {
-    INIT_TEST
-
     // ASSERT_CODE("NULL", WARUDO_ERROR, warudo_log, NULL, 0, "")
 }

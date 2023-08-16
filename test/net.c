@@ -8,7 +8,6 @@ int internal_parse_formdata_callback(const char* input, long int length, warudo*
 }
 
 void test_net(void) {
-    INIT_TEST
     MOCK_CONFIG
 
     ASSERT("NULL", NULL, warudo_url_decode, NULL)

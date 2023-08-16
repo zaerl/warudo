@@ -2,8 +2,6 @@
 #include "test.h"
 
 void test_db(void) {
-    INIT_TEST
-
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_db_close, NULL)
 
     ASSERT_CODE("NULL", WARUDO_ERROR, warudo_db_init, NULL, NULL)
