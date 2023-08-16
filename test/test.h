@@ -22,19 +22,7 @@ extern "C" {
 
 #define ASSERT_CODE(MESSAGE, EXPECTED, TEST_FUNC, ...) warudo_assert_code(TEST_FUNC(__VA_ARGS__), EXPECTED, #TEST_FUNC, MESSAGE);
 
-#define DECLARE_TEST(NAME) void* test_##NAME(void* arg);
 #define MOCK_CONFIG warudo config;
-
-DECLARE_TEST(app)
-DECLARE_TEST(code)
-DECLARE_TEST(db)
-DECLARE_TEST(home)
-DECLARE_TEST(init)
-DECLARE_TEST(log)
-DECLARE_TEST(net)
-DECLARE_TEST(warudo)
-
-typedef void (*warudo_test)(void);
 
 void warudo_assert_code(int result, int expected, const char *func_name, const char *description);
 void warudo_assert_int(int result, int expected, const char *func_name, const char *description);

@@ -10,6 +10,17 @@
 #include "test.h"
 #include "../src/code.h"
 
+#define DECLARE_TEST(NAME) void* test_##NAME(void* arg);
+
+DECLARE_TEST(app)
+DECLARE_TEST(code)
+DECLARE_TEST(db)
+DECLARE_TEST(home)
+DECLARE_TEST(init)
+DECLARE_TEST(log)
+DECLARE_TEST(net)
+DECLARE_TEST(warudo)
+
 static unsigned int tests_valid = 0;
 static unsigned int tests_total = 0;
 
@@ -101,7 +112,7 @@ int main(int argc, const char *argv[]) {
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
-    printf("Execution time: %.3f seconds\n", elapsed);
+    printf("Execution time: %.4f seconds\n", elapsed);
 
     return valid ? 0 : -1;
 }

@@ -1,7 +1,9 @@
 DEBUG ?= 0
 CC = clang
 CFLAGS = -Wall -Wextra -pedantic -std=c11
-TEST_CFLAGS = -Wno-int-conversion -Wno-string-compare -Wno-format -Wno-pointer-to-int-cast -Wno-void-pointer-to-int-cast -Wno-incompatible-pointer-types-discards-qualifiers -Wno-unused-parameter
+TEST_CFLAGS = -Wno-int-conversion -Wno-string-compare -Wno-format -Wno-pointer-to-int-cast
+TEST_CFLAGS_2 = -Wno-void-pointer-to-int-cast -Wno-incompatible-pointer-types-discards-qualifiers
+TEST_CFLAGS_3 = -Wno-unused-parameter -Wno-gnu-zero-variadic-macro-arguments
 LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib
 LDLIBS = -lfcgi
 FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include
@@ -69,7 +71,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 
 # Compile all the source files into object files
 $(TEST_BUILD_DIR)/%.o: $(TEST_SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(TEST_CFLAGS) -c -I$(FCGI_INCLUDE_PATH) $< -o $@
+	$(CC) $(CFLAGS) $(TEST_CFLAGS) $(TEST_CFLAGS_2) $(TEST_CFLAGS_3) -c -I$(FCGI_INCLUDE_PATH) $< -o $@
 
 # Link all the object files into the final executable
 $(TARGET): $(OBJS)
