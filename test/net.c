@@ -46,8 +46,8 @@ void* test_net(void* arg) {
     ASSERT("valid az-_", 1, is_valid_boundary, "az-_")
 
     ASSERT_CODE("NULL all", WARUDO_PARSER_EMPTY, warudo_parse_formdata, NULL, 0, NULL, NULL, &config)
-    ASSERT_CODE("NULL boundady", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, NULL, NULL, &config)
-    ASSERT_CODE("empty boundady", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "", NULL, &config)
+    ASSERT_CODE("NULL boundary", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, NULL, NULL, &config)
+    ASSERT_CODE("empty boundary", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "", NULL, &config)
     ASSERT_CODE("NULL callback", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "test", NULL, &config)
     ASSERT_CODE("NULL config", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, "test", internal_parse_formdata_callback, NULL)
     ASSERT_CODE("too short #1", WARUDO_PARSER_VOID, warudo_parse_formdata, "test", 4, "test", internal_parse_formdata_callback, &config)
@@ -64,14 +64,29 @@ void* test_net(void* arg) {
     ASSERT_CODE("too short #2", WARUDO_PARSER_VOID, warudo_parse_formdata, test, 54, "b", internal_parse_formdata_callback, &config)
     ASSERT_CODE("too short #3", WARUDO_PARSER_NO_BOUNDARY, warudo_parse_formdata, test, 70, "b", internal_parse_formdata_callback, &config)
 
-    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b--\r\n";
-    ASSERT("minimal valid", 1, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\ntesttesttesttest";
+    ASSERT_CODE("empty boundary", WARUDO_PARSER_EMPTY_BOUNDARY, warudo_parse_formdata, test, strlen(test), "", internal_parse_formdata_callback, &config)
+
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n--b--\r\n";
+    ASSERT_CODE("missing content", WARUDO_PARSER_NO_BOUNDARY, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
 
     test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n\r\n--b--\r\n";
-    ASSERT("minimal valid", 1, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+    ASSERT_CODE("missing JSON", WARUDO_PARSER_MISSING_CONTENT, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
 
     test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{\"test\":\"test\"}\"}";
     ASSERT_CODE("minimal missing end", WARUDO_PARSER_NO_BOUNDARY, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\ntesttesttesttest";
+    ASSERT_CODE("missing end", WARUDO_PARSER_NO_BOUNDARY, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b--\r\n";
+    ASSERT_CODE("minimal valid", 1, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b--\r\n";
+    ASSERT_CODE("valid #2", 2, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
+
+    test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b--\r\n";
+    ASSERT_CODE("valid #2", 2, warudo_parse_formdata, test, strlen(test), "b", internal_parse_formdata_callback, &config)
 
     return NULL;
 }

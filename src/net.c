@@ -324,14 +324,16 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
         return WARUDO_PARSER_EMPTY_BOUNDARY;
     }
 
-    long int full_boundary_length = boundary_length + 2;
+    long int full_boundary_length = boundary_length + 4;
     full_boundary = malloc(full_boundary_length + 1);
 
-    full_boundary[0] = '-';
-    full_boundary[1] = '-';
+    full_boundary[0] = '\r';
+    full_boundary[1] = '\n';
+    full_boundary[2] = '-';
+    full_boundary[3] = '-';
     full_boundary[full_boundary_length] = '\0';
 
-    strcpy(full_boundary + 2, boundary);
+    strcpy(full_boundary + 4, boundary);
 
     // At least one entry
     if(length < boundary_length * 2 + 54) {
@@ -340,7 +342,7 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
     }
 
     while(index < length) {
-        char* position = strstr(input + index, full_boundary);
+        char* position = strstr(input + index, index ? full_boundary : full_boundary + 2);
 
         if(position == NULL) {
             res = WARUDO_PARSER_NO_BOUNDARY;
@@ -367,7 +369,7 @@ int warudo_parse_formdata(const char* input, long int length, const char* bounda
 
             index += json_length + full_boundary_length;
         } else {
-            index += full_boundary_length;
+            index += index ? full_boundary_length : full_boundary_length - 2;
         }
 
         position = strstr(input + index, "\r\nContent-Disposition: form-data; name=\"");

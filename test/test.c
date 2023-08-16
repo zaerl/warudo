@@ -32,8 +32,22 @@ void warudo_assert_code(int result, int expected, const char *func_name, const c
     warudo_assert("int", test, func_name, description);
 
     if(!test) {
+        char str1[20];
+        char str2[20];
+
+        char* result_desc = warudo_error_description(result, 0);
+        char* expected_desc = warudo_error_description(expected, 0);
+
+        if(result_desc == NULL) {
+            sprintf(str1, "%d", result);
+        }
+
+        if(expected_desc == NULL) {
+            sprintf(str2, "%d", expected);
+        }
+
         printf("Expected \x1B[32m%s\x1B[0m, got \x1B[31m%s\x1B[0m\n\n",
-            warudo_error_description(expected, 0), warudo_error_description(result, 0));
+            expected_desc ? expected_desc : str2, result_desc ? result_desc : str1);
     }
 }
 
