@@ -85,18 +85,23 @@ int debug_trace(CURL* handle, curl_infotype type, char* data, size_t size, void*
     return 0;
 }
 
-int send_request(CURL* curl) {
+double send_request(CURL* curl) {
+    struct timespec start, end;
+    double elapsed;
+
+    clock_gettime(CLOCK_MONOTONIC, &start);
     CURLcode res = curl_easy_perform(curl);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+
+    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
 
     if (res == CURLE_OK) {
         putc('.', stdout);
-
-        return 1;
     } else {
         fprintf(stderr, "Error sending request: %s\n", curl_easy_strerror(res));
     }
 
-    return 0;
+    return elapsed;
 }
 
 int main(int argc, char* argv[]) {
@@ -120,6 +125,7 @@ int main(int argc, char* argv[]) {
     unsigned long requests = 0;
     size_t len = 0;
     ssize_t read;
+    double elapsed = 0;
 
     file = fopen(argv[1], "r");
     if (!file) {
@@ -145,11 +151,6 @@ int main(int argc, char* argv[]) {
     if(DEBUG) {
         curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, debug_trace);
     }
-
-    struct timespec start, end;
-    double elapsed;
-
-    clock_gettime(CLOCK_MONOTONIC, &start);
 
     while((read = getline(&line, &len, file)) != -1) {
         ++lines_scanned;
@@ -181,9 +182,8 @@ int main(int argc, char* argv[]) {
             curl_easy_setopt(curl, CURLOPT_URL, SERVER_URL);
             ++requests;
 
-            if(send_request(curl)) {
-                entities_created += lines_read;
-            }
+            elapsed += send_request(curl);
+            entities_created += lines_read;
 
             lines_read = 0;
             curl_mime_free(mime);
@@ -194,18 +194,18 @@ int main(int argc, char* argv[]) {
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
         ++requests;
 
-        if(send_request(curl)) {
-            entities_created += lines_read;
-        }
+        elapsed += send_request(curl);
+        entities_created += lines_read;
 
         curl_mime_free(mime);
     }
 
-    clock_gettime(CLOCK_MONOTONIC, &end);
-    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    elapsed /= 1e9;
 
-    printf("\n\n%lu requests\n%lu entities created\n%lu lines scanned (%lu skipped)\nExecution time %.4f seconds\n",
-        requests, entities_created, lines_scanned, lines_skipped, elapsed);
+    printf("\n\n%lu requests of %d entries\n%lu entities created\n%lu lines scanned (%lu skipped)\n",
+        requests, MAX_LINES_PER_REQUEST, entities_created, lines_scanned, lines_skipped);
+
+    printf("Execution time %.4f seconds\n~%.4fs / request\n", elapsed, elapsed / requests);
 
     curl_easy_cleanup(curl);
     fclose(file);
