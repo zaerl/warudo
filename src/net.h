@@ -3,6 +3,8 @@
 
 #include "warudo.h"
 
+typedef int (*warudo_parse_formdata_callback)(const char*, long int, warudo*);
+
 char* warudo_escape_html(const char* input);
 
 char* warudo_url_decode(const char* input);
@@ -38,6 +40,6 @@ long warudo_content_length(warudo* config);
 char* warudo_read_content(long int length, warudo* config);
 
 warudo_code warudo_parse_formdata(const char* input, long int length, const char* boundary,
-    int (*callback)(const char*, long int, warudo*), warudo* config);
+    warudo_parse_formdata_callback callback, warudo* config);
 
 #endif /* WARUDO_NET_H */

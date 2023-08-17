@@ -13,7 +13,7 @@
 extern char **environ;
 #endif
 
-#include "warudo.h"
+#include "net.h"
 
 #define WARUDO_CHECK_CONNECTION(request) \
     if(request.in == NULL || \
@@ -309,7 +309,7 @@ char* warudo_read_content(long int length, warudo* config) {
 }
 
 warudo_code warudo_parse_formdata(const char* input, long int length, const char* boundary,
-    int (*callback)(const char*, long int, warudo*), warudo* config) {
+    warudo_parse_formdata_callback callback, warudo* config) {
     char *full_boundary = NULL;
     long int index = 0;
     int res = 0;
