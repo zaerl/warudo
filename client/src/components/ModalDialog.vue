@@ -36,7 +36,7 @@ function confirm() {
 <dialog :open="props.isOpen">
   <article>
     <a aria-label="Close" class="close" @click="close"></a>
-    <h3>{{ props.title }}{{ props.isDisabled ? 'sì' : 'no' }}</h3>
+    <h3>{{ props.title }}</h3>
     <slot>{{ props.description }}</slot>
     <footer>
       <a

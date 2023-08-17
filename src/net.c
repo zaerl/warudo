@@ -212,7 +212,7 @@ warudo_code warudo_ok(warudo* config) {
 warudo_code warudo_created(unsigned long long int id, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
-    warudo_header("200 OK", "application/json", config);
+    warudo_header("201 Created", "application/json", config);
     FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", id);
 
     return WARUDO_OK;
@@ -221,7 +221,7 @@ warudo_code warudo_created(unsigned long long int id, warudo* config) {
 warudo_code warudo_multi_created(unsigned long int count, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
-    warudo_header("200 OK", "application/json", config);
+    warudo_header("201 Created", "application/json", config);
     FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"count\":%lld}", count);
 
     return WARUDO_OK;
