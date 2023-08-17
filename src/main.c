@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "sqlite3/sqlite3.h"
 
+#include "code.h"
 #include "db.h"
 #include "log.h"
 #include "net.h"
@@ -51,7 +52,8 @@ int main(void) {
         if(ret == 0) {
             warudo_log_info(config, "Accepted request %llu\n", config->requests_count);
         } else {
-            warudo_log_error(config, "Failed to accept request %llu. Code %d\n", config->requests_count, ret);
+            warudo_log_error(config, "Failed to accept request %llu. Code %s\n",
+                config->requests_count, warudo_error_description(ret, 0));
         }
     }
 
