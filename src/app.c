@@ -6,7 +6,7 @@
 #include "net.h"
 #include "db.h"
 
-int page_app(int entry_type, warudo* config) {
+warudo_code warudo_page_app(int entry_type, warudo* config) {
     CHECK_CONFIG
 
     if(config->request_method == WARUDO_REQUEST_GET) {
@@ -22,7 +22,7 @@ int page_app(int entry_type, warudo* config) {
     return warudo_not_allowed("GET, POST", config);
 }
 
-int page_app_keys(warudo* config) {
+warudo_code warudo_page_app_keys(warudo* config) {
     CHECK_CONFIG
 
     if(config->request_method == WARUDO_REQUEST_GET) {

@@ -18,7 +18,7 @@ extern char **environ;
 // make && WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 bin/warudo
 int main(void) {
     warudo *config;
-    int ret;
+    warudo_code ret;
 
     ret = warudo_init(WARUDO_DB_FILE, &config);
 
@@ -35,11 +35,11 @@ int main(void) {
             ++envp;
         }*/
         if(config->page == WARUDO_PAGE_APP) {
-            ret = page_app(WARUDO_ENTRY_TYPE_DATA, config);
+            ret = warudo_page_app(WARUDO_ENTRY_TYPE_DATA, config);
         } else if(config->page == WARUDO_PAGE_APP_KEYS) {
-            ret = page_app_keys(config);
+            ret = warudo_page_app_keys(config);
         } else if(config->page == WARUDO_PAGE_APP_VIEWS) {
-            ret = page_app(WARUDO_ENTRY_TYPE_VIEW, config);
+            ret = warudo_page_app(WARUDO_ENTRY_TYPE_VIEW, config);
         } else if(config->page == WARUDO_PAGE_ROOT) {
             ret = warudo_page_home(config);
         } else {

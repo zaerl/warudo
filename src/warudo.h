@@ -38,35 +38,37 @@ extern "C" {
 #include <fcgiapp.h>
 #include "sqlite3/sqlite3.h"
 
-// Success code
-#define WARUDO_OK 0
+typedef enum {
+    // Success code
+    WARUDO_OK = 0,
 
-// Error codes
-#define WARUDO_ERROR -1
-#define WARUDO_ACCEPT_ERROR -2
-#define WARUDO_ADD_ERROR -3
-#define WARUDO_DB_CLOSE_ERROR -4
-#define WARUDO_DB_ERROR -5
-#define WARUDO_DB_INIT_ERROR -6
-#define WARUDO_DB_OPEN_ERROR -7
-#define WARUDO_EMPTY_CONTENT_ERROR -8
-#define WARUDO_EMPTY_QUERY_STRING_ERROR -9
-#define WARUDO_FCGI_INIT_ERROR -10
-#define WARUDO_INIT_REQUEST_ERROR -11
-#define WARUDO_READ_ERROR -12
-#define WARUDO_SOCKET_ERROR -13
+    // Error codes
+    WARUDO_ERROR = -1,
+    WARUDO_ACCEPT_ERROR = -2,
+    WARUDO_ADD_ERROR = -3,
+    WARUDO_DB_CLOSE_ERROR = -4,
+    WARUDO_DB_ERROR = -5,
+    WARUDO_DB_INIT_ERROR = -6,
+    WARUDO_DB_OPEN_ERROR = -7,
+    WARUDO_EMPTY_CONTENT_ERROR = -8,
+    WARUDO_EMPTY_QUERY_STRING_ERROR = -9,
+    WARUDO_FCGI_INIT_ERROR = -10,
+    WARUDO_INIT_REQUEST_ERROR = -11,
+    WARUDO_READ_ERROR = -12,
+    WARUDO_SOCKET_ERROR = -13,
 
-// Parser error codes
-#define WARUDO_PARSER_EMPTY -14
-#define WARUDO_PARSER_EMPTY_BOUNDARY -15
-#define WARUDO_PARSER_VOID -16
-#define WARUDO_PARSER_NO_BOUNDARY -17
-#define WARUDO_PARSER_MISSING_END -18
-#define WARUDO_PARSER_MISSING_CONTENT -19
-#define WARUDO_PARSER_MISSING_BODY -20
+    // Parser error codes
+    WARUDO_PARSER_EMPTY = -14,
+    WARUDO_PARSER_EMPTY_BOUNDARY = -15,
+    WARUDO_PARSER_VOID = -16,
+    WARUDO_PARSER_NO_BOUNDARY = -17,
+    WARUDO_PARSER_MISSING_END = -18,
+    WARUDO_PARSER_MISSING_CONTENT = -19,
+    WARUDO_PARSER_MISSING_BODY = -20,
 
-// Unknown error codes
-#define WARUDO_UNKNOWN_ERROR -21
+    // Unknown error codes
+    WARUDO_UNKNOWN_ERROR = -21
+} warudo_code;
 
 // HTTP request methods
 #define WARUDO_REQUEST_UNKNOWN 0
@@ -165,35 +167,35 @@ struct warudo {
 typedef struct warudo warudo;
 
 // Init the system
-int warudo_init(const char *filename, warudo **config);
+warudo_code warudo_init(const char *filename, warudo **config);
 
 // Parse the query string
-int warudo_parse_query_string(char* query_string, warudo* config);
+warudo_code warudo_parse_query_string(char* query_string, warudo* config);
 
 // Accept a FCGI connection
-int warudo_accept_connection(warudo *config);
+warudo_code warudo_accept_connection(warudo *config);
 
 // Run at the end of a connection
-int warudo_after_connection(warudo *config);
+warudo_code warudo_after_connection(warudo *config);
 
 // Homepage error page
-int warudo_page_home(warudo* config);
+warudo_code warudo_page_home(warudo* config);
 
 // Root JSON endpoints
-int page_app(int entry_type, warudo* config);
+warudo_code warudo_page_app(int entry_type, warudo* config);
 
 // Keys JSON endpoint
-int page_app_keys(warudo* config);
+warudo_code warudo_page_app_keys(warudo* config);
 
 // Timing functions
 #ifdef WARUDO_TIMING
-int warudo_start_time(warudo *config);
+warudo_code warudo_start_time(warudo *config);
 
-int warudo_end_time(warudo *config, double ms, const char* message);
+warudo_code warudo_end_time(warudo *config, double ms, const char* message);
 #endif
 
 // Close the system
-int warudo_close(warudo *config);
+warudo_code warudo_close(warudo *config);
 
 #ifdef __cplusplus
 }  /* End of the 'extern "C"' block */

@@ -172,7 +172,7 @@ const char* warudo_get_formdata_boundary(const char* content_type) {
     return boundary;
 }
 
-int warudo_status(const char* status, warudo* config) {
+warudo_code warudo_status(const char* status, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     FCGX_FPrintF(config->request.out, "Status: %s\r\n", status);
@@ -180,7 +180,7 @@ int warudo_status(const char* status, warudo* config) {
     return WARUDO_OK;
 }
 
-int warudo_content_type(const char* content_type, warudo *config) {
+warudo_code warudo_content_type(const char* content_type, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     if(config->access_origin != NULL) {
@@ -192,7 +192,7 @@ int warudo_content_type(const char* content_type, warudo *config) {
     return WARUDO_OK;
 }
 
-int warudo_header(const char* status, const char* content_type, warudo* config) {
+warudo_code warudo_header(const char* status, const char* content_type, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_status(status, config);
@@ -201,7 +201,7 @@ int warudo_header(const char* status, const char* content_type, warudo* config) 
     return WARUDO_OK;
 }
 
-int warudo_ok(warudo* config) {
+warudo_code warudo_ok(warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("200 OK", "application/json", config);
@@ -209,7 +209,7 @@ int warudo_ok(warudo* config) {
     return WARUDO_OK;
 }
 
-int warudo_created(unsigned long long int id, warudo* config) {
+warudo_code warudo_created(unsigned long long int id, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("200 OK", "application/json", config);
@@ -218,7 +218,7 @@ int warudo_created(unsigned long long int id, warudo* config) {
     return WARUDO_OK;
 }
 
-int warudo_multi_created(unsigned long int count, warudo* config) {
+warudo_code warudo_multi_created(unsigned long int count, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("200 OK", "application/json", config);
@@ -227,7 +227,7 @@ int warudo_multi_created(unsigned long int count, warudo* config) {
     return WARUDO_OK;
 }
 
-int warudo_not_allowed(const char* allowed, warudo* config) {
+warudo_code warudo_not_allowed(const char* allowed, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_status("405 Method Not Allowed", config);
@@ -238,7 +238,7 @@ int warudo_not_allowed(const char* allowed, warudo* config) {
     return WARUDO_HTTP_NOT_ALLOWED;
 }
 
-int warudo_server_error(const char* description, warudo* config) {
+warudo_code warudo_server_error(const char* description, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("500 Internal Server Error", "text/plain", config);
@@ -247,7 +247,7 @@ int warudo_server_error(const char* description, warudo* config) {
     return WARUDO_HTTP_INTERNAL_ERROR;
 }
 
-int warudo_bad_request(const char* description, warudo* config) {
+warudo_code warudo_bad_request(const char* description, warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("400 Bad Request", "application/json", config);
@@ -256,7 +256,7 @@ int warudo_bad_request(const char* description, warudo* config) {
     return WARUDO_HTTP_BAD_REQUEST;
 }
 
-int warudo_page_not_found(warudo* config) {
+warudo_code warudo_page_not_found(warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("404 Not Found", "text/plain", config);
@@ -274,7 +274,7 @@ unsigned long warudo_process_id(void) {
 #endif
 }
 
-int warudo_environ(warudo* config) {
+warudo_code warudo_environ(warudo* config) {
     FCGX_FPrintF(config->request.out, "<!--db: %s-->\n", WARUDO_DB_FILE);
     FCGX_FPrintF(config->request.out, "<!--config: %s-->\n", WARUDO_CONFIG_FILE);
     FCGX_FPrintF(config->request.out, "<!--pid: %lu-->\n", warudo_process_id());
@@ -282,7 +282,7 @@ int warudo_environ(warudo* config) {
     return WARUDO_OK;
 }
 
-long int warudo_content_length(warudo* config) {
+long warudo_content_length(warudo* config) {
     char *length = FCGX_GetParam("CONTENT_LENGTH", config->request.envp);
     long int len = 0;
 
@@ -308,7 +308,7 @@ char* warudo_read_content(long int length, warudo* config) {
     return data;
 }
 
-int warudo_parse_formdata(const char* input, long int length, const char* boundary,
+warudo_code warudo_parse_formdata(const char* input, long int length, const char* boundary,
     int (*callback)(const char*, long int, warudo*), warudo* config) {
     char *full_boundary = NULL;
     long int index = 0;

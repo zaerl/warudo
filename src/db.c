@@ -18,9 +18,9 @@
 
 #define WARUDO_DB_CALL(STMT, CALL) WARUDO_DB_RET_CALL(STMT, CALL, SQLITE_OK)
 
-int warudo_load_columns(warudo* config);\
+warudo_code warudo_load_columns(warudo* config);\
 
-int warudo_db_init(const char *filename, warudo* config) {
+warudo_code warudo_db_init(const char *filename, warudo* config) {
     CHECK_CONFIG
 
     // Load database
@@ -70,7 +70,7 @@ int warudo_db_init(const char *filename, warudo* config) {
     return WARUDO_OK;
 }
 
-int warudo_db_close(warudo *config) {
+warudo_code warudo_db_close(warudo *config) {
     CHECK_CONFIG
 
     for(unsigned int i = 0; i < config->columns_count; ++i) {
@@ -91,7 +91,7 @@ int warudo_db_close(warudo *config) {
     return sqlite3_close(config->db) == SQLITE_OK ? WARUDO_OK : WARUDO_DB_CLOSE_ERROR;
 }
 
-int warudo_load_columns(warudo* config) {
+warudo_code warudo_load_columns(warudo* config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -123,7 +123,7 @@ int warudo_load_columns(warudo* config) {
     return WARUDO_OK;
 }
 
-unsigned long long int warudo_last_insert_rowid(warudo *config) {
+unsigned long long warudo_last_insert_rowid(warudo *config) {
     if(!config) {
         return 0;
     }
@@ -131,7 +131,7 @@ unsigned long long int warudo_last_insert_rowid(warudo *config) {
     return sqlite3_last_insert_rowid(config->db);
 }
 
-int warudo_parse_json(warudo* config) {
+warudo_code warudo_parse_json(warudo* config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -176,7 +176,7 @@ int warudo_parse_json(warudo* config) {
     return WARUDO_OK;
 }
 
-int warudo_add_index(const char *filename, warudo* config) {
+warudo_code warudo_add_index(const char *filename, warudo* config) {
     CHECK_CONFIG
 
     (void)filename;
@@ -209,7 +209,7 @@ int warudo_add_index(const char *filename, warudo* config) {
     return WARUDO_OK;
 }
 
-int warudo_add_entry(int entry_type, warudo *config) {
+warudo_code warudo_add_entry(int entry_type, warudo *config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -241,7 +241,7 @@ int warudo_add_entry(int entry_type, warudo *config) {
     return WARUDO_OK;
 }
 
-int warudo_formdata_callback(const char* input, long int length, warudo* config) {
+warudo_code warudo_formdata_callback(const char* input, long int length, warudo* config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -262,7 +262,7 @@ int warudo_formdata_callback(const char* input, long int length, warudo* config)
     return WARUDO_OK;
 }
 
-int warudo_add_entries(int entry_type, warudo *config) {
+warudo_code warudo_add_entries(int entry_type, warudo *config) {
     CHECK_CONFIG
 
     (void)entry_type;
@@ -293,7 +293,7 @@ int warudo_add_entries(int entry_type, warudo *config) {
     return count ? WARUDO_OK : WARUDO_EMPTY_CONTENT_ERROR;
 }
 
-int warudo_get_entries(int entry_type, warudo *config) {
+warudo_code warudo_get_entries(int entry_type, warudo *config) {
     CHECK_CONFIG
 
     int must_free = 1;
@@ -379,7 +379,7 @@ int warudo_get_entries(int entry_type, warudo *config) {
     return WARUDO_OK;
 }
 
-int warudo_get_keys(warudo *config) {
+warudo_code warudo_get_keys(warudo *config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -418,7 +418,7 @@ int warudo_get_keys(warudo *config) {
     return WARUDO_OK;
 }
 
-/*int warudo_add_index(const char* name, warudo *config) {
+/*warudo_code warudo_add_index(const char* name, warudo *config) {
     char *query = "ALTER TABLE " WARUDO_ENTRIES_TABLE " ADD COLUMN ?1 TEXT;"
         "AS JSON_EXTRACT(data, '$.%q') AS %q;";
 }*/

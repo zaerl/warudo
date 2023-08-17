@@ -3,7 +3,7 @@
 
 #include "warudo.h"
 
-int warudo_log(warudo *config, int level, const char *format, ...) {
+warudo_code warudo_log(warudo *config, int level, const char *format, ...) {
     CHECK_CONFIG
 
     if(format == NULL) {

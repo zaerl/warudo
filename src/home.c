@@ -5,7 +5,7 @@
 #include "warudo.h"
 #include "net.h"
 
-int warudo_page_home(warudo* config) {
+warudo_code warudo_page_home(warudo* config) {
     CHECK_CONFIG
 
     return warudo_server_error("Warudo is a Fast CGI application. "
