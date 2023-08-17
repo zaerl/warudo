@@ -93,7 +93,7 @@ double send_request(CURL* curl) {
     CURLcode res = curl_easy_perform(curl);
     clock_gettime(CLOCK_MONOTONIC, &end);
 
-    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
+    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
     if (res == CURLE_OK) {
         putc('.', stdout);
@@ -199,8 +199,6 @@ int main(int argc, char* argv[]) {
 
         curl_mime_free(mime);
     }
-
-    elapsed /= 1e9;
 
     printf("\n\n%lu requests of %d entries\n%lu entities created\n%lu lines scanned (%lu skipped)\n",
         requests, MAX_LINES_PER_REQUEST, entities_created, lines_scanned, lines_skipped);

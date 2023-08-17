@@ -94,6 +94,9 @@ stress-test: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR) $(STRESS_TEST_TARGE
 start: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TARGET)
 	WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 $(TARGET)
 
+db:
+	sqlite3 warudo.db
+
 clean:
 	rm -rf $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET) ${DBS}
 
