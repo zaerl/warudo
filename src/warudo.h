@@ -42,6 +42,12 @@ typedef enum {
     // Success code
     WARUDO_OK = 0,
 
+    // HTTP codes
+    WARUDO_HTTP_BAD_REQUEST = 400,
+    WARUDO_HTTP_NOT_FOUND = 404,
+    WARUDO_HTTP_NOT_ALLOWED = 405,
+    WARUDO_HTTP_INTERNAL_ERROR = 500,
+
     // Error codes
     WARUDO_ERROR = -1,
     WARUDO_ACCEPT_ERROR = -2,
@@ -74,12 +80,6 @@ typedef enum {
 #define WARUDO_REQUEST_UNKNOWN 0
 #define WARUDO_REQUEST_GET 1
 #define WARUDO_REQUEST_POST 2
-
-// HTTP codes
-#define WARUDO_HTTP_BAD_REQUEST 400
-#define WARUDO_HTTP_NOT_FOUND 404
-#define WARUDO_HTTP_NOT_ALLOWED 405
-#define WARUDO_HTTP_INTERNAL_ERROR 500
 
 // Pages
 #define WARUDO_PAGE_NOT_FOUND 0

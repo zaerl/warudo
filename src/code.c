@@ -51,6 +51,16 @@ const char *warudo_error_description(warudo_code code, int extended) {
             return extended ? "Missing body" : "MISSING_BODY";
         case WARUDO_UNKNOWN_ERROR:
             return extended ? "Unknown error" : "UNKNOWN_ERROR";
+
+        // HTTP codes
+        case WARUDO_HTTP_BAD_REQUEST:
+            return extended ? "404 Bad Request" : "BAD_REQUEST";
+        case WARUDO_HTTP_NOT_FOUND:
+            return extended ? "404 Not Found" : "WARUDO_HTTP_NOT_FOUND";
+        case WARUDO_HTTP_NOT_ALLOWED:
+            return extended ? "405 Not Allowed" : "WARUDO_HTTP_NOT_ALLOWED";
+        case WARUDO_HTTP_INTERNAL_ERROR:
+            return extended ? "500 Internal Server Error" : "WARUDO_HTTP_INTERNAL_ERROR";
     }
 
     return NULL;
