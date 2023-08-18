@@ -1,8 +1,8 @@
-#ifndef WARUDO_CODE_H
-#define WARUDO_CODE_H
+#ifndef WRD_CODE_H
+#define WRD_CODE_H
 
 #include "warudo.h"
 
-const char *warudo_error_description(warudo_code code, int extended);
+const char *wrd_error_description(wrd_code code, int extended);
 
-#endif // WARUDO_CODE_H
+#endif // WRD_CODE_H

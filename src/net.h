@@ -1,25 +1,25 @@
-#ifndef WARUDO_NET_H
-#define WARUDO_NET_H
+#ifndef WRD_NET_H
+#define WRD_NET_H
 
 #include "warudo.h"
 
-typedef int (*warudo_parse_formdata_callback)(const char*, long int, warudo*);
+typedef int (*wrd_parse_formdata_callback)(const char*, long int, warudo*);
 
-char *warudo_escape_html(const char *input);
+char *wrd_escape_html(const char *input);
 
-char *warudo_url_decode(const char *input);
+char *wrd_url_decode(const char *input);
 
-int warudo_is_valid_boundary(const char *boundary);
+int wrd_is_valid_boundary(const char *boundary);
 
-const char *warudo_get_formdata_boundary(const char *content_type);
+const char *wrd_get_formdata_boundary(const char *content_type);
 
-warudo_code warudo_environ(warudo *config);
+wrd_code wrd_environ(warudo *config);
 
-long warudo_content_length(warudo *config);
+long wrd_content_length(warudo *config);
 
-char *warudo_read_content(long int length, warudo *config);
+char *wrd_read_content(long int length, warudo *config);
 
-warudo_code warudo_parse_formdata(const char *input, long int length, const char *boundary,
-    warudo_parse_formdata_callback callback, warudo *config);
+wrd_code wrd_parse_formdata(const char *input, long int length, const char *boundary,
+    wrd_parse_formdata_callback callback, warudo *config);
 
-#endif // WARUDO_NET_H
+#endif // WRD_NET_H

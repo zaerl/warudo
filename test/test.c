@@ -24,19 +24,19 @@ DECLARE_TEST(warudo)
 static unsigned int tests_valid = 0;
 static unsigned int tests_total = 0;
 
-void warudo_assert(const char* type, int test, const char *func_name, const char *description);
+void wrd_assert(const char* type, int test, const char *func_name, const char *description);
 
-void warudo_assert_code(int result, int expected, const char *func_name, const char *description) {
+void wrd_assert_code(int result, int expected, const char *func_name, const char *description) {
     int test = result == expected;
 
-    warudo_assert("int", test, func_name, description);
+    wrd_assert("int", test, func_name, description);
 
     if(!test) {
         char str1[20];
         char str2[20];
 
-        char* result_desc = warudo_error_description(result, 0);
-        char* expected_desc = warudo_error_description(expected, 0);
+        char* result_desc = wrd_error_description(result, 0);
+        char* expected_desc = wrd_error_description(expected, 0);
 
         if(result_desc == NULL) {
             sprintf(str1, "%d", result);
@@ -51,27 +51,27 @@ void warudo_assert_code(int result, int expected, const char *func_name, const c
     }
 }
 
-void warudo_assert_int(int result, int expected, const char *func_name, const char *description) {
+void wrd_assert_int(int result, int expected, const char *func_name, const char *description) {
     int test = result == expected;
 
-    warudo_assert("int", test, func_name, description);
+    wrd_assert("int", test, func_name, description);
 
     if(!test) {
         printf("Expected \x1B[32m%d\x1B[0m, got \x1B[31m%d\x1B[0m\n\n", expected, result);
     }
 }
 
-void warudo_assert_string(char* result, char* expected, const char *func_name, const char *description) {
+void wrd_assert_string(char* result, char* expected, const char *func_name, const char *description) {
     int test = strcmp(result, expected) == 0;
 
-    warudo_assert("string", test, func_name, description);
+    wrd_assert("string", test, func_name, description);
 
     if(!test) {
         printf("Expected \"\x1B[32m%s\x1B[0m\", got \"\x1B[31m%d\x1B[0m\"\n\n", expected, result);
     }
 }
 
-void warudo_assert(const char* type, int test, const char *func_name, const char *description) {
+void wrd_assert(const char* type, int test, const char *func_name, const char *description) {
     ++tests_total;
 
     const char* ok = "\x1B[32mOK\x1B[0m";

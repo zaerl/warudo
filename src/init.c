@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef WARUDO_TIMING
+#ifdef WRD_TIMING
 #include <time.h>
 #endif
 
@@ -10,9 +10,9 @@
 #include "db.h"
 #include "log.h"
 
-warudo_code warudo_init(const char *filename, warudo **config) {
+wrd_code wrd_init(const char *filename, warudo **config) {
     if(!config) {
-        return WARUDO_ERROR;
+        return WRD_ERROR;
     }
 
     warudo *pdb;
@@ -21,7 +21,7 @@ warudo_code warudo_init(const char *filename, warudo **config) {
     pdb = malloc(sizeof(warudo));
     pdb->columns_count = 0;
     pdb->requests_count = 0;
-#ifdef WARUDO_TIMING
+#ifdef WRD_TIMING
     pdb->timing_count = 0;
     pdb->timing_end_count = 0;
 #endif
@@ -30,18 +30,18 @@ warudo_code warudo_init(const char *filename, warudo **config) {
     res = FCGX_Init();
 
     if(res != 0) {
-        warudo_close(pdb);
+        wrd_close(pdb);
 
-        return WARUDO_FCGI_INIT_ERROR;
+        return WRD_FCGI_INIT_ERROR;
     }
 
     // Create a socket to listen for connections
-    int socket = FCGX_OpenSocket(WARUDO_SOCKET_PATH, 1024);
+    int socket = FCGX_OpenSocket(WRD_SOCKET_PATH, 1024);
 
     if(socket == -1) {
-        warudo_close(pdb);
+        wrd_close(pdb);
 
-        return WARUDO_SOCKET_ERROR;
+        return WRD_SOCKET_ERROR;
     }
 
     pdb->socket = socket;
@@ -50,13 +50,13 @@ warudo_code warudo_init(const char *filename, warudo **config) {
     FCGX_InitRequest(&pdb->request, pdb->socket, 0);
 
     if(res != 0) {
-        warudo_close(pdb);
+        wrd_close(pdb);
 
-        return WARUDO_INIT_REQUEST_ERROR;
+        return WRD_INIT_REQUEST_ERROR;
     }
 
     pdb->page = -1;
-    pdb->request_method = WARUDO_REQUEST_UNKNOWN;
+    pdb->request_method = WRD_REQUEST_UNKNOWN;
     pdb->script_name = NULL;
     pdb->query_string = NULL;
 
@@ -71,49 +71,49 @@ warudo_code warudo_init(const char *filename, warudo **config) {
     pdb->query_sort = NULL;
 
     // Environment variables
-    pdb->access_origin = WARUDO_DEFAULT_CORS;
-    pdb->log_level = WARUDO_DEFAULT_LOG_LEVEL;
+    pdb->access_origin = WRD_DEFAULT_CORS;
+    pdb->log_level = WRD_DEFAULT_LOG_LEVEL;
 
     char *env = getenv("WARUDO_LOG_LEVEL");
 
     if(env != NULL) {
         int log_level = atoi(env);
         pdb->log_level = log_level;
-        warudo_log_info(pdb, "Log level %u\n", log_level);
+        wrd_log_info(pdb, "Log level %u\n", log_level);
     }
 
-    warudo_log_info(pdb, "Starting warudo %s\n", WARUDO_VERSION);
+    wrd_log_info(pdb, "Starting warudo %s\n", WRD_VERSION);
 
     if(env != NULL) {
-        warudo_log_info(pdb, "Log level: %u\n", pdb->log_level);
+        wrd_log_info(pdb, "Log level: %u\n", pdb->log_level);
     }
 
     env = getenv("WARUDO_CORS");
 
     if(env != NULL) {
-        warudo_log_info(pdb, "Access origin: \"%s\"\n", env);
+        wrd_log_info(pdb, "Access origin: \"%s\"\n", env);
         pdb->access_origin = env;
     }
 
     // Load database
-    res = warudo_db_init(filename, pdb);
+    res = wrd_db_init(filename, pdb);
 
-    if(res != WARUDO_OK) {
-        warudo_close(pdb);
+    if(res != WRD_OK) {
+        wrd_close(pdb);
 
-        return WARUDO_DB_INIT_ERROR;
+        return WRD_DB_INIT_ERROR;
     }
 
     *config = pdb;
 
-    return WARUDO_OK;
+    return WRD_OK;
 }
 
-warudo_code warudo_parse_query_string(char *query_string, warudo *config) {
+wrd_code wrd_parse_query_string(char *query_string, warudo *config) {
     CHECK_CONFIG
 
     if(query_string == NULL) {
-        return WARUDO_EMPTY_QUERY_STRING_ERROR;
+        return WRD_EMPTY_QUERY_STRING_ERROR;
     }
 
     char *saveptr;
@@ -129,52 +129,52 @@ warudo_code warudo_parse_query_string(char *query_string, warudo *config) {
             char *value = delimiter + 1;
 
             if(value != NULL) {
-                WARUDO_GET_QUERY_ULLINT_VALUE(parameter, limit, value, length_1)
-                else WARUDO_GET_QUERY_INT_VALUE(parameter, offset, value, length_1)
-                else WARUDO_GET_QUERY_ULLINT_VALUE(parameter, id, value, length_1)
-                else WARUDO_GET_QUERY_INT_VALUE(parameter, multi, value, length_1)
-                else WARUDO_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
-                else WARUDO_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
-                else WARUDO_GET_QUERY_STRING_VALUE(parameter, orderby, value, length_1)
-                else WARUDO_GET_QUERY_STRING_VALUE(parameter, sort, value, length_1)
+                WRD_GET_QUERY_ULLINT_VALUE(parameter, limit, value, length_1)
+                else WRD_GET_QUERY_INT_VALUE(parameter, offset, value, length_1)
+                else WRD_GET_QUERY_ULLINT_VALUE(parameter, id, value, length_1)
+                else WRD_GET_QUERY_INT_VALUE(parameter, multi, value, length_1)
+                else WRD_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
+                else WRD_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
+                else WRD_GET_QUERY_STRING_VALUE(parameter, orderby, value, length_1)
+                else WRD_GET_QUERY_STRING_VALUE(parameter, sort, value, length_1)
             }
         }
 
         parameter = strtok_r(NULL, "&", &saveptr);
     }
 
-    return WARUDO_OK;
+    return WRD_OK;
 }
 
-warudo_code warudo_accept_connection(warudo *config) {
+wrd_code wrd_accept_connection(warudo *config) {
     CHECK_CONFIG
 
     config->page = -1;
-    config->request_method = WARUDO_REQUEST_UNKNOWN;
+    config->request_method = WRD_REQUEST_UNKNOWN;
     config->script_name = NULL;
     config->query_string = NULL;
     ++config->requests_count;
 
     // Query string
-    WARUDO_FREE_QUERY_ULLINT_VALUE(id, 0)
-    WARUDO_FREE_QUERY_INT_VALUE(limit, WARUDO_DEFAULT_QUERY_LIMIT)
-    WARUDO_FREE_QUERY_ULLINT_VALUE(offset, 0)
-    WARUDO_FREE_QUERY_ULLINT_VALUE(multi, WARUDO_DEFAULT_QUERY_MULTI)
-    WARUDO_FREE_QUERY_STRING_VALUE(key)
-    WARUDO_FREE_QUERY_STRING_VALUE(value)
-    WARUDO_FREE_QUERY_STRING_VALUE(orderby)
-    WARUDO_FREE_QUERY_STRING_VALUE(sort)
-    // WARUDO_FREE_QUERY_STRING_VALUES(keys)
-    // WARUDO_FREE_QUERY_STRING_VALUES(values)
+    WRD_FREE_QUERY_ULLINT_VALUE(id, 0)
+    WRD_FREE_QUERY_INT_VALUE(limit, WRD_DEFAULT_QUERY_LIMIT)
+    WRD_FREE_QUERY_ULLINT_VALUE(offset, 0)
+    WRD_FREE_QUERY_ULLINT_VALUE(multi, WRD_DEFAULT_QUERY_MULTI)
+    WRD_FREE_QUERY_STRING_VALUE(key)
+    WRD_FREE_QUERY_STRING_VALUE(value)
+    WRD_FREE_QUERY_STRING_VALUE(orderby)
+    WRD_FREE_QUERY_STRING_VALUE(sort)
+    // WRD_FREE_QUERY_STRING_VALUES(keys)
+    // WRD_FREE_QUERY_STRING_VALUES(values)
 
     int accepted = FCGX_Accept_r(&config->request);
 
-#ifdef WARUDO_TIMING
-    warudo_start_time(config);
+#ifdef WRD_TIMING
+    wrd_start_time(config);
 #endif
 
     if(accepted < 0) {
-        return WARUDO_ACCEPT_ERROR;
+        return WRD_ACCEPT_ERROR;
     }
 
     const char *script_name = FCGX_GetParam("SCRIPT_NAME", config->request.envp);
@@ -182,61 +182,61 @@ warudo_code warudo_accept_connection(warudo *config) {
     const char *request_method = FCGX_GetParam("REQUEST_METHOD", config->request.envp);
 
     if(script_name != NULL && strcmp(script_name, "/") == 0) {
-        config->page = WARUDO_PAGE_ROOT;
+        config->page = WRD_PAGE_ROOT;
     } else if(script_name != NULL && strcmp(script_name, "/app/entries") == 0) {
-        config->page = WARUDO_PAGE_APP;
+        config->page = WRD_PAGE_APP;
     } else if(script_name != NULL && strcmp(script_name, "/app/keys") == 0) {
-        config->page = WARUDO_PAGE_APP_KEYS;
+        config->page = WRD_PAGE_APP_KEYS;
     } else if(script_name != NULL && strcmp(script_name, "/app/dashboards") == 0) {
-        config->page = WARUDO_PAGE_APP_VIEWS;
+        config->page = WRD_PAGE_APP_VIEWS;
     } else {
-        config->page = WARUDO_PAGE_NOT_FOUND;
+        config->page = WRD_PAGE_NOT_FOUND;
     }
 
     if(request_method != NULL) {
         if(strcmp(request_method, "GET") == 0) {
-            config->request_method = WARUDO_REQUEST_GET;
+            config->request_method = WRD_REQUEST_GET;
         } else if(strcmp(request_method, "POST") == 0) {
-            config->request_method = WARUDO_REQUEST_POST;
+            config->request_method = WRD_REQUEST_POST;
         } else {
-            config->request_method = WARUDO_REQUEST_UNKNOWN;
+            config->request_method = WRD_REQUEST_UNKNOWN;
         }
     }
 
     if(query_string != NULL) {
-        warudo_parse_query_string((char*)query_string, config);
+        wrd_parse_query_string((char*)query_string, config);
     }
 
     config->script_name = script_name;
     config->query_string = query_string;
 
-    return WARUDO_OK;
+    return WRD_OK;
 }
 
-warudo_code warudo_after_connection(warudo *config) {
+wrd_code wrd_after_connection(warudo *config) {
     CHECK_CONFIG
 
     FCGX_Finish_r(&config->request);
 
-#ifdef WARUDO_TIMING
-    warudo_end_time(config, 1000, "after finish request");
+#ifdef WRD_TIMING
+    wrd_end_time(config, 1000, "after finish request");
 #endif
 
-    return WARUDO_OK;
+    return WRD_OK;
 }
 
-#ifdef WARUDO_TIMING
-warudo_code warudo_start_time(warudo *config) {
+#ifdef WRD_TIMING
+wrd_code wrd_start_time(warudo *config) {
     CHECK_CONFIG
 
     ++config->timing_count;
     config->timing_end_count = 0;
     clock_gettime(CLOCK_MONOTONIC, &config->start);
 
-    return WARUDO_OK;
+    return WRD_OK;
 }
 
-warudo_code warudo_end_time(warudo *config, double ms, const char *message) {
+wrd_code wrd_end_time(warudo *config, double ms, const char *message) {
     CHECK_CONFIG
 
     struct timespec end;
@@ -247,21 +247,21 @@ warudo_code warudo_end_time(warudo *config, double ms, const char *message) {
     time_taken += (end.tv_nsec - config->start.tv_nsec) / 1000000.0;
 
     if(ms && time_taken > ms) {
-        warudo_log_info(config, "%llu: %llu time %.0lf ms %s\n", config->timing_count,
+        wrd_log_info(config, "%llu: %llu time %.0lf ms %s\n", config->timing_count,
             config->timing_end_count, time_taken, message ? message : "");
     }
 
-    return WARUDO_OK;
+    return WRD_OK;
 }
 #endif
 
-warudo_code warudo_close(warudo *config) {
+wrd_code wrd_close(warudo *config) {
     CHECK_CONFIG
 
     FCGX_Free(&config->request, 1);
-    warudo_db_close(config);
+    wrd_db_close(config);
 
     free(config);
 
-    return WARUDO_OK;
+    return WRD_OK;
 }

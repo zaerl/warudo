@@ -16,7 +16,7 @@ extern char **environ;
 #include "net.h"
 
 // Function to escape special characters in a string for HTML
-char *warudo_escape_html(const char *input) {
+char *wrd_escape_html(const char *input) {
     if(input == NULL) {
         return NULL;
     }
@@ -78,7 +78,7 @@ char *warudo_escape_html(const char *input) {
     return escaped;
 }
 
-char *warudo_url_decode(const char *input) {
+char *wrd_url_decode(const char *input) {
     if(input == NULL) {
         return NULL;
     }
@@ -123,7 +123,7 @@ char *warudo_url_decode(const char *input) {
     return decoded_url;
 }
 
-int warudo_is_valid_boundary(const char *boundary) {
+int wrd_is_valid_boundary(const char *boundary) {
     if(boundary == NULL) {
         return 0;
     }
@@ -145,7 +145,7 @@ int warudo_is_valid_boundary(const char *boundary) {
 }
 
 // multipart/form-data; boundary=random string
-const char *warudo_get_formdata_boundary(const char *content_type) {
+const char *wrd_get_formdata_boundary(const char *content_type) {
     if(content_type == NULL || strlen(content_type) < 31) {
         return NULL;
     }
@@ -158,14 +158,14 @@ const char *warudo_get_formdata_boundary(const char *content_type) {
 
     boundary = content_type + 30;
 
-    if(!warudo_is_valid_boundary(boundary)) {
+    if(!wrd_is_valid_boundary(boundary)) {
         return NULL;
     }
 
     return boundary;
 }
 
-unsigned long warudo_process_id(void) {
+unsigned long wrd_process_id(void) {
 #ifdef _WIN32
     return (unsigned long)GetCurrentProcessId();
 #elif __linux__ || __APPLE__
@@ -173,15 +173,15 @@ unsigned long warudo_process_id(void) {
 #endif
 }
 
-warudo_code warudo_environ(warudo *config) {
-    FCGX_FPrintF(config->request.out, "<!--db: %s-->\n", WARUDO_DB_FILE);
-    FCGX_FPrintF(config->request.out, "<!--config: %s-->\n", WARUDO_CONFIG_FILE);
-    FCGX_FPrintF(config->request.out, "<!--pid: %lu-->\n", warudo_process_id());
+wrd_code wrd_environ(warudo *config) {
+    FCGX_FPrintF(config->request.out, "<!--db: %s-->\n", WRD_DB_FILE);
+    FCGX_FPrintF(config->request.out, "<!--config: %s-->\n", WRD_CONFIG_FILE);
+    FCGX_FPrintF(config->request.out, "<!--pid: %lu-->\n", wrd_process_id());
 
-    return WARUDO_OK;
+    return WRD_OK;
 }
 
-long warudo_content_length(warudo *config) {
+long wrd_content_length(warudo *config) {
     char *length = FCGX_GetParam("CONTENT_LENGTH", config->request.envp);
     long int len = 0;
 
@@ -193,8 +193,8 @@ long warudo_content_length(warudo *config) {
 }
 
 
-char *warudo_read_content(long int length, warudo *config) {
-    long int len = length == 0 ? warudo_content_length(config) : length;
+char *wrd_read_content(long int length, warudo *config) {
+    long int len = length == 0 ? wrd_content_length(config) : length;
 
     if(len <= 0) {
         return NULL;
@@ -207,20 +207,20 @@ char *warudo_read_content(long int length, warudo *config) {
     return data;
 }
 
-warudo_code warudo_parse_formdata(const char *input, long int length, const char *boundary,
-    warudo_parse_formdata_callback callback, warudo *config) {
+wrd_code wrd_parse_formdata(const char *input, long int length, const char *boundary,
+    wrd_parse_formdata_callback callback, warudo *config) {
     char *full_boundary = NULL;
     long int index = 0;
     int res = 0;
 
     if(!config || length == 0 || input == NULL || boundary == NULL || callback == NULL) {
-        return WARUDO_PARSER_EMPTY;
+        return WRD_PARSER_EMPTY;
     }
 
     long int boundary_length = strlen(boundary);
 
     if(boundary_length == 0) {
-        return WARUDO_PARSER_EMPTY_BOUNDARY;
+        return WRD_PARSER_EMPTY_BOUNDARY;
     }
 
     long int full_boundary_length = boundary_length + 4;
@@ -236,7 +236,7 @@ warudo_code warudo_parse_formdata(const char *input, long int length, const char
 
     // At least one entry
     if(length < boundary_length * 2 + 54) {
-        res = WARUDO_PARSER_VOID;
+        res = WRD_PARSER_VOID;
         goto error;
     }
 
@@ -244,14 +244,14 @@ warudo_code warudo_parse_formdata(const char *input, long int length, const char
         char *position = strstr(input + index, index ? full_boundary : full_boundary + 2);
 
         if(position == NULL) {
-            res = WARUDO_PARSER_NO_BOUNDARY;
+            res = WRD_PARSER_NO_BOUNDARY;
             goto error;
         }
 
         if(index && position != input + index) {
             int json_length = position - (input + index);
 
-            if((*callback)(input + index, json_length, config) == WARUDO_OK) {
+            if((*callback)(input + index, json_length, config) == WRD_OK) {
                 ++res;
             }
 
@@ -261,7 +261,7 @@ warudo_code warudo_parse_formdata(const char *input, long int length, const char
                 if(strncmp(input + index + json_length + full_boundary_length, "--\r\n", 4) == 0) {
                     break;
                 } else {
-                    res = WARUDO_PARSER_MISSING_END;
+                    res = WRD_PARSER_MISSING_END;
                     goto error;
                 }
             }
@@ -274,7 +274,7 @@ warudo_code warudo_parse_formdata(const char *input, long int length, const char
         position = strstr(input + index, "\r\nContent-Disposition: form-data; name=\"");
 
         if(position == NULL || position != input + index) {
-            res = WARUDO_PARSER_MISSING_CONTENT;
+            res = WRD_PARSER_MISSING_CONTENT;
             goto error;
         }
 
@@ -286,7 +286,7 @@ warudo_code warudo_parse_formdata(const char *input, long int length, const char
         position = strstr(input + index, "\"\r\n\r\n");
 
         if(position == NULL) {
-            res = WARUDO_PARSER_MISSING_BODY;
+            res = WRD_PARSER_MISSING_BODY;
             goto error;
         }
 

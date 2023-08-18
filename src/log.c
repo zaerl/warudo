@@ -3,15 +3,15 @@
 
 #include "warudo.h"
 
-warudo_code warudo_log(warudo *config, int level, const char *format, ...) {
+wrd_code wrd_log(warudo *config, int level, const char *format, ...) {
     CHECK_CONFIG
 
     if(format == NULL) {
-        return WARUDO_ERROR;
+        return WRD_ERROR;
     }
 
-    if(config->log_level == WARUDO_LOG_LEVEL_NO_LOG || level > config->log_level) {
-        return WARUDO_OK;
+    if(config->log_level == WRD_LOG_LEVEL_NO_LOG || level > config->log_level) {
+        return WRD_OK;
     }
 
     va_list args;
@@ -19,5 +19,5 @@ warudo_code warudo_log(warudo *config, int level, const char *format, ...) {
     vfprintf(stderr, format, args);
     va_end(args);
 
-    return WARUDO_OK;
+    return WRD_OK;
 }

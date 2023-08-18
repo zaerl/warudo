@@ -20,45 +20,45 @@ extern char **environ;
 // make && WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 bin/warudo
 int main(void) {
     warudo *config;
-    warudo_code ret;
+    wrd_code ret;
 
-    ret = warudo_init(WARUDO_DB_FILE, &config);
+    ret = wrd_init(WRD_DB_FILE, &config);
 
-    if(ret != WARUDO_OK) {
-        warudo_log_error(config, "Failed to initialize\n", "");
+    if(ret != WRD_OK) {
+        wrd_log_error(config, "Failed to initialize\n", "");
         return ret;
     }
 
-    while(warudo_accept_connection(config) >= 0) {
+    while(wrd_accept_connection(config) >= 0) {
         /*char **envp = config->request.envp;
 
         while(*envp) {
-            warudo_log_debug(config, "%s\n", *envp);
+            wrd_log_debug(config, "%s\n", *envp);
             ++envp;
         }*/
-        if(config->page == WARUDO_PAGE_APP) {
-            ret = warudo_page_app(WARUDO_ENTRY_TYPE_DATA, config);
-        } else if(config->page == WARUDO_PAGE_APP_KEYS) {
-            ret = warudo_page_app_keys(config);
-        } else if(config->page == WARUDO_PAGE_APP_VIEWS) {
-            ret = warudo_page_app(WARUDO_ENTRY_TYPE_VIEW, config);
-        } else if(config->page == WARUDO_PAGE_ROOT) {
-            ret = warudo_page_home(config);
+        if(config->page == WRD_PAGE_APP) {
+            ret = wrd_page_app(WRD_ENTRY_TYPE_DATA, config);
+        } else if(config->page == WRD_PAGE_APP_KEYS) {
+            ret = wrd_page_app_keys(config);
+        } else if(config->page == WRD_PAGE_APP_VIEWS) {
+            ret = wrd_page_app(WRD_ENTRY_TYPE_VIEW, config);
+        } else if(config->page == WRD_PAGE_ROOT) {
+            ret = wrd_page_home(config);
         } else {
-            ret = warudo_not_found(config);
+            ret = wrd_not_found(config);
         }
 
-        warudo_after_connection(config);
+        wrd_after_connection(config);
 
         if(ret == 0) {
-            warudo_log_info(config, "Accepted request %llu\n", config->requests_count);
+            wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
         } else {
-            warudo_log_error(config, "Failed to accept request %llu. Code %s\n",
-                config->requests_count, warudo_error_description(ret, 0));
+            wrd_log_error(config, "Failed to accept request %llu. Code %s\n",
+                config->requests_count, wrd_error_description(ret, 0));
         }
     }
 
-    warudo_close(config);
+    wrd_close(config);
 
-    return WARUDO_OK;
+    return WRD_OK;
 }

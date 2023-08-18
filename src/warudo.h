@@ -9,29 +9,29 @@ extern "C" {
 #error "Windows is not supported"
 #endif
 
-#define WARUDO_VERSION "0.1.0"
+#define WRD_VERSION "0.1.0"
 
 // Configurations
-#define WARUDO_BUFFLEN 8192
-#define WARUDO_CONFIG_FILE "warudo.conf"
-#define WARUDO_DB_FILE "warudo.db"
-#define WARUDO_ENTRIES_TABLE "entries"
-#define WARUDO_MAX_COLUMNS 64
-#define WARUDO_SOCKET_PATH ":6251"
-#define WARUDO_TIMING 1
-#define WARUDO_DASHBOARDS_TABLE "dashboards"
-#define WARUDO_MAX_QUERY_KEYS 16
+#define WRD_BUFFLEN 8192
+#define WRD_CONFIG_FILE "warudo.conf"
+#define WRD_DB_FILE "warudo.db"
+#define WRD_ENTRIES_TABLE "entries"
+#define WRD_MAX_COLUMNS 64
+#define WRD_SOCKET_PATH ":6251"
+#define WRD_TIMING 1
+#define WRD_DASHBOARDS_TABLE "dashboards"
+#define WRD_MAX_QUERY_KEYS 16
 
-#define WARUDO_LOG_LEVEL_NO_LOG 0
-#define WARUDO_LOG_LEVEL_ERROR 1
-#define WARUDO_LOG_LEVEL_INFO 2
-#define WARUDO_LOG_LEVEL_DEBUG 3
+#define WRD_LOG_LEVEL_NO_LOG 0
+#define WRD_LOG_LEVEL_ERROR 1
+#define WRD_LOG_LEVEL_INFO 2
+#define WRD_LOG_LEVEL_DEBUG 3
 
 // Environment variables
-#define WARUDO_DEFAULT_CORS NULL
-#define WARUDO_DEFAULT_LOG_LEVEL WARUDO_LOG_LEVEL_NO_LOG
+#define WRD_DEFAULT_CORS NULL
+#define WRD_DEFAULT_LOG_LEVEL WRD_LOG_LEVEL_NO_LOG
 
-#ifdef WARUDO_TIMING
+#ifdef WRD_TIMING
 #include <time.h>
 #endif
 
@@ -40,92 +40,92 @@ extern "C" {
 
 typedef enum {
     // Success code
-    WARUDO_OK = 0,
+    WRD_OK = 0,
 
     // HTTP codes
-    WARUDO_HTTP_BAD_REQUEST = 400,
-    WARUDO_HTTP_NOT_FOUND = 404,
-    WARUDO_HTTP_NOT_ALLOWED = 405,
-    WARUDO_HTTP_INTERNAL_ERROR = 500,
+    WRD_HTTP_BAD_REQUEST = 400,
+    WRD_HTTP_NOT_FOUND = 404,
+    WRD_HTTP_NOT_ALLOWED = 405,
+    WRD_HTTP_INTERNAL_ERROR = 500,
 
     // Error codes
-    WARUDO_ERROR = -1,
-    WARUDO_ACCEPT_ERROR = -2,
-    WARUDO_ADD_ERROR = -3,
-    WARUDO_DB_CLOSE_ERROR = -4,
-    WARUDO_DB_ERROR = -5,
-    WARUDO_DB_INIT_ERROR = -6,
-    WARUDO_DB_OPEN_ERROR = -7,
-    WARUDO_EMPTY_CONTENT_ERROR = -8,
-    WARUDO_EMPTY_QUERY_STRING_ERROR = -9,
-    WARUDO_FCGI_INIT_ERROR = -10,
-    WARUDO_INIT_REQUEST_ERROR = -11,
-    WARUDO_READ_ERROR = -12,
-    WARUDO_SOCKET_ERROR = -13,
+    WRD_ERROR = -1,
+    WRD_ACCEPT_ERROR = -2,
+    WRD_ADD_ERROR = -3,
+    WRD_DB_CLOSE_ERROR = -4,
+    WRD_DB_ERROR = -5,
+    WRD_DB_INIT_ERROR = -6,
+    WRD_DB_OPEN_ERROR = -7,
+    WRD_EMPTY_CONTENT_ERROR = -8,
+    WRD_EMPTY_QUERY_STRING_ERROR = -9,
+    WRD_FCGI_INIT_ERROR = -10,
+    WRD_INIT_REQUEST_ERROR = -11,
+    WRD_READ_ERROR = -12,
+    WRD_SOCKET_ERROR = -13,
 
     // Parser error codes
-    WARUDO_PARSER_EMPTY = -14,
-    WARUDO_PARSER_EMPTY_BOUNDARY = -15,
-    WARUDO_PARSER_VOID = -16,
-    WARUDO_PARSER_NO_BOUNDARY = -17,
-    WARUDO_PARSER_MISSING_END = -18,
-    WARUDO_PARSER_MISSING_CONTENT = -19,
-    WARUDO_PARSER_MISSING_BODY = -20,
+    WRD_PARSER_EMPTY = -14,
+    WRD_PARSER_EMPTY_BOUNDARY = -15,
+    WRD_PARSER_VOID = -16,
+    WRD_PARSER_NO_BOUNDARY = -17,
+    WRD_PARSER_MISSING_END = -18,
+    WRD_PARSER_MISSING_CONTENT = -19,
+    WRD_PARSER_MISSING_BODY = -20,
 
     // Unknown error codes
-    WARUDO_UNKNOWN_ERROR = -21
-} warudo_code;
+    WRD_UNKNOWN_ERROR = -21
+} wrd_code;
 
 // HTTP request methods
-#define WARUDO_REQUEST_UNKNOWN 0
-#define WARUDO_REQUEST_GET 1
-#define WARUDO_REQUEST_POST 2
+#define WRD_REQUEST_UNKNOWN 0
+#define WRD_REQUEST_GET 1
+#define WRD_REQUEST_POST 2
 
 // Pages
-#define WARUDO_PAGE_NOT_FOUND 0
-#define WARUDO_PAGE_ROOT 1
-#define WARUDO_PAGE_APP 2
-#define WARUDO_PAGE_APP_KEYS 3
-#define WARUDO_PAGE_APP_VIEWS 4
+#define WRD_PAGE_NOT_FOUND 0
+#define WRD_PAGE_ROOT 1
+#define WRD_PAGE_APP 2
+#define WRD_PAGE_APP_KEYS 3
+#define WRD_PAGE_APP_VIEWS 4
 
 // Tables
-#define WARUDO_ENTRY_TYPE_DATA 0
-#define WARUDO_ENTRY_TYPE_VIEW 1
+#define WRD_ENTRY_TYPE_DATA 0
+#define WRD_ENTRY_TYPE_VIEW 1
 
 // Query string
-#define WARUDO_DEFAULT_QUERY_LIMIT 100
-#define WARUDO_DEFAULT_QUERY_MULTI 0
+#define WRD_DEFAULT_QUERY_LIMIT 100
+#define WRD_DEFAULT_QUERY_MULTI 0
 
-#define WARUDO_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && \
+#define WRD_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && \
     strncmp(KEY, #IDX, LENGTH_1) == 0) { \
     config->query_##IDX = FN; \
     config->query_valid_##IDX = 1; }
-#define WARUDO_GET_QUERY_ULLINT_VALUE(KEY, IDX, VALUE, LENGTH_1) WARUDO_GET_QUERY_VALUE(KEY, IDX, VALUE, strtoll(VALUE, NULL, 10), LENGTH_1)
-#define WARUDO_GET_QUERY_INT_VALUE(KEY, IDX, VALUE, LENGTH_1) WARUDO_GET_QUERY_VALUE(KEY, IDX, VALUE, strtol(VALUE, NULL, 10), LENGTH_1)
-#define WARUDO_GET_QUERY_STRING_VALUE(KEY, IDX, VALUE, LENGTH_1) WARUDO_GET_QUERY_VALUE(KEY, IDX, VALUE, strdup(VALUE), LENGTH_1)
+#define WRD_GET_QUERY_ULLINT_VALUE(KEY, IDX, VALUE, LENGTH_1) WRD_GET_QUERY_VALUE(KEY, IDX, VALUE, strtoll(VALUE, NULL, 10), LENGTH_1)
+#define WRD_GET_QUERY_INT_VALUE(KEY, IDX, VALUE, LENGTH_1) WRD_GET_QUERY_VALUE(KEY, IDX, VALUE, strtol(VALUE, NULL, 10), LENGTH_1)
+#define WRD_GET_QUERY_STRING_VALUE(KEY, IDX, VALUE, LENGTH_1) WRD_GET_QUERY_VALUE(KEY, IDX, VALUE, strdup(VALUE), LENGTH_1)
 
-#define WARUDO_FREE_QUERY_ULLINT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
-#define WARUDO_FREE_QUERY_INT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
-#define WARUDO_FREE_QUERY_STRING_VALUE(NAME) if(config->query_##NAME != NULL) free((void*)config->query_##NAME); \
+#define WRD_FREE_QUERY_ULLINT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
+#define WRD_FREE_QUERY_INT_VALUE(NAME, DEFAULT_VALUE) config->query_##NAME = DEFAULT_VALUE; config->query_valid_##NAME = 0;
+#define WRD_FREE_QUERY_STRING_VALUE(NAME) if(config->query_##NAME != NULL) free((void*)config->query_##NAME); \
     config->query_##NAME = NULL; \
     config->query_valid_##NAME = 0;
-// #define WARUDO_FREE_QUERY_STRING_VALUES(NAME) for(int i = 0; i < config->query_valid_##NAME; ++i) { free((void*)config->query_##NAME[i]); \
+// #define WRD_FREE_QUERY_STRING_VALUES(NAME) for(int i = 0; i < config->query_valid_##NAME; ++i) { free((void*)config->query_##NAME[i]); \
 //  config->query_##NAME[i] = NULL; } \
 //  config->query_valid_##NAME = 0;
 
-#define WARUDO_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
-// #define WARUDO_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
+#define WRD_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
+// #define WRD_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
 
-#define CHECK_CONFIG if(!config) return WARUDO_ERROR;
+#define CHECK_CONFIG if(!config) return WRD_ERROR;
 
-struct warudo_column {
+struct wrd_column {
     char *name;
     char *type;
 };
 
-typedef struct warudo_column warudo_column;
+typedef struct wrd_column wrd_column;
 
-struct warudo {
+typedef struct {
     sqlite3 *db;
     sqlite3_stmt *insert_stmt;
     sqlite3_stmt *insert_dashboard_stmt;
@@ -142,60 +142,58 @@ struct warudo {
     int request_method;
     const char *script_name;
     const char *query_string;
-    warudo_column columns[WARUDO_MAX_COLUMNS];
+    wrd_column columns[WRD_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;
-#ifdef WARUDO_TIMING
+#ifdef WRD_TIMING
     struct timespec start;
     unsigned long long int timing_count;
     unsigned long long int timing_end_count;
 #endif
 
     // Query string
-    WARUDO_QUERY_VALUE(unsigned long long int, id)
-    WARUDO_QUERY_VALUE(unsigned long long int, offset)
-    WARUDO_QUERY_VALUE(unsigned int, limit)
-    WARUDO_QUERY_VALUE(unsigned int, multi)
-    WARUDO_QUERY_VALUE(const char*, key)
-    WARUDO_QUERY_VALUE(const char*, value)
-    WARUDO_QUERY_VALUE(const char*, orderby)
-    WARUDO_QUERY_VALUE(const char*, sort)
-    // WARUDO_QUERY_VALUES(const char*, keys, WARUDO_MAX_QUERY_KEYS)
-    // WARUDO_QUERY_VALUES(const char*, values, WARUDO_MAX_QUERY_KEYS)
-};
-
-typedef struct warudo warudo;
+    WRD_QUERY_VALUE(unsigned long long int, id)
+    WRD_QUERY_VALUE(unsigned long long int, offset)
+    WRD_QUERY_VALUE(unsigned int, limit)
+    WRD_QUERY_VALUE(unsigned int, multi)
+    WRD_QUERY_VALUE(const char*, key)
+    WRD_QUERY_VALUE(const char*, value)
+    WRD_QUERY_VALUE(const char*, orderby)
+    WRD_QUERY_VALUE(const char*, sort)
+    // WRD_QUERY_VALUES(const char*, keys, WRD_MAX_QUERY_KEYS)
+    // WRD_QUERY_VALUES(const char*, values, WRD_MAX_QUERY_KEYS)
+} warudo;
 
 // Init the system
-warudo_code warudo_init(const char *filename, warudo **config);
+wrd_code wrd_init(const char *filename, warudo **config);
 
 // Parse the query string
-warudo_code warudo_parse_query_string(char *query_string, warudo *config);
+wrd_code wrd_parse_query_string(char *query_string, warudo *config);
 
 // Accept a FCGI connection
-warudo_code warudo_accept_connection(warudo *config);
+wrd_code wrd_accept_connection(warudo *config);
 
 // Run at the end of a connection
-warudo_code warudo_after_connection(warudo *config);
+wrd_code wrd_after_connection(warudo *config);
 
 // Homepage error page
-warudo_code warudo_page_home(warudo *config);
+wrd_code wrd_page_home(warudo *config);
 
 // Root JSON endpoints
-warudo_code warudo_page_app(int entry_type, warudo *config);
+wrd_code wrd_page_app(int entry_type, warudo *config);
 
 // Keys JSON endpoint
-warudo_code warudo_page_app_keys(warudo *config);
+wrd_code wrd_page_app_keys(warudo *config);
 
 // Timing functions
-#ifdef WARUDO_TIMING
-warudo_code warudo_start_time(warudo *config);
+#ifdef WRD_TIMING
+wrd_code wrd_start_time(warudo *config);
 
-warudo_code warudo_end_time(warudo *config, double ms, const char *message);
+wrd_code wrd_end_time(warudo *config, double ms, const char *message);
 #endif
 
 // Close the system
-warudo_code warudo_close(warudo *config);
+wrd_code wrd_close(warudo *config);
 
 #ifdef __cplusplus
 }
