@@ -5,10 +5,14 @@
 extern "C" {
 #endif
 
+#include <fcgiapp.h>
+#include "sqlite3/sqlite3.h"
+
 #if defined(_WIN32) || defined(_WIN64)
 #error "Windows is not supported"
 #endif
 
+// Version
 #define WRD_VERSION "0.1.0"
 
 // Configurations
@@ -22,21 +26,20 @@ extern "C" {
 #define WRD_DASHBOARDS_TABLE "dashboards"
 #define WRD_MAX_QUERY_KEYS 16
 
-#define WRD_LOG_LEVEL_NO_LOG 0
-#define WRD_LOG_LEVEL_ERROR 1
-#define WRD_LOG_LEVEL_INFO 2
-#define WRD_LOG_LEVEL_DEBUG 3
-
-// Environment variables
-#define WRD_DEFAULT_CORS NULL
-#define WRD_DEFAULT_LOG_LEVEL WRD_LOG_LEVEL_NO_LOG
-
 #ifdef WRD_TIMING
 #include <time.h>
 #endif
 
-#include <fcgiapp.h>
-#include "sqlite3/sqlite3.h"
+typedef enum {
+    WRD_LOG_LEVEL_NO_LOG = 0,
+    WRD_LOG_LEVEL_ERROR = 1,
+    WRD_LOG_LEVEL_INFO = 2,
+    WRD_LOG_LEVEL_DEBUG = 3
+} wrd_log_level;
+
+// Environment variables
+#define WRD_DEFAULT_CORS NULL
+#define WRD_DEFAULT_LOG_LEVEL WRD_LOG_LEVEL_NO_LOG
 
 typedef enum {
     // Success code
@@ -134,7 +137,7 @@ typedef struct {
 
     // Environment variables
     const char *access_origin;
-    int log_level;
+    wrd_log_level log_level;
 
     FCGX_Request request;
     int socket;
