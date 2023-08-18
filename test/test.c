@@ -12,13 +12,13 @@
 
 #define DECLARE_TEST(NAME) void* test_##NAME(void* arg);
 
-DECLARE_TEST(app)
 DECLARE_TEST(code)
 DECLARE_TEST(db)
-DECLARE_TEST(home)
 DECLARE_TEST(init)
 DECLARE_TEST(log)
 DECLARE_TEST(net)
+DECLARE_TEST(route_app)
+DECLARE_TEST(route_home)
 DECLARE_TEST(warudo)
 
 static unsigned int tests_valid = 0;
@@ -107,10 +107,10 @@ int main(int argc, const char *argv[]) {
         pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
         pthread_join(thread_##NAME, NULL);
 
-    RUN_TEST(app)
+    RUN_TEST(route_app)
     RUN_TEST(code)
     RUN_TEST(db)
-    RUN_TEST(home)
+    RUN_TEST(route_home)
     RUN_TEST(init)
     RUN_TEST(log)
     RUN_TEST(net)

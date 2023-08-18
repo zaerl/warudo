@@ -39,11 +39,11 @@ void* test_net(void* arg) {
     ASSERT("valid", "a", warudo_get_formdata_boundary, "multipart/form-data; boundary=a")
     ASSERT("valid", "az-_", warudo_get_formdata_boundary, "multipart/form-data; boundary=az-_")
 
-    ASSERT("NULL", 0, is_valid_boundary, NULL)
-    ASSERT("NULL", 0, is_valid_boundary, "")
-    ASSERT("no \\n", 0, is_valid_boundary, "\n")
-    ASSERT("no $%&/", 0, is_valid_boundary, "$%&/")
-    ASSERT("valid az-_", 1, is_valid_boundary, "az-_")
+    ASSERT("NULL", 0, warudo_is_valid_boundary, NULL)
+    ASSERT("NULL", 0, warudo_is_valid_boundary, "")
+    ASSERT("no \\n", 0, warudo_is_valid_boundary, "\n")
+    ASSERT("no $%&/", 0, warudo_is_valid_boundary, "$%&/")
+    ASSERT("valid az-_", 1, warudo_is_valid_boundary, "az-_")
 
     ASSERT_CODE("NULL all", WARUDO_PARSER_EMPTY, warudo_parse_formdata, NULL, 0, NULL, NULL, &config)
     ASSERT_CODE("NULL boundary", WARUDO_PARSER_EMPTY, warudo_parse_formdata, "test", 4, NULL, NULL, &config)
