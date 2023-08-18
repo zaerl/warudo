@@ -91,7 +91,7 @@ warudo_code warudo_bad_request(const char* description, warudo* config) {
     return WARUDO_HTTP_BAD_REQUEST;
 }
 
-warudo_code warudo_page_not_found(warudo* config) {
+warudo_code warudo_not_found(warudo* config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("404 Not Found", "text/plain", config);

@@ -44,7 +44,7 @@ int main(void) {
         } else if(config->page == WARUDO_PAGE_ROOT) {
             ret = warudo_page_home(config);
         } else {
-            ret = warudo_page_not_found(config);
+            ret = warudo_not_found(config);
         }
 
         warudo_after_connection(config);

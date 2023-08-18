@@ -31,7 +31,7 @@ warudo_code warudo_server_error(const char* description, warudo* config);
 
 warudo_code warudo_bad_request(const char* description, warudo* config);
 
-warudo_code warudo_page_not_found(warudo* config);
+warudo_code warudo_not_found(warudo* config);
 
 warudo_code warudo_environ(warudo *config);
 
