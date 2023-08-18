@@ -107,13 +107,13 @@ int main(int argc, const char *argv[]) {
         pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
         pthread_join(thread_##NAME, NULL);
 
-    RUN_TEST(route_app)
     RUN_TEST(code)
     RUN_TEST(db)
-    RUN_TEST(route_home)
     RUN_TEST(init)
     RUN_TEST(log)
     RUN_TEST(net)
+    RUN_TEST(route_app)
+    RUN_TEST(route_home)
     RUN_TEST(warudo)
 
     int valid = tests_valid == tests_total;
