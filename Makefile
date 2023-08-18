@@ -98,6 +98,6 @@ db:
 	sqlite3 warudo.db
 
 clean:
-	rm -rf $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET) ${DBS}
+	rm -rf $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET)
 
 .PHONY: all clean
