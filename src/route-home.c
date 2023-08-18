@@ -1,11 +1,8 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
-#include "warudo.h"
+#include "http.h"
 #include "net.h"
+#include "warudo.h"
 
-warudo_code warudo_page_home(warudo* config) {
+warudo_code warudo_page_home(warudo *config) {
     CHECK_CONFIG
 
     return warudo_server_error("Warudo is a Fast CGI application. "

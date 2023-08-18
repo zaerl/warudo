@@ -16,14 +16,14 @@ extern char **environ;
 #include "net.h"
 
 // Function to escape special characters in a string for HTML
-char* warudo_escape_html(const char* input) {
+char *warudo_escape_html(const char *input) {
     if(input == NULL) {
         return NULL;
     }
 
     size_t len = strlen(input);
     size_t escaped_len = len * 6 + 1;
-    char* escaped = malloc(len);
+    char *escaped = malloc(len);
 
     if(escaped == NULL) {
         return NULL;
@@ -61,7 +61,7 @@ char* warudo_escape_html(const char* input) {
         if(j >= escaped_len - 6) {
             // Increase buffer size if necessary
             escaped_len *= 2;
-            char* temp = realloc(escaped, escaped_len);
+            char *temp = realloc(escaped, escaped_len);
 
             if(temp == NULL) {
                 free(escaped);
@@ -78,7 +78,7 @@ char* warudo_escape_html(const char* input) {
     return escaped;
 }
 
-char* warudo_url_decode(const char* input) {
+char *warudo_url_decode(const char *input) {
     if(input == NULL) {
         return NULL;
     }
@@ -105,14 +105,14 @@ char* warudo_url_decode(const char* input) {
             if(isxdigit(decoded_url[i + 1]) && isxdigit(decoded_url[i + 2])) {
                 decoded = 0;
 
-                /* combine the next to numbers into one */
+                // combine the next to numbers into one
                 hex_code[0] = decoded_url[i + 1];
                 hex_code[1] = decoded_url[i + 2];
 
-                /* convert it to decimal */
+                // convert it to decimal
                 long int x = strtol(hex_code, NULL, 16);
 
-                /* remove the hex */
+                // remove the hex
                 memmove(&decoded_url[i + 1], &decoded_url[i + 3], strlen(&decoded_url[i + 3]) + 1);
 
                 decoded_url[i] = x;
@@ -123,7 +123,7 @@ char* warudo_url_decode(const char* input) {
     return decoded_url;
 }
 
-int warudo_is_valid_boundary(const char* boundary) {
+int warudo_is_valid_boundary(const char *boundary) {
     if(boundary == NULL) {
         return 0;
     }
@@ -145,12 +145,12 @@ int warudo_is_valid_boundary(const char* boundary) {
 }
 
 // multipart/form-data; boundary=random string
-const char* warudo_get_formdata_boundary(const char* content_type) {
+const char *warudo_get_formdata_boundary(const char *content_type) {
     if(content_type == NULL || strlen(content_type) < 31) {
         return NULL;
     }
 
-    const char* boundary = strstr(content_type, "multipart/form-data; boundary=");
+    const char *boundary = strstr(content_type, "multipart/form-data; boundary=");
 
     if(boundary == NULL || boundary != content_type) {
         return NULL;
@@ -173,7 +173,7 @@ unsigned long warudo_process_id(void) {
 #endif
 }
 
-warudo_code warudo_environ(warudo* config) {
+warudo_code warudo_environ(warudo *config) {
     FCGX_FPrintF(config->request.out, "<!--db: %s-->\n", WARUDO_DB_FILE);
     FCGX_FPrintF(config->request.out, "<!--config: %s-->\n", WARUDO_CONFIG_FILE);
     FCGX_FPrintF(config->request.out, "<!--pid: %lu-->\n", warudo_process_id());
@@ -181,7 +181,7 @@ warudo_code warudo_environ(warudo* config) {
     return WARUDO_OK;
 }
 
-long warudo_content_length(warudo* config) {
+long warudo_content_length(warudo *config) {
     char *length = FCGX_GetParam("CONTENT_LENGTH", config->request.envp);
     long int len = 0;
 
@@ -193,7 +193,7 @@ long warudo_content_length(warudo* config) {
 }
 
 
-char* warudo_read_content(long int length, warudo* config) {
+char *warudo_read_content(long int length, warudo *config) {
     long int len = length == 0 ? warudo_content_length(config) : length;
 
     if(len <= 0) {
@@ -207,8 +207,8 @@ char* warudo_read_content(long int length, warudo* config) {
     return data;
 }
 
-warudo_code warudo_parse_formdata(const char* input, long int length, const char* boundary,
-    warudo_parse_formdata_callback callback, warudo* config) {
+warudo_code warudo_parse_formdata(const char *input, long int length, const char *boundary,
+    warudo_parse_formdata_callback callback, warudo *config) {
     char *full_boundary = NULL;
     long int index = 0;
     int res = 0;
@@ -241,7 +241,7 @@ warudo_code warudo_parse_formdata(const char* input, long int length, const char
     }
 
     while(index < length) {
-        char* position = strstr(input + index, index ? full_boundary : full_boundary + 2);
+        char *position = strstr(input + index, index ? full_boundary : full_boundary + 2);
 
         if(position == NULL) {
             res = WARUDO_PARSER_NO_BOUNDARY;

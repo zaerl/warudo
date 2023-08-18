@@ -5,6 +5,7 @@
 
 #include "code.h"
 #include "db.h"
+#include "http.h"
 #include "log.h"
 #include "net.h"
 
@@ -29,7 +30,7 @@ int main(void) {
     }
 
     while(warudo_accept_connection(config) >= 0) {
-        /*char** envp = config->request.envp;
+        /*char **envp = config->request.envp;
 
         while(*envp) {
             warudo_log_debug(config, "%s\n", *envp);

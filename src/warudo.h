@@ -119,29 +119,29 @@ typedef enum {
 #define CHECK_CONFIG if(!config) return WARUDO_ERROR;
 
 struct warudo_column {
-    char* name;
-    char* type;
+    char *name;
+    char *type;
 };
 
 typedef struct warudo_column warudo_column;
 
 struct warudo {
     sqlite3 *db;
-    sqlite3_stmt* insert_stmt;
-    sqlite3_stmt* insert_dashboard_stmt;
-    sqlite3_stmt* add_index_stmt;
-    sqlite3_stmt* parse_json_stmt;
+    sqlite3_stmt *insert_stmt;
+    sqlite3_stmt *insert_dashboard_stmt;
+    sqlite3_stmt *add_index_stmt;
+    sqlite3_stmt *parse_json_stmt;
 
     // Environment variables
-    const char* access_origin;
+    const char *access_origin;
     int log_level;
 
     FCGX_Request request;
     int socket;
     int page;
     int request_method;
-    const char* script_name;
-    const char* query_string;
+    const char *script_name;
+    const char *query_string;
     warudo_column columns[WARUDO_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;
@@ -170,7 +170,7 @@ typedef struct warudo warudo;
 warudo_code warudo_init(const char *filename, warudo **config);
 
 // Parse the query string
-warudo_code warudo_parse_query_string(char* query_string, warudo* config);
+warudo_code warudo_parse_query_string(char *query_string, warudo *config);
 
 // Accept a FCGI connection
 warudo_code warudo_accept_connection(warudo *config);
@@ -179,26 +179,26 @@ warudo_code warudo_accept_connection(warudo *config);
 warudo_code warudo_after_connection(warudo *config);
 
 // Homepage error page
-warudo_code warudo_page_home(warudo* config);
+warudo_code warudo_page_home(warudo *config);
 
 // Root JSON endpoints
-warudo_code warudo_page_app(int entry_type, warudo* config);
+warudo_code warudo_page_app(int entry_type, warudo *config);
 
 // Keys JSON endpoint
-warudo_code warudo_page_app_keys(warudo* config);
+warudo_code warudo_page_app_keys(warudo *config);
 
 // Timing functions
 #ifdef WARUDO_TIMING
 warudo_code warudo_start_time(warudo *config);
 
-warudo_code warudo_end_time(warudo *config, double ms, const char* message);
+warudo_code warudo_end_time(warudo *config, double ms, const char *message);
 #endif
 
 // Close the system
 warudo_code warudo_close(warudo *config);
 
 #ifdef __cplusplus
-}  /* End of the 'extern "C"' block */
+}
 #endif
 
-#endif /* WARUDO_H */
+#endif // WARUDO_H

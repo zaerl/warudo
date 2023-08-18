@@ -7,7 +7,7 @@
         return WARUDO_FCGI_INIT_ERROR; \
     }
 
-warudo_code warudo_status(const char* status, warudo* config) {
+warudo_code warudo_status(const char *status, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     FCGX_FPrintF(config->request.out, "Status: %s\r\n", status);
@@ -15,7 +15,7 @@ warudo_code warudo_status(const char* status, warudo* config) {
     return WARUDO_OK;
 }
 
-warudo_code warudo_content_type(const char* content_type, warudo *config) {
+warudo_code warudo_content_type(const char *content_type, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     if(config->access_origin != NULL) {
@@ -27,7 +27,7 @@ warudo_code warudo_content_type(const char* content_type, warudo *config) {
     return WARUDO_OK;
 }
 
-warudo_code warudo_header(const char* status, const char* content_type, warudo* config) {
+warudo_code warudo_header(const char *status, const char *content_type, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_status(status, config);
@@ -36,7 +36,7 @@ warudo_code warudo_header(const char* status, const char* content_type, warudo* 
     return WARUDO_OK;
 }
 
-warudo_code warudo_ok(warudo* config) {
+warudo_code warudo_ok(warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("200 OK", "application/json", config);
@@ -44,7 +44,7 @@ warudo_code warudo_ok(warudo* config) {
     return WARUDO_OK;
 }
 
-warudo_code warudo_created(unsigned long long int id, warudo* config) {
+warudo_code warudo_created(unsigned long long int id, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("201 Created", "application/json", config);
@@ -53,7 +53,7 @@ warudo_code warudo_created(unsigned long long int id, warudo* config) {
     return WARUDO_OK;
 }
 
-warudo_code warudo_multi_created(unsigned long int count, warudo* config) {
+warudo_code warudo_multi_created(unsigned long int count, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("201 Created", "application/json", config);
@@ -62,7 +62,7 @@ warudo_code warudo_multi_created(unsigned long int count, warudo* config) {
     return WARUDO_OK;
 }
 
-warudo_code warudo_not_allowed(const char* allowed, warudo* config) {
+warudo_code warudo_not_allowed(const char *allowed, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_status("405 Method Not Allowed", config);
@@ -73,7 +73,7 @@ warudo_code warudo_not_allowed(const char* allowed, warudo* config) {
     return WARUDO_HTTP_NOT_ALLOWED;
 }
 
-warudo_code warudo_server_error(const char* description, warudo* config) {
+warudo_code warudo_server_error(const char *description, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("500 Internal Server Error", "text/plain", config);
@@ -82,7 +82,7 @@ warudo_code warudo_server_error(const char* description, warudo* config) {
     return WARUDO_HTTP_INTERNAL_ERROR;
 }
 
-warudo_code warudo_bad_request(const char* description, warudo* config) {
+warudo_code warudo_bad_request(const char *description, warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("400 Bad Request", "application/json", config);
@@ -91,7 +91,7 @@ warudo_code warudo_bad_request(const char* description, warudo* config) {
     return WARUDO_HTTP_BAD_REQUEST;
 }
 
-warudo_code warudo_not_found(warudo* config) {
+warudo_code warudo_not_found(warudo *config) {
     WARUDO_CHECK_CONNECTION(config->request);
 
     warudo_header("404 Not Found", "text/plain", config);

@@ -74,7 +74,7 @@ warudo_code warudo_init(const char *filename, warudo **config) {
     pdb->access_origin = WARUDO_DEFAULT_CORS;
     pdb->log_level = WARUDO_DEFAULT_LOG_LEVEL;
 
-    char* env = getenv("WARUDO_LOG_LEVEL");
+    char *env = getenv("WARUDO_LOG_LEVEL");
 
     if(env != NULL) {
         int log_level = atoi(env);
@@ -109,15 +109,15 @@ warudo_code warudo_init(const char *filename, warudo **config) {
     return WARUDO_OK;
 }
 
-warudo_code warudo_parse_query_string(char* query_string, warudo* config) {
+warudo_code warudo_parse_query_string(char *query_string, warudo *config) {
     CHECK_CONFIG
 
     if(query_string == NULL) {
         return WARUDO_EMPTY_QUERY_STRING_ERROR;
     }
 
-    char* saveptr;
-    char* parameter = strtok_r(query_string, "&", &saveptr);
+    char *saveptr;
+    char *parameter = strtok_r(query_string, "&", &saveptr);
 
     while(parameter != NULL) {
         char *delimiter = strchr(parameter, '=');
@@ -126,7 +126,7 @@ warudo_code warudo_parse_query_string(char* query_string, warudo* config) {
             int delimiter_idx = delimiter - parameter;
             int length_1 = delimiter_idx;
             // int length_2 = strlen(parameter) - delimiter_idx - 1;
-            char* value = delimiter + 1;
+            char *value = delimiter + 1;
 
             if(value != NULL) {
                 WARUDO_GET_QUERY_ULLINT_VALUE(parameter, limit, value, length_1)
@@ -177,9 +177,9 @@ warudo_code warudo_accept_connection(warudo *config) {
         return WARUDO_ACCEPT_ERROR;
     }
 
-    const char* script_name = FCGX_GetParam("SCRIPT_NAME", config->request.envp);
-    const char* query_string = FCGX_GetParam("QUERY_STRING", config->request.envp);
-    const char* request_method = FCGX_GetParam("REQUEST_METHOD", config->request.envp);
+    const char *script_name = FCGX_GetParam("SCRIPT_NAME", config->request.envp);
+    const char *query_string = FCGX_GetParam("QUERY_STRING", config->request.envp);
+    const char *request_method = FCGX_GetParam("REQUEST_METHOD", config->request.envp);
 
     if(script_name != NULL && strcmp(script_name, "/") == 0) {
         config->page = WARUDO_PAGE_ROOT;
@@ -236,7 +236,7 @@ warudo_code warudo_start_time(warudo *config) {
     return WARUDO_OK;
 }
 
-warudo_code warudo_end_time(warudo *config, double ms, const char* message) {
+warudo_code warudo_end_time(warudo *config, double ms, const char *message) {
     CHECK_CONFIG
 
     struct timespec end;
