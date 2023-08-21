@@ -56,8 +56,7 @@ bin/warudo
 obj
 stress-test
 warudo.db
-warudo.db-shm
-warudo.db-wal
+warudo.db-*
 *.log
 
 # Client

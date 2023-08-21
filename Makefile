@@ -1,9 +1,10 @@
 DEBUG ?= 0
 CC = clang
-CFLAGS = -Wall -Wextra -pedantic -std=c11
+CFLAGS = -Wall -Wextra -pedantic -std=c11 -DSQLITE_USE_URI=1
 TEST_CFLAGS = -Wno-int-conversion -Wno-string-compare -Wno-format -Wno-pointer-to-int-cast
 TEST_CFLAGS_2 = -Wno-void-pointer-to-int-cast -Wno-incompatible-pointer-types-discards-qualifiers
 TEST_CFLAGS_3 = -Wno-unused-parameter -Wno-gnu-zero-variadic-macro-arguments
+HCTREE_CFLAGS = -Wno-unused-parameter
 LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib
 LDLIBS = -lfcgi
 FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include
@@ -19,6 +20,7 @@ TEST_BUILD_DIR = test-build
 HC_TREE_BUILD = hctree-build
 HC_TREE_SRC = hctree-src
 HC_TREE_REPO = hctree.fossil
+HC_TREE_AMALGAMATION_DIR = $(SRC_DIR)/sqlite3
 
 BIN_DIR = bin
 DBS = *.db *.db-shm *.db-wal
@@ -111,8 +113,28 @@ $(HC_TREE_REPO):
 hctree-pull: $(HC_TREE_BUILD) $(HC_TREE_SRC) $(HC_TREE_REPO)
 	cd $(HC_TREE_SRC) && fossil open ../$(HC_TREE_REPO) && fossil up hctree
 
-hctree: hctree-pull
+hctree-patch:
+	patch -i hct_file.diff $(HC_TREE_SRC)/src/hct_file.c
+
+hctree-restore:
+	patch -R -i hct_file.diff $(HC_TREE_SRC)/src/hct_file.c
+
+hctree-configure:
 	cd $(HC_TREE_BUILD) && ../$(HC_TREE_SRC)/configure
+
+hctree-amalgamation: hctree-configure
+	rm -rf $(HC_TREE_BUILD)
+	mkdir -p $(HC_TREE_BUILD)
+	cd $(HC_TREE_BUILD) && ../$(HC_TREE_SRC)/configure
+	cd $(HC_TREE_BUILD) && make sqlite3.c
+	cp $(HC_TREE_BUILD)/sqlite3.c $(HC_TREE_AMALGAMATION_DIR)/sqlite3.c
+	cp $(HC_TREE_BUILD)/sqlite3.h $(HC_TREE_AMALGAMATION_DIR)/sqlite3.h
+
+hctree-make: hctree-configure
+	cd $(HC_TREE_BUILD) && make
+
+hctree-clean: $(HC_TREE_BUILD)
+	rm -r $(HC_TREE_BUILD)/{*,.*}
 
 db:
 	sqlite3 warudo.db
