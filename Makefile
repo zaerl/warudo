@@ -15,6 +15,11 @@ TOOLS_DIR = tools
 BUILD_DIR = build
 TEST_BUILD_DIR = test-build
 
+# HC-tree
+HC_TREE_BUILD = hctree-build
+HC_TREE_SRC = hctree-src
+HC_TREE_REPO = hctree.fossil
+
 BIN_DIR = bin
 DBS = *.db *.db-shm *.db-wal
 
@@ -57,7 +62,7 @@ all: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TARGET)
 
 # Create build directory if it doesn't exist
 $(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+	mkdir -p $@
 
 # Create subdirectories in build directory
 $(BUILD_SUBDIRS):
@@ -65,7 +70,7 @@ $(BUILD_SUBDIRS):
 
 # Create test build directory if it doesn't exist
 $(TEST_BUILD_DIR):
-	mkdir -p $(TEST_BUILD_DIR)
+	mkdir -p $@
 
 # Compile all the source files into object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
@@ -94,10 +99,25 @@ stress-test: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR) $(STRESS_TEST_TARGE
 start: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TARGET)
 	WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 $(TARGET)
 
+$(HC_TREE_BUILD):
+	mkdir -p $@
+
+$(HC_TREE_SRC):
+	mkdir -p $@
+
+$(HC_TREE_REPO):
+	fossil clone https://www.sqlite.org/hctree $@
+
+hctree-pull: $(HC_TREE_BUILD) $(HC_TREE_SRC) $(HC_TREE_REPO)
+	cd $(HC_TREE_SRC) && fossil open ../$(HC_TREE_REPO) && fossil up hctree
+
+hctree: hctree-pull
+	cd $(HC_TREE_BUILD) && ../$(HC_TREE_SRC)/configure
+
 db:
 	sqlite3 warudo.db
 
 clean:
-	rm -rf $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET)
+	rm -rf $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET) $(HC_TREE_BUILD) $(HC_TREE_SRC)
 
 .PHONY: all clean

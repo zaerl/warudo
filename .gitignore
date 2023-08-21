@@ -90,3 +90,9 @@ coverage
 *.sw?
 
 warudo/*
+
+# HC-tree
+hctree.fossil
+hctree.fossil-journal
+hctree-src/
+hctree-build/
