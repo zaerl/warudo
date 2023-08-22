@@ -18,7 +18,7 @@ extern "C" {
 // Configurations
 #define WRD_BUFFLEN 8192
 #define WRD_CONFIG_FILE "warudo.conf"
-#define WRD_DB_FILE "warudo.db"
+#define WRD_DB_FILE "file:warudo.db"
 #define WRD_HCTREE_DB_FILE "file:warudo.db?hctree=1"
 #define WRD_ENTRIES_TABLE "entries"
 #define WRD_MAX_COLUMNS 64

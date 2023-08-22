@@ -1,6 +1,7 @@
 DEBUG ?= 0
 CC = clang
-CFLAGS = -Wall -Wextra -pedantic -std=c11 -DSQLITE_USE_URI=1
+SQLITE_CFLAGS = -DSQLITE_USE_URI=1
+CFLAGS = -Wall -Wextra -pedantic -std=c11 $(SQLITE_CFLAGS)
 TEST_CFLAGS = -Wno-int-conversion -Wno-string-compare -Wno-format -Wno-pointer-to-int-cast
 TEST_CFLAGS_2 = -Wno-void-pointer-to-int-cast -Wno-incompatible-pointer-types-discards-qualifiers
 TEST_CFLAGS_3 = -Wno-unused-parameter -Wno-gnu-zero-variadic-macro-arguments
