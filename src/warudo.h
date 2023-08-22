@@ -97,7 +97,7 @@ typedef enum {
 #define WRD_ENTRY_TYPE_VIEW 1
 
 // Query string
-#define WRD_DEFAULT_QUERY_LIMIT 100
+#define WRD_DEFAULT_QUERY_LIMIT 10
 #define WRD_DEFAULT_QUERY_MULTI 0
 
 #define WRD_GET_QUERY_VALUE(KEY, IDX, VALUE, FN, LENGTH_1) if(!config->query_valid_##IDX && \

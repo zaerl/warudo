@@ -33,6 +33,14 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
     char *error_msg = 0;
     const char *query = NULL;
 
+    rc = sqlite3_initialize();
+
+    if(rc != SQLITE_OK) {
+        wrd_log(config, WRD_LOG_LEVEL_ERROR, "Can't initialize DB\n");
+
+        return WRD_DB_INIT_ERROR;
+    }
+
     rc = sqlite3_open(filename, &config->db);
 
     if(rc != SQLITE_OK) {
@@ -92,7 +100,15 @@ wrd_code wrd_db_close(warudo *config) {
     sqlite3_finalize(config->add_index_stmt);
     sqlite3_finalize(config->parse_json_stmt);
 
-    return sqlite3_close(config->db) == SQLITE_OK ? WRD_OK : WRD_DB_CLOSE_ERROR;
+    if(sqlite3_close(config->db) != SQLITE_OK) {
+        return WRD_DB_CLOSE_ERROR;
+    }
+
+    if(sqlite3_shutdown() != SQLITE_OK) {
+        return WRD_DB_CLOSE_ERROR;
+    }
+
+    return WRD_OK;
 }
 
 wrd_code wrd_load_columns(warudo *config) {

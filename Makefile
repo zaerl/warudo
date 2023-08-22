@@ -1,10 +1,15 @@
 DEBUG ?= 0
 CC = clang
-SQLITE_CFLAGS = -DSQLITE_USE_URI=1
-CFLAGS = -Wall -Wextra -pedantic -std=c11 $(SQLITE_CFLAGS)
+
+SQLITE_CFLAGS = -DSQLITE_USE_URI=1 -DSQLITE_DQS=0 -DSQLITE_DEFAULT_MEMSTATUS=0 -DSQLITE_LIKE_DOESNT_MATCH_BLOBS
+SQLITE_CFLAGS_2 = -DSQLITE_MAX_EXPR_DEPTH=0 -DSQLITE_OMIT_DECLTYPE -DSQLITE_OMIT_DEPRECATED -DSQLITE_OMIT_PROGRESS_CALLBACK
+SQLITE_CFLAGS_3 = -DSQLITE_OMIT_SHARED_CACHE -DSQLITE_USE_ALLOCA -DSQLITE_OMIT_AUTOINIT
+CFLAGS = -Wall -Wextra -pedantic -std=c11 $(SQLITE_CFLAGS) $(SQLITE_CFLAGS_2) $(SQLITE_CFLAGS_3)
+
 TEST_CFLAGS = -Wno-int-conversion -Wno-string-compare -Wno-format -Wno-pointer-to-int-cast
 TEST_CFLAGS_2 = -Wno-void-pointer-to-int-cast -Wno-incompatible-pointer-types-discards-qualifiers
 TEST_CFLAGS_3 = -Wno-unused-parameter -Wno-gnu-zero-variadic-macro-arguments
+
 HCTREE_CFLAGS = -Wno-unused-parameter
 LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib
 LDLIBS = -lfcgi
