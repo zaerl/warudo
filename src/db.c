@@ -11,7 +11,7 @@
 #define WRD_DB_RET_CALL(STMT, CALL, RET) \
     rc = CALL; \
     if(rc != RET) { \
-        wrd_log_error(config, "Failed to execute db query: %d/%d %s\n", rc, RET, sqlite3_errmsg(config->db)); \
+        wrd_log_error(config, "Failed to execute db query: %d/%d %s (%s, %d)\n", rc, RET, sqlite3_errmsg(config->db), __FUNCTION__, __LINE__); \
         if(must_finalize) sqlite3_finalize(STMT); \
         if(must_free) sqlite3_free((void*)query); \
         if(must_output_error) wrd_bad_request("Failed to get data.", config); \
@@ -40,6 +40,8 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
 
         return WRD_DB_OPEN_ERROR;
     }
+
+    sqlite3_extended_result_codes(config->db, 1);
 
     const char *sql =
         "CREATE TABLE IF NOT EXISTS " WRD_ENTRIES_TABLE "("
