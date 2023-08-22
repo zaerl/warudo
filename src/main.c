@@ -19,13 +19,14 @@ extern char **environ;
 // /opt/homebrew/opt/lighttpd/bin/lighttpd -D -f /opt/homebrew/etc/lighttpd/lighttpd.conf
 // make && WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 bin/warudo
 int main(void) {
-    warudo *config;
+    warudo *config = NULL;
     wrd_code ret;
 
     ret = wrd_init(WRD_DB_FILE, &config);
 
     if(ret != WRD_OK) {
         wrd_log_error(config, "Failed to initialize\n", "");
+
         return ret;
     }
 

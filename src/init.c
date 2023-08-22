@@ -95,6 +95,8 @@ wrd_code wrd_init(const char *filename, warudo **config) {
         pdb->access_origin = env;
     }
 
+    wrd_log_info(pdb, "Loading DB: \"%s\"\n", filename);
+
     // Load database
     res = wrd_db_init(filename, pdb);
 

@@ -4,13 +4,13 @@
 #include "warudo.h"
 
 wrd_code wrd_log(warudo *config, wrd_log_level level, const char *format, ...) {
-    CHECK_CONFIG
-
     if(format == NULL) {
         return WRD_ERROR;
     }
 
-    if(config->log_level == WRD_LOG_LEVEL_NO_LOG || level > config->log_level) {
+    wrd_log_level log_level = config ? config->log_level : WRD_DEFAULT_LOG_LEVEL;
+
+    if(log_level == WRD_LOG_LEVEL_NO_LOG || level > log_level) {
         return WRD_OK;
     }
 
