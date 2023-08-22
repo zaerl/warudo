@@ -89,14 +89,11 @@ $(TARGET): $(OBJS)
 $(TEST_TARGET): $(OBJS) $(TEST_OBJS)
 	$(CC) $(CFLAGS) -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS) $(filter-out build/main.o, $^) -o $@
 
-$(STRESS_TEST_TARGET): stress-test.c
-	$(CC) $(CFLAGS) -lcurl -o $@ stress-test.c
-
 test: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR) $(TEST_TARGET)
 	$(TEST_TARGET)
 
-stress-test: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR) $(STRESS_TEST_TARGET)
-	$(STRESS_TEST_TARGET) stress-test.log
+stress-test: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR)
+	$(CC) $(CFLAGS) -lcurl -o $(STRESS_TEST_TARGET) stress-test.c
 
 start: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TARGET)
 	WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 $(TARGET)
