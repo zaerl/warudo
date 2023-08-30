@@ -5,12 +5,16 @@
 extern "C" {
 #endif
 
-#include <fcgiapp.h>
-#include "sqlite3/sqlite3.h"
-
 #if defined(_WIN32) || defined(_WIN64)
 #error "Windows is not supported"
 #endif
+
+#ifndef USE_LIBFCGI
+#define USE_LIBFCGI 1
+#endif
+
+#include <fcgiapp.h>
+#include "sqlite3/sqlite3.h"
 
 // Version
 #define WRD_VERSION "0.1.0"

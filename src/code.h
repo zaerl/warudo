@@ -3,6 +3,14 @@
 
 #include "warudo.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 const char *wrd_error_description(wrd_code code, int extended);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // WRD_CODE_H

@@ -3,6 +3,10 @@
 
 #include "warudo.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 wrd_code wrd_status(const char *status, warudo *config);
 
 wrd_code wrd_content_type(const char *content_type, warudo *config);
@@ -22,5 +26,9 @@ wrd_code wrd_server_error(const char *description, warudo *config);
 wrd_code wrd_bad_request(const char *description, warudo *config);
 
 wrd_code wrd_not_found(warudo *config);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // WRD_HTTP_H
