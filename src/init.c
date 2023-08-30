@@ -37,9 +37,9 @@ wrd_code wrd_init(const char *filename, warudo **config) {
     }
 
     // Create a socket to listen for connections
-    int socket = FCGX_OpenSocket(WRD_SOCKET_PATH, 1024);
+    int socket = wrd_fcgi_open_socket(WRD_SOCKET_PATH, 1024);
 
-    if(socket == -1) {
+    if(socket == WRD_SOCKET_ERROR) {
         wrd_close(pdb);
 
         return WRD_SOCKET_ERROR;
@@ -47,10 +47,9 @@ wrd_code wrd_init(const char *filename, warudo **config) {
 
     pdb->socket = socket;
 
-    // Initialize the request structure
-    FCGX_InitRequest(&pdb->request, pdb->socket, 0);
+    res = wrd_fcgi_init_request(pdb);
 
-    if(res != 0) {
+    if(res != WRD_OK) {
         wrd_close(pdb);
 
         return WRD_INIT_REQUEST_ERROR;
