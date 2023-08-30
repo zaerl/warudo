@@ -9,11 +9,14 @@ extern "C" {
 #error "Windows is not supported"
 #endif
 
-#ifndef USE_LIBFCGI
-#define USE_LIBFCGI 1
+#ifndef WRD_USE_LIBFCGI
+#define WRD_USE_LIBFCGI 1
 #endif
 
+#ifdef WRD_USE_LIBFCGI
 #include <fcgiapp.h>
+#endif
+
 #include "sqlite3/sqlite3.h"
 
 // Version
@@ -144,7 +147,9 @@ typedef struct {
     const char *access_origin;
     wrd_log_level log_level;
 
+#ifdef WRD_USE_LIBFCGI
     FCGX_Request request;
+#endif
     int socket;
     int page;
     int request_method;

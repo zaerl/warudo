@@ -14,6 +14,7 @@ extern char **environ;
 #endif
 
 #include "net.h"
+#include "fcgi.h"
 
 // Function to escape special characters in a string for HTML
 char *wrd_escape_html(const char *input) {
@@ -182,7 +183,7 @@ wrd_code wrd_environ(warudo *config) {
 }
 
 long wrd_content_length(warudo *config) {
-    char *length = FCGX_GetParam("CONTENT_LENGTH", config->request.envp);
+    char *length = wrd_fcgi_get_param("CONTENT_LENGTH", config);
     long int len = 0;
 
     if(length != NULL) {

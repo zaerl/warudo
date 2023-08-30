@@ -1,4 +1,5 @@
 #include "http.h"
+#include "fcgi.h"
 
 #define WRD_CHECK_CONNECTION(request) \
     if(request.in == NULL || \
@@ -68,7 +69,7 @@ wrd_code wrd_not_allowed(const char *allowed, warudo *config) {
     wrd_status("405 Method Not Allowed", config);
     FCGX_FPrintF(config->request.out, "Allow: %s\r\n", allowed);
     wrd_content_type("text/type", config);
-    FCGX_PutS("Not allowed.", config->request.out);
+    wrd_fcgi_puts("Not allowed.", config);
 
     return WRD_HTTP_NOT_ALLOWED;
 }
@@ -77,7 +78,7 @@ wrd_code wrd_server_error(const char *description, warudo *config) {
     WRD_CHECK_CONNECTION(config->request);
 
     wrd_header("500 Internal Server Error", "text/plain", config);
-    FCGX_PutS(description, config->request.out);
+    wrd_fcgi_puts(description, config);
 
     return WRD_HTTP_INTERNAL_ERROR;
 }
@@ -95,7 +96,7 @@ wrd_code wrd_not_found(warudo *config) {
     WRD_CHECK_CONNECTION(config->request);
 
     wrd_header("404 Not Found", "text/plain", config);
-    FCGX_PutS("Unknown.", config->request.out);
+    wrd_fcgi_puts("Unknown.", config);
 
     return WRD_HTTP_NOT_FOUND;
 }

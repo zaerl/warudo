@@ -8,6 +8,7 @@
 
 #include "warudo.h"
 #include "db.h"
+#include "fcgi.h"
 #include "log.h"
 
 wrd_code wrd_init(const char *filename, warudo **config) {
@@ -27,12 +28,12 @@ wrd_code wrd_init(const char *filename, warudo **config) {
 #endif
 
     // Load FCGI
-    res = FCGX_Init();
+    res = wrd_fcgi_init();
 
-    if(res != 0) {
+    if(res != WRD_OK) {
         wrd_close(pdb);
 
-        return WRD_FCGI_INIT_ERROR;
+        return res;
     }
 
     // Create a socket to listen for connections
@@ -179,9 +180,9 @@ wrd_code wrd_accept_connection(warudo *config) {
         return WRD_ACCEPT_ERROR;
     }
 
-    const char *script_name = FCGX_GetParam("SCRIPT_NAME", config->request.envp);
-    const char *query_string = FCGX_GetParam("QUERY_STRING", config->request.envp);
-    const char *request_method = FCGX_GetParam("REQUEST_METHOD", config->request.envp);
+    const char *script_name = wrd_fcgi_get_param("SCRIPT_NAME", config);
+    const char *query_string = wrd_fcgi_get_param("QUERY_STRING", config);
+    const char *request_method = wrd_fcgi_get_param("REQUEST_METHOD", config);
 
     if(script_name != NULL && strcmp(script_name, "/") == 0) {
         config->page = WRD_PAGE_ROOT;

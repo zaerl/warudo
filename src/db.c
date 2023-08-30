@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "db.h"
+#include "fcgi.h"
 #include "http.h"
 #include "log.h"
 #include "net.h"
@@ -185,7 +186,7 @@ wrd_code wrd_parse_json(warudo *config) {
             const char *value = (const char*)sqlite3_column_text(stmt, 2);
 
             if(strcmp(key_name, "string") == 0) {
-                FCGX_PutS(value, config->request.out);
+                wrd_fcgi_puts(value, config);
             }
 
             break;
@@ -296,7 +297,7 @@ wrd_code wrd_add_entries(int entry_type, warudo *config) {
     }
 
     char *input = wrd_read_content(length, config);
-    const char *boundary = wrd_get_formdata_boundary(FCGX_GetParam("CONTENT_TYPE", config->request.envp));
+    const char *boundary = wrd_get_formdata_boundary(wrd_fcgi_get_param("CONTENT_TYPE", config));
 
     count = wrd_parse_formdata(input, length, boundary, &wrd_formdata_callback, config);
 
@@ -304,7 +305,7 @@ wrd_code wrd_add_entries(int entry_type, warudo *config) {
         wrd_bad_request("No entries created.", config);
     } else {
         // wrd_ok(config);
-        // FCGX_PutS(input, config->request.out);
+        // wrd_fcgi_puts(input, config);
         wrd_multi_created(count, config);
     }
 
@@ -372,7 +373,7 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
     }
 
     wrd_ok(config);
-    FCGX_PutS("[", config->request.out);
+    wrd_fcgi_puts("[", config);
 
     while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         // Retrieve the result
@@ -382,7 +383,7 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
         const char *data = (const char*)sqlite3_column_text(stmt, 3);
 
         if(count != 0) {
-            FCGX_PutS(",", config->request.out);
+            wrd_fcgi_puts(",", config);
         }
 
         FCGX_FPrintF(config->request.out, "{\"id\":%lld,\"created\":%lld,\"modified\":%lld,\"data\":%s}",
@@ -390,7 +391,7 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
         ++count;
     }
 
-    FCGX_PutS("]", config->request.out);
+    wrd_fcgi_puts("]", config);
     sqlite3_finalize(stmt);
 
     if(must_free) {
@@ -414,7 +415,7 @@ wrd_code wrd_get_keys(warudo *config) {
     WRD_DB_CALL(stmt, sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
     wrd_ok(config);
-    FCGX_PutS("[", config->request.out);
+    wrd_fcgi_puts("[", config);
 
     while((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
         // Retrieve the result
@@ -426,14 +427,14 @@ wrd_code wrd_get_keys(warudo *config) {
         }
 
         if(count != 0) {
-            FCGX_PutS(",", config->request.out);
+            wrd_fcgi_puts(",", config);
         }
 
         FCGX_FPrintF(config->request.out, "{\"name\":\"%s\",\"value\":%lld}", key_name, key_count);
         ++count;
     }
 
-    FCGX_PutS("]", config->request.out);
+    wrd_fcgi_puts("]", config);
     sqlite3_finalize(stmt);
 
     return WRD_OK;
