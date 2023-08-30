@@ -169,15 +169,15 @@ wrd_code wrd_accept_connection(warudo *config) {
     // WRD_FREE_QUERY_STRING_VALUES(keys)
     // WRD_FREE_QUERY_STRING_VALUES(values)
 
-    int accepted = FCGX_Accept_r(&config->request);
+    wrd_code accepted = wrd_fcgi_accept(config);
+
+    if(accepted != WRD_OK) {
+        return accepted;
+    }
 
 #ifdef WRD_TIMING
     wrd_start_time(config);
 #endif
-
-    if(accepted < 0) {
-        return WRD_ACCEPT_ERROR;
-    }
 
     const char *script_name = wrd_fcgi_get_param("SCRIPT_NAME", config);
     const char *query_string = wrd_fcgi_get_param("QUERY_STRING", config);
@@ -218,7 +218,7 @@ wrd_code wrd_accept_connection(warudo *config) {
 wrd_code wrd_after_connection(warudo *config) {
     CHECK_CONFIG
 
-    FCGX_Finish_r(&config->request);
+    wrd_fcgi_finish_request(config);
 
 #ifdef WRD_TIMING
     wrd_end_time(config, 1000, "after finish request");
@@ -260,7 +260,7 @@ wrd_code wrd_end_time(warudo *config, double ms, const char *message) {
 wrd_code wrd_close(warudo *config) {
     CHECK_CONFIG
 
-    FCGX_Free(&config->request, 1);
+    wrd_fcgi_free_request(config);
     wrd_db_close(config);
 
     free(config);

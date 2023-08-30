@@ -24,6 +24,8 @@ wrd_code wrd_fcgi_open_socket(const char *path, int backlog) {
 }
 
 wrd_code wrd_fcgi_init_request(warudo *config) {
+    CHECK_CONFIG
+
     int res = WRD_OK;
 
 #ifdef WRD_USE_LIBFCGI
@@ -35,14 +37,42 @@ wrd_code wrd_fcgi_init_request(warudo *config) {
     return res;
 }
 
-wrd_code wrd_fcgi_puts(const char *str, warudo *config) {
+wrd_code wrd_fcgi_accept(warudo *config) {
     CHECK_CONFIG
 
+    int accepted = WRD_OK;
+
 #ifdef WRD_USE_LIBFCGI
-    FCGX_PutS(str, config->request.out);
+    if(FCGX_Accept_r(&config->request) < 0) {
+        accepted = WRD_ACCEPT_ERROR;
+    }
 #endif
 
-    return WRD_OK;
+    return accepted;
+}
+
+wrd_code wrd_fcgi_finish_request(warudo *config) {
+    CHECK_CONFIG
+
+    int res = WRD_OK;
+
+#ifdef WRD_USE_LIBFCGI
+    FCGX_Finish_r(&config->request);
+#endif
+
+    return res;
+}
+
+wrd_code wrd_fcgi_free_request(warudo *config) {
+    CHECK_CONFIG
+
+    int res = WRD_OK;
+
+#ifdef WRD_USE_LIBFCGI
+    FCGX_Free(&config->request, 1);
+#endif
+
+    return res;
 }
 
 char *wrd_fcgi_get_param(const char *name, warudo *config) {
@@ -55,6 +85,26 @@ char *wrd_fcgi_get_param(const char *name, warudo *config) {
 #endif
 
     return NULL;
+}
+
+wrd_code wrd_fcgi_getstr(char *str, int length, warudo *config) {
+    CHECK_CONFIG
+
+#ifdef WRD_USE_LIBFCGI
+    FCGX_GetStr(str, length, config->request.in);
+#endif
+
+    return WRD_OK;
+}
+
+wrd_code wrd_fcgi_puts(const char *str, warudo *config) {
+    CHECK_CONFIG
+
+#ifdef WRD_USE_LIBFCGI
+    FCGX_PutS(str, config->request.out);
+#endif
+
+    return WRD_OK;
 }
 
 wrd_code wrd_fcgi_printf(warudo *config, const char *format, ...) {

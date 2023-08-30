@@ -203,7 +203,7 @@ char *wrd_read_content(long int length, warudo *config) {
 
     char *data = malloc(len);
 
-    FCGX_GetStr(data, len, config->request.in);
+    wrd_fcgi_getstr(data, len, config);
 
     return data;
 }
