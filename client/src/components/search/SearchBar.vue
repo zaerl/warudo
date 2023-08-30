@@ -69,15 +69,15 @@ function onClose(confirmed: boolean) {
   :is-disabled="isModalDisabled"
   @close="onClose">
   <form>
-    <label for="key">
+    <label for="json-syntax">
       Key name
       <KeysList type="keys" v-model="currentFilter.key" />
-      <small>The JSON query syntax is supported. See <a target="_blank" href="https://sqlite.org/json1.html#the_json_extract_function">json_extract</a>.</small>
+      <small id="json-syntax">The JSON query syntax is supported. See <a target="_blank" href="https://sqlite.org/json1.html#the_json_extract_function">json_extract</a>.</small>
     </label>
-    <label for="key">
+    <label for="like-syntax">
       Value
       <input type="text" name="value" placeholder="Value" required v-model="currentFilter.value">
-      <small>The LIKE query syntax is supported. See <a target="_blank" href="https://sqlite.org/lang_expr.html#like">LIKE</a>.</small>
+      <small id="like-syntax">The LIKE query syntax is supported. See <a target="_blank" href="https://sqlite.org/lang_expr.html#like">LIKE</a>.</small>
     </label>
   </form>
 </ModalDialog>
