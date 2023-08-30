@@ -175,9 +175,9 @@ unsigned long wrd_process_id(void) {
 }
 
 wrd_code wrd_environ(warudo *config) {
-    FCGX_FPrintF(config->request.out, "<!--db: %s-->\n", WRD_DB_FILE);
-    FCGX_FPrintF(config->request.out, "<!--config: %s-->\n", WRD_CONFIG_FILE);
-    FCGX_FPrintF(config->request.out, "<!--pid: %lu-->\n", wrd_process_id());
+    wrd_fcgi_printf(config, "<!--db: %s-->\n", WRD_DB_FILE);
+    wrd_fcgi_printf(config, "<!--config: %s-->\n", WRD_CONFIG_FILE);
+    wrd_fcgi_printf(config, "<!--pid: %lu-->\n", wrd_process_id());
 
     return WRD_OK;
 }

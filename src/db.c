@@ -386,7 +386,7 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
             wrd_fcgi_puts(",", config);
         }
 
-        FCGX_FPrintF(config->request.out, "{\"id\":%lld,\"created\":%lld,\"modified\":%lld,\"data\":%s}",
+        wrd_fcgi_printf(config, "{\"id\":%lld,\"created\":%lld,\"modified\":%lld,\"data\":%s}",
             id, created, modified, data ? data : "{}");
         ++count;
     }
@@ -430,7 +430,7 @@ wrd_code wrd_get_keys(warudo *config) {
             wrd_fcgi_puts(",", config);
         }
 
-        FCGX_FPrintF(config->request.out, "{\"name\":\"%s\",\"value\":%lld}", key_name, key_count);
+        wrd_fcgi_printf(config, "{\"name\":\"%s\",\"value\":%lld}", key_name, key_count);
         ++count;
     }
 

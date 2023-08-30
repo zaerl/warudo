@@ -1,3 +1,6 @@
+#include <stdarg.h>
+#include <stdio.h>
+
 #include "fcgi.h"
 
 wrd_code wrd_fcgi_init(void) {
@@ -30,4 +33,19 @@ char *wrd_fcgi_get_param(const char *name, warudo *config) {
 #endif
 
     return NULL;
+}
+
+wrd_code wrd_fcgi_printf(warudo *config, const char *format, ...) {
+    CHECK_CONFIG
+
+#ifdef WRD_USE_LIBFCGI
+    va_list args;
+    va_start(args, format);
+    int res = FCGX_VFPrintF(config->request.out, format, args);
+    va_end(args);
+
+    return res == EOF ? WRD_ERROR : WRD_OK;
+#endif
+
+    return WRD_OK;
 }

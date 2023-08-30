@@ -11,7 +11,7 @@
 wrd_code wrd_status(const char *status, warudo *config) {
     WRD_CHECK_CONNECTION(config->request);
 
-    FCGX_FPrintF(config->request.out, "Status: %s\r\n", status);
+    wrd_fcgi_printf(config, "Status: %s\r\n", status);
 
     return WRD_OK;
 }
@@ -20,10 +20,10 @@ wrd_code wrd_content_type(const char *content_type, warudo *config) {
     WRD_CHECK_CONNECTION(config->request);
 
     if(config->access_origin != NULL) {
-        FCGX_FPrintF(config->request.out, "Access-Control-Allow-Origin: %s\r\n", config->access_origin);
+        wrd_fcgi_printf(config, "Access-Control-Allow-Origin: %s\r\n", config->access_origin);
     }
 
-    FCGX_FPrintF(config->request.out, "Content-type: %s;charset=utf-8\r\n\r\n", content_type);
+    wrd_fcgi_printf(config, "Content-type: %s;charset=utf-8\r\n\r\n", content_type);
 
     return WRD_OK;
 }
@@ -49,7 +49,7 @@ wrd_code wrd_created(unsigned long long int id, warudo *config) {
     WRD_CHECK_CONNECTION(config->request);
 
     wrd_header("201 Created", "application/json", config);
-    FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"id\":%lld}", id);
+    wrd_fcgi_printf(config, "{\"status\":\"success\",\"id\":%lld}", id);
 
     return WRD_OK;
 }
@@ -58,7 +58,7 @@ wrd_code wrd_multi_created(unsigned long int count, warudo *config) {
     WRD_CHECK_CONNECTION(config->request);
 
     wrd_header("201 Created", "application/json", config);
-    FCGX_FPrintF(config->request.out, "{\"status\":\"success\",\"count\":%lld}", count);
+    wrd_fcgi_printf(config, "{\"status\":\"success\",\"count\":%lld}", count);
 
     return WRD_OK;
 }
@@ -67,7 +67,7 @@ wrd_code wrd_not_allowed(const char *allowed, warudo *config) {
     WRD_CHECK_CONNECTION(config->request);
 
     wrd_status("405 Method Not Allowed", config);
-    FCGX_FPrintF(config->request.out, "Allow: %s\r\n", allowed);
+    wrd_fcgi_printf(config, "Allow: %s\r\n", allowed);
     wrd_content_type("text/type", config);
     wrd_fcgi_puts("Not allowed.", config);
 
@@ -87,7 +87,7 @@ wrd_code wrd_bad_request(const char *description, warudo *config) {
     WRD_CHECK_CONNECTION(config->request);
 
     wrd_header("400 Bad Request", "application/json", config);
-    FCGX_FPrintF(config->request.out, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
+    wrd_fcgi_printf(config, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
 
     return WRD_HTTP_BAD_REQUEST;
 }

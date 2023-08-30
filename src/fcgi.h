@@ -10,6 +10,7 @@ extern "C" {
 wrd_code wrd_fcgi_init(void);
 wrd_code wrd_fcgi_puts(const char *str, warudo *config);
 char *wrd_fcgi_get_param(const char *name, warudo *config);
+wrd_code wrd_fcgi_printf(warudo *config, const char *format, ...);
 
 #ifdef __cplusplus
 }
