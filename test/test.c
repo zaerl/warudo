@@ -14,6 +14,7 @@
 
 DECLARE_TEST(code)
 DECLARE_TEST(db)
+DECLARE_TEST(fcgi)
 DECLARE_TEST(init)
 DECLARE_TEST(log)
 DECLARE_TEST(net)
@@ -109,6 +110,7 @@ int main(int argc, const char *argv[]) {
 
     RUN_TEST(code)
     RUN_TEST(db)
+    RUN_TEST(fcgi)
     RUN_TEST(init)
     RUN_TEST(log)
     RUN_TEST(net)

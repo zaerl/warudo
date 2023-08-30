@@ -4,6 +4,7 @@
 
 void* test_log(void* arg) {
     MOCK_CONFIG
+
     printf("Testing log %d\n", config.log_level);
 
     ASSERT_CODE("NULL", WRD_OK, wrd_log, NULL, 0, "")
