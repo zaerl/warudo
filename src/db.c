@@ -75,7 +75,9 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
 
     WRD_DB_CALL(config->insert_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_ENTRIES_TABLE "(data) VALUES(json(?1));", -1, &config->insert_stmt, NULL));
     WRD_DB_CALL(config->insert_dashboard_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_DASHBOARDS_TABLE "(data) VALUES(json(?1));", -1, &config->insert_dashboard_stmt, NULL));
-    WRD_DB_CALL(config->add_index_stmt, sqlite3_prepare_v2(config->db, "ALTER TABLE " WRD_ENTRIES_TABLE " add column name TEXT as (json_extract(value, ?2));", -1, &config->add_index_stmt, NULL));
+    WRD_DB_CALL(config->add_index_stmt, sqlite3_prepare_v2(config->db, "ALTER TABLE " WRD_ENTRIES_TABLE
+        " add column \"?1\" as (json_extract(value, ?1));"
+        "create index ?1 on " WRD_ENTRIES_TABLE "(?1);", -1, &config->add_index_stmt, NULL));
     WRD_DB_CALL(config->parse_json_stmt, sqlite3_prepare_v2(config->db, "SELECT * FROM json_each(?1) WHERE type='true';", -1, &config->parse_json_stmt, NULL));
 
     // return wrd_load_columns(config);
