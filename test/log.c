@@ -2,7 +2,7 @@
 #include "../src/warudo.h"
 #include "test.h"
 
-void* test_log(void* arg) {
+void *test_log(void *arg) {
     MOCK_CONFIG
 
     printf("Testing log %d\n", config.log_level);

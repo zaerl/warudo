@@ -3,11 +3,11 @@
 
 static int formdata_result = WRD_OK;
 
-int internal_parse_formdata_callback(const char* input, long int length, warudo* config) {
+int internal_parse_formdata_callback(const char *input, long int length, warudo *config) {
     return formdata_result;
 }
 
-void* test_net(void* arg) {
+void *test_net(void *arg) {
     MOCK_CONFIG
 
     ASSERT("NULL", NULL, wrd_url_decode, NULL)
@@ -52,7 +52,7 @@ void* test_net(void* arg) {
     ASSERT_CODE("NULL config", WRD_PARSER_EMPTY, wrd_parse_formdata, "test", 4, "test", internal_parse_formdata_callback, NULL)
     ASSERT_CODE("too short #1", WRD_PARSER_VOID, wrd_parse_formdata, "test", 4, "test", internal_parse_formdata_callback, &config)
 
-    const char* test = "0123456789"
+    const char *test = "0123456789"
         "0123456789"
         "0123456789"
         "0123456789"

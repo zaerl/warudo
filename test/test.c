@@ -10,7 +10,7 @@
 #include "test.h"
 #include "../src/code.h"
 
-#define DECLARE_TEST(NAME) void* test_##NAME(void* arg);
+#define DECLARE_TEST(NAME) void *test_##NAME(void *arg);
 
 DECLARE_TEST(code)
 DECLARE_TEST(db)
@@ -25,7 +25,7 @@ DECLARE_TEST(warudo)
 static unsigned int tests_valid = 0;
 static unsigned int tests_total = 0;
 
-void wrd_assert(const char* type, int test, const char *func_name, const char *description);
+void wrd_assert(const char *type, int test, const char *func_name, const char *description);
 
 void wrd_assert_code(int result, int expected, const char *func_name, const char *description) {
     int test = result == expected;
@@ -36,8 +36,8 @@ void wrd_assert_code(int result, int expected, const char *func_name, const char
         char str1[20];
         char str2[20];
 
-        char* result_desc = wrd_error_description(result, 0);
-        char* expected_desc = wrd_error_description(expected, 0);
+        char *result_desc = wrd_error_description(result, 0);
+        char *expected_desc = wrd_error_description(expected, 0);
 
         if(result_desc == NULL) {
             sprintf(str1, "%d", result);
@@ -62,7 +62,7 @@ void wrd_assert_int(int result, int expected, const char *func_name, const char 
     }
 }
 
-void wrd_assert_string(char* result, char* expected, const char *func_name, const char *description) {
+void wrd_assert_string(char *result, char *expected, const char *func_name, const char *description) {
     int test = strcmp(result, expected) == 0;
 
     wrd_assert("string", test, func_name, description);
@@ -72,11 +72,11 @@ void wrd_assert_string(char* result, char* expected, const char *func_name, cons
     }
 }
 
-void wrd_assert(const char* type, int test, const char *func_name, const char *description) {
+void wrd_assert(const char *type, int test, const char *func_name, const char *description) {
     ++tests_total;
 
-    const char* ok = "\x1B[32mOK\x1B[0m";
-    const char* fail = "\x1B[31mFAIL\x1B[0m";
+    const char *ok = "\x1B[32mOK\x1B[0m";
+    const char *fail = "\x1B[31mFAIL\x1B[0m";
     int length = 80 - (strlen(type) + strlen(func_name) + strlen(description) + (test ? 2 : 4) + 5);
 
     if(length <= 0) {

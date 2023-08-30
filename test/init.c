@@ -1,6 +1,6 @@
 #include "test.h"
 
-void* test_init(void* arg) {
+void *test_init(void *arg) {
     ASSERT_CODE("NULL", WRD_ERROR, wrd_init, NULL, NULL)
     ASSERT_CODE("NULL", WRD_ERROR, wrd_accept_connection, NULL)
     ASSERT_CODE("NULL", WRD_ERROR, wrd_parse_query_string, NULL, NULL)

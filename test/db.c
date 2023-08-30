@@ -1,7 +1,7 @@
 #include "../src/db.h"
 #include "test.h"
 
-void* test_db(void* arg) {
+void *test_db(void *arg) {
     ASSERT_CODE("NULL", WRD_ERROR, wrd_db_close, NULL)
 
     ASSERT_CODE("NULL", WRD_ERROR, wrd_db_init, NULL, NULL)

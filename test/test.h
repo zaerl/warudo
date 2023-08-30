@@ -26,7 +26,7 @@ extern "C" {
 
 void wrd_assert_code(int result, int expected, const char *func_name, const char *description);
 void wrd_assert_int(int result, int expected, const char *func_name, const char *description);
-void wrd_assert_string(char* result, char* expected, const char *func_name, const char *description);
+void wrd_assert_string(char *result, char *expected, const char *func_name, const char *description);
 
 #ifdef __cplusplus
 }
