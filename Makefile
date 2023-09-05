@@ -21,6 +21,7 @@ TOOLS_DIR = tools
 
 BUILD_DIR = build
 TEST_BUILD_DIR = test-build
+BIN_DIR = bin
 
 # HC-tree
 HC_TREE_BUILD = hctree-build
@@ -28,7 +29,6 @@ HC_TREE_SRC = hctree-src
 HC_TREE_REPO = hctree.fossil
 HC_TREE_AMALGAMATION_DIR = $(SRC_DIR)/sqlite3
 
-BIN_DIR = bin
 DBS = *.db *.db-shm *.db-wal
 
 FORMATTER = clang-format
@@ -59,14 +59,14 @@ TEST_OBJS = $(patsubst $(TEST_SRC_DIR)/%, $(TEST_BUILD_DIR)/%, $(TEST_SRCS:.c=.o
 BUILD_SUBDIRS := $(foreach dir,$(SUBDIRS),$(patsubst $(SRC_DIR)/%, $(BUILD_DIR)/%, $(dir)))
 
 # Define the final executable name
-TARGET = $(BIN_DIR)/warudo
+TARGET = $(BIN_DIR)/warudo.cgi
 
 # Define the test executable name
 TEST_TARGET = $(BIN_DIR)/test
 
 STRESS_TEST_TARGET = $(BIN_DIR)/stress-test
 
-all: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TARGET)
+all: $(BUILD_DIR) $(BUILD_SUBDIRS) $(BIN_DIR) $(TARGET)
 
 # Create build directory if it doesn't exist
 $(BUILD_DIR):
@@ -78,6 +78,10 @@ $(BUILD_SUBDIRS):
 
 # Create test build directory if it doesn't exist
 $(TEST_BUILD_DIR):
+	mkdir -p $@
+
+# Create bin directory if it doesn't exist
+$(BIN_DIR):
 	mkdir -p $@
 
 # Compile all the source files into object files
@@ -143,6 +147,6 @@ db:
 	sqlite3 warudo.db
 
 clean:
-	rm -rf $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET) $(HC_TREE_BUILD) $(HC_TREE_SRC)
+	rm -rf $(BIN_DIR) $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET) $(HC_TREE_BUILD) $(HC_TREE_SRC)
 
 .PHONY: all clean
