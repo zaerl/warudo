@@ -3,15 +3,24 @@
 #include <stdlib.h>
 #include <curl/curl.h>
 #include <time.h>
+#include <getopt.h>
 
 // Server URL
 #define SERVER_URL "http://localhost:6252/app/entries?multi=1"
-#define ENTRIES_PER_REQUEST_DEFAULT 500
-#define MAX_REQUESTS_DEFAULT -1
-#define VERBOSE_DEFAULT 0
-#define DEBUG_DEFAULT 0
+#define VERSION "0.1.1"
 
-#define CLI_ARG(name) "\033[4m" name "\033[0m"
+// CLI commands
+#define CLI_DEBUG 0
+#define CLI_ENTRIES_PER_REQUEST 1
+#define CLI_HELP 2
+#define CLI_MAX_REQUESTS 3
+#define CLI_VERBOSE 4
+
+// CLI defaults
+#define DEFAULT_DEBUG 0
+#define DEFAULT_ENTRIES_PER_REQUEST 600
+#define DEFAULT_MAX_REQUESTS -1
+#define DEFAULT_VERBOSE 0
 
 // Callback function to write response data
 size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
@@ -107,19 +116,24 @@ double send_request(CURL* curl) {
     return elapsed;
 }
 
-long get_cli_number(char *arg) {
-    if(arg == NULL) {
-        return -1;
+int show_version(void) {
+    printf("warudo v%s\n", VERSION);
+
+    return 0;
+}
+
+void show_help(const char *executable, struct option options[], const char *descriptions[]) {
+    printf("Usage: %s [OPTIONS] FILENAME\n", executable);
+    puts("Options:");
+
+    for(unsigned long i = 0; i < 6; ++i) {
+        printf("  -%c%s, --%s%s\n\t%s\n",
+            options[i].val,
+            options[i].has_arg == no_argument ? "" : " \033[4mnumber\033[0m",
+            options[i].name,
+            options[i].has_arg == no_argument ? "" : "=\033[4mnumber\033[0m",
+            descriptions[i]);
     }
-
-    char* endptr = NULL;
-    long number = strtol(arg, &endptr, 10);
-
-    if(*endptr != '\0') {
-        return -1;
-    }
-
-    return number;
 }
 
 int main(int argc, char* argv[]) {
@@ -129,10 +143,6 @@ int main(int argc, char* argv[]) {
     CURL* curl = NULL;
     double elapsed = 0;
     FILE* file = NULL;
-    int debug = DEBUG_DEFAULT;
-    int verbose = VERBOSE_DEFAULT;
-    long max_requests = MAX_REQUESTS_DEFAULT;
-    long entries_per_request = ENTRIES_PER_REQUEST_DEFAULT;
     size_t len = 0;
     ssize_t read = 0;
     unsigned long entities_created = 0;
@@ -141,73 +151,88 @@ int main(int argc, char* argv[]) {
     unsigned long lines_skipped = 0;
     unsigned long requests = 0;
 
-    if(argc == 1 || (argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0))) {
-        printf("Usage: %s [options] filename\n", argv[0]);
-        puts("Options:");
-        puts("  -D, --debug\tDebug output");
-        puts("  -h, --help\tShow this help");
-        puts("  -m " CLI_ARG("number") "\tMaximum number of requests");
-        puts("  -r " CLI_ARG("number") "\tMaximum number of entries per request");
-        puts("  -v, --verbose\tVerbose output");
+    int debug_flag = DEFAULT_DEBUG;
+    int entries_per_request = DEFAULT_ENTRIES_PER_REQUEST;
+    int max_requests = DEFAULT_MAX_REQUESTS;
+    int verbose_flag = DEFAULT_VERBOSE;
 
-        return 0;
+    struct option long_options[] = {
+        { "debug", no_argument, 0, 'd' },
+        { "entries", required_argument, 0, 'e' },
+        { "help", no_argument, 0, 'h' },
+        { "max-requests", required_argument, 0, 'm' },
+        { "verbose", no_argument, 0, 'v' },
+        { "version", no_argument, 0, 'V' },
+        { 0, 0, 0, 0 }
+    };
+    const char *descriptions[] = {
+        "Debug output",
+        "Number of entries per request",
+        "Show this help",
+        "Maximum number of requests",
+        "Verbose output",
+        "Print version"
+    };
+
+    if(argc == 1) {
+        fprintf(stderr, "Error: Missing filename argument.\n");
+        show_help(argv[0], long_options, descriptions);
+
+        return 1;
     }
 
-    for(int i = 1; i < argc; ++i) {
-        if(strcmp(argv[i], "-v") == 0 || strcmp(argv[i], "--verbose") == 0) {
-            verbose = 1;
-        } else if(strcmp(argv[i], "-D") == 0 || strcmp(argv[i], "--debug") == 0) {
-            debug = 1;
-        } else if(strcmp(argv[i], "-m") == 0) {
-            if(i + 1 >= argc) {
-                printf("Please provide a number for the maximum number of requests.\n");
+    int option;
+    int option_index = 0;
 
-                return 1;
-            }
-
-            i += 1;
-
-            max_requests = get_cli_number(argv[i]);
-
-            if(max_requests < 0) {
-                printf("Please provide a valid number for the maximum number of requests.\n");
-
-                return 1;
-            }
-        } else if(strcmp(argv[i], "-r") == 0) {
-            if(i + 1 >= argc) {
-                printf("Please provide a number for the maximum number of entries per request.\n");
-
-                return 1;
-            }
-
-            i += 1;
-
-            entries_per_request = get_cli_number(argv[i]);
-
-            if(entries_per_request < 0) {
-                printf("Please provide a valid number for the maximum number of entries per request.\n");
-
-                return 1;
-            }
-        } else {
-            filename = argv[i];
+    while((option = getopt_long(argc, argv, "de:hm:vV", long_options, &option_index)) != -1) {
+        switch (option) {
+            case 'd':
+                debug_flag = 1;
+                break;
+            case 'e':
+                entries_per_request = atoi(optarg);
+                break;
+            case 'h':
+                show_help(argv[0], long_options, descriptions);
+                return 0;
+            case 'm':
+                max_requests = atoi(optarg);
+                break;
+            case 'v':
+                verbose_flag = 1;
+                break;
+            case 'V':
+                return show_version();
+            case '?':
+                // getopt_long already printed an error message
+                break;
+            default:
+                abort();
         }
     }
 
-    // Check if filename is provided
-    if(filename == NULL) {
-        printf("Please provide a filename.\n");
+    // Process other non-option arguments (if any)
+    if(optind >= argc) {
+        fprintf(stderr, "Error: Missing filename argument.\n");
+        show_help(argv[0], long_options, descriptions);
+
         return 1;
     }
 
+    filename = argv[optind];
+
     // Disable output buffering
     setvbuf(stdout, NULL, _IONBF, 0);
-    file = fopen(filename, "r");
 
-    if (!file) {
-        printf("File not found: %s\n", filename);
-        return 1;
+    if(strcmp(filename, "-") == 0) {
+        file = stdin;
+    } else {
+        file = fopen(filename, "r");
+
+        if (!file) {
+            printf("File not found: %s\n", filename);
+            return 1;
+        }
     }
 
     // Initialize libcurl
@@ -221,11 +246,11 @@ int main(int argc, char* argv[]) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_URL, SERVER_URL);
 
-    if(verbose) {
+    if(verbose_flag) {
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     }
 
-    if(debug) {
+    if(debug_flag) {
         curl_easy_setopt(curl, CURLOPT_DEBUGFUNCTION, debug_trace);
     }
 
