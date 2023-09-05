@@ -64,7 +64,8 @@ TARGET = $(BIN_DIR)/warudo.cgi
 # Define the test executable name
 TEST_TARGET = $(BIN_DIR)/test
 
-STRESS_TEST_TARGET = $(BIN_DIR)/stress-test
+# Define the warudo CLI executable name
+WARUDO_TARGET = $(BIN_DIR)/warudo
 
 all: $(BUILD_DIR) $(BUILD_SUBDIRS) $(BIN_DIR) $(TARGET)
 
@@ -99,11 +100,11 @@ $(TARGET): $(OBJS)
 $(TEST_TARGET): $(OBJS) $(TEST_OBJS)
 	$(CC) $(CFLAGS) -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS) $(filter-out build/main.o, $^) -o $@
 
-test: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR) $(TEST_TARGET)
+test: $(BIN_DIR) $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR) $(TEST_TARGET)
 	$(TEST_TARGET)
 
-stress-test: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR)
-	$(CC) $(CFLAGS) -lcurl -o $(STRESS_TEST_TARGET) stress-test.c
+warudo: $(BIN_DIR)
+	$(CC) $(CFLAGS) -lcurl -o $(WARUDO_TARGET) warudo.c
 
 start: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TARGET)
 	WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 $(TARGET)
