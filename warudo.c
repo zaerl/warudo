@@ -6,7 +6,7 @@
 #include <getopt.h>
 
 // Server URL
-#define SERVER_URL "http://localhost:6252/app/entries?multi=1"
+#define DEFAULT_SERVER_URL "http://localhost:6252/app/entries?multi=1"
 #define VERSION "0.1.1"
 
 // CLI commands
@@ -155,12 +155,14 @@ int main(int argc, char* argv[]) {
     int entries_per_request = DEFAULT_ENTRIES_PER_REQUEST;
     int max_requests = DEFAULT_MAX_REQUESTS;
     int verbose_flag = DEFAULT_VERBOSE;
+    char *url = DEFAULT_SERVER_URL;
 
     struct option long_options[] = {
         { "debug", no_argument, 0, 'd' },
         { "entries", required_argument, 0, 'e' },
         { "help", no_argument, 0, 'h' },
         { "max-requests", required_argument, 0, 'm' },
+        { "url", required_argument, 0, 'u' },
         { "verbose", no_argument, 0, 'v' },
         { "version", no_argument, 0, 'V' },
         { 0, 0, 0, 0 }
@@ -170,6 +172,7 @@ int main(int argc, char* argv[]) {
         "Number of entries per request",
         "Show this help",
         "Maximum number of requests",
+        "Server URL",
         "Verbose output",
         "Print version"
     };
@@ -184,7 +187,7 @@ int main(int argc, char* argv[]) {
     int option;
     int option_index = 0;
 
-    while((option = getopt_long(argc, argv, "de:hm:vV", long_options, &option_index)) != -1) {
+    while((option = getopt_long(argc, argv, "de:hm:u:vV", long_options, &option_index)) != -1) {
         switch (option) {
             case 'd':
                 debug_flag = 1;
@@ -197,6 +200,9 @@ int main(int argc, char* argv[]) {
                 return 0;
             case 'm':
                 max_requests = atoi(optarg);
+                break;
+            case 'u':
+                url = optarg;
                 break;
             case 'v':
                 verbose_flag = 1;
@@ -244,7 +250,7 @@ int main(int argc, char* argv[]) {
     }
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curl, CURLOPT_URL, SERVER_URL);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
 
     if(verbose_flag) {
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
@@ -281,7 +287,7 @@ int main(int argc, char* argv[]) {
 
         if(lines_read == (unsigned long)entries_per_request) {
             curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
-            curl_easy_setopt(curl, CURLOPT_URL, SERVER_URL);
+            curl_easy_setopt(curl, CURLOPT_URL, url);
             ++requests;
 
             elapsed += send_request(curl);
