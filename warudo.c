@@ -236,7 +236,8 @@ int main(int argc, char* argv[]) {
         file = fopen(filename, "r");
 
         if (!file) {
-            printf("File not found: %s\n", filename);
+            fprintf(stderr, "File not found: %s\n", filename);
+
             return 1;
         }
     }
@@ -247,6 +248,8 @@ int main(int argc, char* argv[]) {
 
     if(!curl) {
         fprintf(stderr, "Error initializing CURL\n");
+
+        return 1;
     }
 
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
