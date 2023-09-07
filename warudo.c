@@ -122,12 +122,17 @@ int show_version(void) {
     return 0;
 }
 
-void show_help(const char *executable, struct option options[], const char *descriptions[]) {
-    printf("Usage: %s [OPTIONS] FILENAME\n", executable);
-    puts("Options:");
+void show_help(const char *executable, struct option options[], const char *descriptions[], const char *error) {
+    FILE *stream = error ? stderr : stdout;
+
+    fprintf(stream, "%s%swarudo - Warudo CLI client [v%s]\n\nUsage: %s [OPTIONS] FILENAME\n",
+        error ? error : "",
+        error ? "\n\n" : "",
+        VERSION, executable);
+    fprintf(stream, "Options:\n");
 
     for(unsigned long i = 0; i < 6; ++i) {
-        printf("  -%c%s, --%s%s\n\t%s\n",
+        fprintf(stream, "  -%c%s, --%s%s\n\t%s\n",
             options[i].val,
             options[i].has_arg == no_argument ? "" : " \033[4mnumber\033[0m",
             options[i].name,
@@ -178,8 +183,7 @@ int main(int argc, char* argv[]) {
     };
 
     if(argc == 1) {
-        fprintf(stderr, "Error: Missing filename argument.\n");
-        show_help(argv[0], long_options, descriptions);
+        show_help(argv[0], long_options, descriptions, "Error: Missing filename argument.");
 
         return 1;
     }
@@ -196,7 +200,7 @@ int main(int argc, char* argv[]) {
                 entries_per_request = atoi(optarg);
                 break;
             case 'h':
-                show_help(argv[0], long_options, descriptions);
+                show_help(argv[0], long_options, descriptions, NULL);
                 return 0;
             case 'm':
                 max_requests = atoi(optarg);
@@ -219,8 +223,7 @@ int main(int argc, char* argv[]) {
 
     // Process other non-option arguments (if any)
     if(optind >= argc) {
-        fprintf(stderr, "Error: Missing filename argument.\n");
-        show_help(argv[0], long_options, descriptions);
+        show_help(argv[0], long_options, descriptions, "Error: Missing filename argument.");
 
         return 1;
     }
