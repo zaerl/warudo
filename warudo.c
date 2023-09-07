@@ -6,7 +6,6 @@
 #include <getopt.h>
 
 // Server URL
-#define DEFAULT_SERVER_URL "http://localhost:6252/app/entries?multi=1"
 #define VERSION "0.1.1"
 
 // CLI commands
@@ -20,6 +19,8 @@
 #define DEFAULT_DEBUG 0
 #define DEFAULT_ENTRIES_PER_REQUEST 600
 #define DEFAULT_MAX_REQUESTS -1
+#define DEFAULT_QUIET 0
+#define DEFAULT_SERVER_URL "http://localhost:6252/app/entries?multi=1"
 #define DEFAULT_VERBOSE 0
 
 // Callback function to write response data
@@ -97,7 +98,7 @@ int debug_trace(CURL* handle, curl_infotype type, char* data, size_t size, void*
     return 0;
 }
 
-double send_request(CURL* curl) {
+double send_request(CURL* curl, int quiet) {
     struct timespec start, end;
     double elapsed;
 
@@ -108,7 +109,9 @@ double send_request(CURL* curl) {
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
     if (res == CURLE_OK) {
-        putc('.', stdout);
+        if(!quiet) {
+            putc('.', stdout);
+        }
     } else {
         fprintf(stderr, "Error sending request: %s\n", curl_easy_strerror(res));
     }
@@ -159,6 +162,7 @@ int main(int argc, char* argv[]) {
     int debug_flag = DEFAULT_DEBUG;
     int entries_per_request = DEFAULT_ENTRIES_PER_REQUEST;
     int max_requests = DEFAULT_MAX_REQUESTS;
+    int quiet = DEFAULT_QUIET;
     int verbose_flag = DEFAULT_VERBOSE;
     char *url = DEFAULT_SERVER_URL;
 
@@ -167,6 +171,7 @@ int main(int argc, char* argv[]) {
         { "entries", required_argument, 0, 'e' },
         { "help", no_argument, 0, 'h' },
         { "max-requests", required_argument, 0, 'm' },
+        { "quiet", no_argument, 0, 'q' },
         { "url", required_argument, 0, 'u' },
         { "verbose", no_argument, 0, 'v' },
         { "version", no_argument, 0, 'V' },
@@ -177,6 +182,7 @@ int main(int argc, char* argv[]) {
         "Number of entries per request",
         "Show this help",
         "Maximum number of requests",
+        "Quiet mode",
         "Server URL",
         "Verbose output",
         "Print version"
@@ -191,7 +197,7 @@ int main(int argc, char* argv[]) {
     int option;
     int option_index = 0;
 
-    while((option = getopt_long(argc, argv, "de:hm:u:vV", long_options, &option_index)) != -1) {
+    while((option = getopt_long(argc, argv, "de:hm:qu:vV", long_options, &option_index)) != -1) {
         switch (option) {
             case 'd':
                 debug_flag = 1;
@@ -204,6 +210,9 @@ int main(int argc, char* argv[]) {
                 return 0;
             case 'm':
                 max_requests = atoi(optarg);
+                break;
+            case 'q':
+                quiet = 1;
                 break;
             case 'u':
                 url = optarg;
@@ -258,7 +267,7 @@ int main(int argc, char* argv[]) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(curl, CURLOPT_URL, url);
 
-    if(verbose_flag) {
+    if(verbose_flag || debug_flag) {
         curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
     }
 
@@ -296,7 +305,7 @@ int main(int argc, char* argv[]) {
             curl_easy_setopt(curl, CURLOPT_URL, url);
             ++requests;
 
-            elapsed += send_request(curl);
+            elapsed += send_request(curl, quiet);
             entities_created += lines_read;
 
             lines_read = 0;
@@ -312,16 +321,18 @@ int main(int argc, char* argv[]) {
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
         ++requests;
 
-        elapsed += send_request(curl);
+        elapsed += send_request(curl, quiet);
         entities_created += lines_read;
 
         curl_mime_free(mime);
     }
 
-    printf("\n\n%lu requests of %lu entries\n%lu entities created\n%lu lines scanned (%lu skipped)\n",
-        requests, (unsigned long)entries_per_request, entities_created, lines_scanned, lines_skipped);
+    if(!quiet) {
+        printf("\n\n%lu requests of %lu entries\n%lu entities created\n%lu lines scanned (%lu skipped)\n",
+            requests, (unsigned long)entries_per_request, entities_created, lines_scanned, lines_skipped);
 
-    printf("Execution time %.4f seconds\n~%.4fs / request\n", elapsed, elapsed / requests);
+        printf("Execution time %.4f seconds\n~%.4fs / request\n", elapsed, elapsed / requests);
+    }
 
     curl_easy_cleanup(curl);
     fclose(file);
