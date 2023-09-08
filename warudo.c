@@ -137,9 +137,9 @@ void show_help(const char *executable, struct option options[], const char *desc
     for(unsigned long i = 0; i < 6; ++i) {
         fprintf(stream, "  -%c%s, --%s%s\n\t%s\n",
             options[i].val,
-            options[i].has_arg == no_argument ? "" : " \033[4mnumber\033[0m",
+            options[i].has_arg == no_argument ? "" : " number",
             options[i].name,
-            options[i].has_arg == no_argument ? "" : "=\033[4mnumber\033[0m",
+            options[i].has_arg == no_argument ? "" : "=number",
             descriptions[i]);
     }
 }
@@ -189,9 +189,7 @@ int main(int argc, char* argv[]) {
     };
 
     if(argc == 1) {
-        show_help(argv[0], long_options, descriptions, "Error: Missing filename argument.");
-
-        return 1;
+        file = stdin;
     }
 
     int option;
@@ -232,15 +230,10 @@ int main(int argc, char* argv[]) {
 
     // Process other non-option arguments (if any)
     if(optind >= argc) {
-        show_help(argv[0], long_options, descriptions, "Error: Missing filename argument.");
-
-        return 1;
+        filename = "-";
+    } else {
+        filename = argv[optind];
     }
-
-    filename = argv[optind];
-
-    // Disable output buffering
-    setvbuf(stdout, NULL, _IONBF, 0);
 
     if(strcmp(filename, "-") == 0) {
         file = stdin;
@@ -253,6 +246,9 @@ int main(int argc, char* argv[]) {
             return 1;
         }
     }
+
+    // Disable output buffering
+    setvbuf(stdout, NULL, _IONBF, 0);
 
     // Initialize libcurl
     curl_global_init(CURL_GLOBAL_ALL);
