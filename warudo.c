@@ -98,17 +98,19 @@ int debug_trace(CURL* handle, curl_infotype type, char* data, size_t size, void*
     return 0;
 }
 
-double send_request(CURL* curl, int quiet) {
+long send_request(CURL* curl, int quiet, double *elapsed) {
     struct timespec start, end;
-    double elapsed;
+    long http_code = 0;
 
     clock_gettime(CLOCK_MONOTONIC, &start);
     CURLcode res = curl_easy_perform(curl);
     clock_gettime(CLOCK_MONOTONIC, &end);
 
-    elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    *elapsed += (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
 
     if (res == CURLE_OK) {
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+
         if(!quiet) {
             putc('.', stdout);
         }
@@ -116,7 +118,7 @@ double send_request(CURL* curl, int quiet) {
         fprintf(stderr, "Error sending request: %s\n", curl_easy_strerror(res));
     }
 
-    return elapsed;
+    return http_code;
 }
 
 int show_version(void) {
@@ -158,6 +160,7 @@ int main(int argc, char* argv[]) {
     unsigned long lines_scanned = 0;
     unsigned long lines_skipped = 0;
     unsigned long requests = 0;
+    // int is_terminal = isatty(STDOUT_FILENO);
 
     int debug_flag = DEFAULT_DEBUG;
     int entries_per_request = DEFAULT_ENTRIES_PER_REQUEST;
@@ -298,11 +301,13 @@ int main(int argc, char* argv[]) {
 
         if(lines_read == (unsigned long)entries_per_request) {
             curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
-            curl_easy_setopt(curl, CURLOPT_URL, url);
             ++requests;
 
-            elapsed += send_request(curl, quiet);
-            entities_created += lines_read;
+            long net_res = send_request(curl, quiet, &elapsed);
+
+            if(net_res == 201) {
+                entities_created += lines_read;
+            }
 
             lines_read = 0;
             curl_mime_free(mime);
@@ -317,8 +322,11 @@ int main(int argc, char* argv[]) {
         curl_easy_setopt(curl, CURLOPT_MIMEPOST, mime);
         ++requests;
 
-        elapsed += send_request(curl, quiet);
-        entities_created += lines_read;
+        long net_res = send_request(curl, quiet, &elapsed);
+
+        if(net_res == 201) {
+            entities_created += lines_read;
+        }
 
         curl_mime_free(mime);
     }
