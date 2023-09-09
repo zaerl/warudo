@@ -13,6 +13,7 @@
 #define DECLARE_TEST(NAME) void *test_##NAME(void *arg);
 
 DECLARE_TEST(code)
+DECLARE_TEST(data)
 DECLARE_TEST(db)
 DECLARE_TEST(fcgi)
 DECLARE_TEST(init)
@@ -109,6 +110,7 @@ int main(int argc, const char *argv[]) {
         pthread_join(thread_##NAME, NULL);
 
     RUN_TEST(code)
+    RUN_TEST(data)
     RUN_TEST(db)
     RUN_TEST(fcgi)
     RUN_TEST(init)

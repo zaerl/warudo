@@ -104,7 +104,7 @@ test: $(BIN_DIR) $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR) $(TEST_TARGET)
 	$(TEST_TARGET)
 
 warudo: $(BIN_DIR)
-	$(CC) $(CFLAGS) -lcurl -o $(WARUDO_TARGET) warudo.c
+	$(CC) $(CFLAGS) -lcurl -o $(WARUDO_TARGET) $(SRC_DIR)/data.c warudo.c
 
 start: $(BUILD_DIR) $(BUILD_SUBDIRS) $(TARGET)
 	WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 $(TARGET)

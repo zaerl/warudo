@@ -23,6 +23,7 @@ extern "C" {
 #define ASSERT_CODE(MESSAGE, EXPECTED, TEST_FUNC, ...) wrd_assert_code(TEST_FUNC(__VA_ARGS__), EXPECTED, #TEST_FUNC, MESSAGE);
 
 #define MOCK_CONFIG warudo config;
+#define MOCK_FILE(NAME) FILE *NAME = tmpfile(); if(!NAME) wrd_assert_int(0, 1, "tmpfile", "tmpfile() failed");
 
 void wrd_assert_code(int result, int expected, const char *func_name, const char *description);
 void wrd_assert_int(int result, int expected, const char *func_name, const char *description);
