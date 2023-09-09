@@ -45,7 +45,7 @@ void debug_dump(const char* text, FILE* stream, unsigned char* ptr, size_t size)
         // Show hex to the left
         for(c = 0; c < width; ++c) {
             if(i + c < size) {
-                fprintf(stream, "%02x ", ptr[i+c]);
+                fprintf(stream, "%02x ", ptr[i + c]);
             } else {
                 fputs("   ", stream);
             }
