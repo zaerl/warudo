@@ -12,6 +12,7 @@
 
 #define DECLARE_TEST(NAME) void *test_##NAME(void *arg);
 
+DECLARE_TEST(auth)
 DECLARE_TEST(code)
 DECLARE_TEST(data)
 DECLARE_TEST(db)
@@ -64,12 +65,20 @@ void wrd_assert_int(int result, int expected, const char *func_name, const char 
 }
 
 void wrd_assert_string(char *result, char *expected, const char *func_name, const char *description) {
-    int test = strcmp(result, expected) == 0;
+    wrd_assert_const_string(result, expected, func_name, description);
+
+    if(result) {
+        free(result);
+    }
+}
+
+void wrd_assert_const_string(const char *result, char *expected, const char *func_name, const char *description) {
+    int test = result && expected ? strcmp(result, expected) == 0 : 0;
 
     wrd_assert("string", test, func_name, description);
 
     if(!test) {
-        printf("Expected \"\x1B[32m%s\x1B[0m\", got \"\x1B[31m%d\x1B[0m\"\n\n", expected, result);
+        printf("Expected \"\x1B[32m%s\x1B[0m\", got \"\x1B[31m%s\x1B[0m\"\n\n", expected ? expected : "NULL", result ? result : "NULL");
     }
 }
 
@@ -109,6 +118,7 @@ int main(int argc, const char *argv[]) {
         pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
         pthread_join(thread_##NAME, NULL);
 
+    RUN_TEST(auth)
     RUN_TEST(code)
     RUN_TEST(data)
     RUN_TEST(db)

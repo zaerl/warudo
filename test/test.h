@@ -16,7 +16,7 @@ extern "C" {
         void*: wrd_assert_int((int)TEST_FUNC(__VA_ARGS__), (int)EXPECTED, #TEST_FUNC, MESSAGE), \
         int: wrd_assert_int(TEST_FUNC(__VA_ARGS__), EXPECTED, #TEST_FUNC, MESSAGE), \
         char*: wrd_assert_string(TEST_FUNC(__VA_ARGS__), EXPECTED, #TEST_FUNC, MESSAGE), \
-        const char*: wrd_assert_string(TEST_FUNC(__VA_ARGS__), EXPECTED, #TEST_FUNC, MESSAGE), \
+        const char*: wrd_assert_const_string(TEST_FUNC(__VA_ARGS__), EXPECTED, #TEST_FUNC, MESSAGE), \
         default: wrd_assert_int(TEST_FUNC(__VA_ARGS__), EXPECTED, #TEST_FUNC, MESSAGE) \
     );
 
@@ -28,6 +28,7 @@ extern "C" {
 void wrd_assert_code(int result, int expected, const char *func_name, const char *description);
 void wrd_assert_int(int result, int expected, const char *func_name, const char *description);
 void wrd_assert_string(char *result, char *expected, const char *func_name, const char *description);
+void wrd_assert_const_string(const char *result, char *expected, const char *func_name, const char *description);
 
 #ifdef __cplusplus
 }

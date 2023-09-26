@@ -36,8 +36,8 @@ void *test_net(void *arg) {
     ASSERT("invalid", NULL, wrd_get_formdata_boundary, "application/json; charset=utf-8")
     ASSERT("no \\n", NULL, wrd_get_formdata_boundary, "multipart/form-data; boundary=\n")
     ASSERT("no $%&/", NULL, wrd_get_formdata_boundary, "multipart/form-data; boundary=$%&/")
-    ASSERT("valid", "a", wrd_get_formdata_boundary, "multipart/form-data; boundary=a")
-    ASSERT("valid", "az-_", wrd_get_formdata_boundary, "multipart/form-data; boundary=az-_")
+    ASSERT("valid", (const char*)"a", wrd_get_formdata_boundary, "multipart/form-data; boundary=a")
+    ASSERT("valid", (const char*)"az-_", wrd_get_formdata_boundary, "multipart/form-data; boundary=az-_")
 
     ASSERT("NULL", 0, wrd_is_valid_boundary, NULL)
     ASSERT("NULL", 0, wrd_is_valid_boundary, "")

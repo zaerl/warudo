@@ -21,14 +21,14 @@ void *test_data(void *arg) {
 
     // test, 0000000016 bytes (0x00000010)
     // 0000: 74 65 73 74 74 65 73 74 74 65 73 74 74 65 73 74 testtesttesttest
-    ASSERT("16 written", 16, wrd_debug_dump, "test", temp_file_2, "testtesttesttest", 16)
+    ASSERT("16 written", 16, wrd_debug_dump, "test", temp_file_2, (unsigned char*)"testtesttesttest", 16)
     ASSERT("107 file size", 36 + 6 + 16 * 3 + 16 + 1, test_file_size, temp_file_2)
 
     MOCK_FILE(temp_file_3)
 
     // test, 0000000001 bytes (0x00000001)
     // 0000: 74                                              t
-    ASSERT("1 size, 1 written", 1, wrd_debug_dump, "test", temp_file_3, "testtesttesttest", 1)
+    ASSERT("1 size, 1 written", 1, wrd_debug_dump, "test", temp_file_3, (unsigned char*)"testtesttesttest", 1)
     ASSERT("1 size, 92 file size", 36 + 6 + 16 * 3 + 1 + 1, test_file_size, temp_file_3)
 
     return NULL;

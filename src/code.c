@@ -1,4 +1,4 @@
-#include "warudo.h"
+#include "code.h"
 
 const char *wrd_error_description(wrd_code code, int extended) {
     switch(code) {
