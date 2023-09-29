@@ -27,12 +27,19 @@ extern "C" {
 #define WRD_CONFIG_FILE "warudo.conf"
 #define WRD_DB_FILE "file:warudo.db"
 #define WRD_HCTREE_DB_FILE "file:warudo.db?hctree=1"
-#define WRD_ENTRIES_TABLE "entries"
 #define WRD_MAX_COLUMNS 64
 #define WRD_SOCKET_PATH ":6251"
 #define WRD_TIMING 1
-#define WRD_DASHBOARDS_TABLE "dashboards"
 #define WRD_MAX_QUERY_KEYS 16
+// Default tables
+#define WRD_DASHBOARDS_TABLE "dashboards"
+#define WRD_ENTRIES_TABLE "entries"
+#define WRD_AUTH_TABLE "http_auth"
+
+// Headers
+#define WRD_AUTH_DEFAULT_USER "admin"
+#define WRD_AUTH_DEFAULT_PASS "admin"
+#define WRD_AUTH_DEFAULT_ROLE "admin"
 
 #ifdef WRD_TIMING
 #include <time.h>

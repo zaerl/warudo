@@ -58,11 +58,26 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
         "created INTEGER DEFAULT (UNIXEPOCH()), "
         "modified INTEGER DEFAULT (UNIXEPOCH()), "
         "data TEXT NOT NULL);"
+
         "CREATE TABLE IF NOT EXISTS " WRD_DASHBOARDS_TABLE "("
         "id INTEGER PRIMARY KEY, "
         "created INTEGER DEFAULT (UNIXEPOCH()), "
         "modified INTEGER DEFAULT (UNIXEPOCH()), "
         "data TEXT NOT NULL);"
+
+        "CREATE TABLE IF NOT EXISTS " WRD_AUTH_TABLE "("
+        "id INTEGER PRIMARY KEY, "
+        "username TEXT NOT NULL,"
+        "password TEXT NOT NULL,"
+        "user_role TEXT NOT NULL,"
+        "created INTEGER DEFAULT (UNIXEPOCH()), "
+        "modified INTEGER DEFAULT (UNIXEPOCH()), "
+        "data TEXT NOT NULL);"
+
+        "INSERT INTO " WRD_AUTH_TABLE " (username, password, user_role, data)"
+        "SELECT '" WRD_AUTH_DEFAULT_USER "', '" WRD_AUTH_DEFAULT_PASS "', '" WRD_AUTH_DEFAULT_ROLE "', '' "
+        "WHERE NOT EXISTS (SELECT 1 FROM " WRD_AUTH_TABLE ");"
+
         "PRAGMA journal_mode = WAL;"
         "PRAGMA synchronous = NORMAL;"
         "PRAGMA busy_timeout = 5000;";
