@@ -11,7 +11,7 @@ wrd_code wrd_db_init(const char *filename, warudo *config);
 wrd_code wrd_parse_json(warudo *config);
 wrd_code wrd_add_index(const char *filename, warudo *config);
 wrd_code wrd_db_close(warudo *config);
-wrd_code wrd_load_columns(warudo *config);
+// wrd_code wrd_load_columns(warudo *config);
 unsigned long long wrd_last_insert_rowid(warudo *config);
 
 wrd_code wrd_add_entry(int entry_type, warudo *config);

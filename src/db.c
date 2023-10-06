@@ -21,7 +21,7 @@
 
 #define WRD_DB_CALL(STMT, CALL) WRD_DB_RET_CALL(STMT, CALL, SQLITE_OK)
 
-wrd_code wrd_load_columns(warudo *config);\
+// wrd_code wrd_load_columns(warudo *config);
 
 wrd_code wrd_db_init(const char *filename, warudo *config) {
     CHECK_CONFIG
@@ -129,7 +129,7 @@ wrd_code wrd_db_close(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_load_columns(warudo *config) {
+/*wrd_code wrd_load_columns(warudo *config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -159,7 +159,7 @@ wrd_code wrd_load_columns(warudo *config) {
     sqlite3_finalize(stmt);
 
     return WRD_OK;
-}
+}*/
 
 unsigned long long wrd_last_insert_rowid(warudo *config) {
     if(!config) {

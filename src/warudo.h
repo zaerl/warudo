@@ -13,12 +13,6 @@ extern "C" {
 #define WRD_USE_LIBFCGI 1
 #endif
 
-#ifdef WRD_USE_LIBFCGI
-#include <fcgiapp.h>
-#endif
-
-#include "sqlite3/sqlite3.h"
-
 // Version
 #define WRD_VERSION "0.1.0"
 
@@ -40,6 +34,12 @@ extern "C" {
 #define WRD_AUTH_DEFAULT_USER "admin"
 #define WRD_AUTH_DEFAULT_PASS "admin"
 #define WRD_AUTH_DEFAULT_ROLE "admin"
+
+#ifdef WRD_USE_LIBFCGI
+#include <fcgiapp.h>
+#endif
+
+#include "sqlite3/sqlite3.h"
 
 #ifdef WRD_TIMING
 #include <time.h>
