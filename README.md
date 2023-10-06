@@ -13,6 +13,18 @@ external programs that support that interface.
 make
 make && WARUDO_CORS="*" bin/warudo
 
+### CLI
+```
+make warudo
+./bin/warudo
+
+cat file.log | ./tools/parse-log.sh
+cat file.log | ./bin/warudo
+```
+
+### Test
+`make test`
+
 ### Thanks
 Warudo is built using work of amazing individuals.
 

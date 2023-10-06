@@ -1,4 +1,5 @@
 #!/bin/bash
+# cat file.log | ./tools/parse-log.sh --debug
 
 current_dir="$(dirname "$0")"
 php_script="$current_dir/parse-log.php"
