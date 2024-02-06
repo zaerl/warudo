@@ -9,9 +9,13 @@ external programs that support that interface.
 
 ### Macos
 
+```
+# In one tab start Nginx
 /opt/homebrew/opt/nginx/bin/nginx -g "daemon off;"
-make
-make && WARUDO_CORS="*" bin/warudo
+
+# In another tab start the CGI script
+make && WARUDO_CORS="*" bin/warudo.cgi
+```
 
 ### CLI
 ```
@@ -20,6 +24,12 @@ make warudo
 
 cat file.log | ./tools/parse-log.sh
 cat file.log | ./bin/warudo
+```
+
+### HC-Tree
+```
+make hctree.fossil
+make hctree-amalgamation
 ```
 
 ### Test

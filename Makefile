@@ -148,6 +148,6 @@ db:
 	sqlite3 warudo.db
 
 clean:
-	rm -rf $(BIN_DIR) $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET) $(HC_TREE_BUILD) $(HC_TREE_SRC)
+	rm -rf $(BIN_DIR) $(BUILD_DIR) $(TEST_BUILD_DIR) $(TARGET) $(HC_TREE_BUILD) $(HC_TREE_SRC) $(HC_TREE_REPO)
 
 .PHONY: all clean
