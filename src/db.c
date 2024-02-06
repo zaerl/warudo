@@ -57,13 +57,13 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
         "id INTEGER PRIMARY KEY, "
         "created INTEGER DEFAULT (UNIXEPOCH()), "
         "modified INTEGER DEFAULT (UNIXEPOCH()), "
-        "data TEXT NOT NULL);"
+        "data BLOB NOT NULL);"
 
         "CREATE TABLE IF NOT EXISTS " WRD_DASHBOARDS_TABLE "("
         "id INTEGER PRIMARY KEY, "
         "created INTEGER DEFAULT (UNIXEPOCH()), "
         "modified INTEGER DEFAULT (UNIXEPOCH()), "
-        "data TEXT NOT NULL);"
+        "data BLOB NOT NULL);"
 
         "CREATE TABLE IF NOT EXISTS " WRD_AUTH_TABLE "("
         "id INTEGER PRIMARY KEY, "
@@ -72,7 +72,7 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
         "user_role TEXT NOT NULL,"
         "created INTEGER DEFAULT (UNIXEPOCH()), "
         "modified INTEGER DEFAULT (UNIXEPOCH()), "
-        "data TEXT NOT NULL);"
+        "data BLOB NOT NULL);"
 
         "INSERT INTO " WRD_AUTH_TABLE " (username, password, user_role, data)"
         "SELECT '" WRD_AUTH_DEFAULT_USER "', '" WRD_AUTH_DEFAULT_PASS "', '" WRD_AUTH_DEFAULT_ROLE "', '' "
@@ -89,10 +89,10 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
         return WRD_DB_OPEN_ERROR;
     }
 
-    WRD_DB_CALL(config->insert_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_ENTRIES_TABLE "(data) VALUES(json(?1));", -1, &config->insert_stmt, NULL));
-    WRD_DB_CALL(config->insert_dashboard_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_DASHBOARDS_TABLE "(data) VALUES(json(?1));", -1, &config->insert_dashboard_stmt, NULL));
+    WRD_DB_CALL(config->insert_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_ENTRIES_TABLE "(data) VALUES(jsonb(?1));", -1, &config->insert_stmt, NULL));
+    WRD_DB_CALL(config->insert_dashboard_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_DASHBOARDS_TABLE "(data) VALUES(jsonb(?1));", -1, &config->insert_dashboard_stmt, NULL));
     WRD_DB_CALL(config->add_index_stmt, sqlite3_prepare_v2(config->db, "ALTER TABLE " WRD_ENTRIES_TABLE
-        " add column \"?1\" as (json_extract(value, ?1));"
+        " add column \"?1\" as (jsonb_extract(value, ?1));"
         "create index ?1 on " WRD_ENTRIES_TABLE "(?1);", -1, &config->add_index_stmt, NULL));
     WRD_DB_CALL(config->parse_json_stmt, sqlite3_prepare_v2(config->db, "SELECT * FROM json_each(?1) WHERE type='true';", -1, &config->parse_json_stmt, NULL));
 
@@ -358,12 +358,12 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
      * SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ?1 OFFSET ?2;
      */
     if(has_search) {
-        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE CAST(data ->> ?1 AS TEXT) LIKE ?2 ORDER BY %q %q LIMIT ?3 OFFSET ?4;", table_name, order_by, sort);
+        query = sqlite3_mprintf("SELECT id, created, modified, JSON(data) FROM %q WHERE CAST(data ->> ?1 AS TEXT) LIKE ?2 ORDER BY %q %q LIMIT ?3 OFFSET ?4;", table_name, order_by, sort);
         limit_index = 3;
     } else if(config->query_id) {
-        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q WHERE id = ?1;", table_name);
+        query = sqlite3_mprintf("SELECT id, created, modified, JSON(data) FROM %q WHERE id = ?1;", table_name);
     } else {
-        query = sqlite3_mprintf("SELECT id, created, modified, data FROM %q ORDER BY %q %q LIMIT ?1 OFFSET ?2;", table_name, order_by, sort);
+        query = sqlite3_mprintf("SELECT id, created, modified, JSON(data) FROM %q ORDER BY %q %q LIMIT ?1 OFFSET ?2;", table_name, order_by, sort);
         limit_index = 1;
     }
 
