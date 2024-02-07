@@ -6,7 +6,7 @@
 #include "fcgi.h"
 #include "http.h"
 #include "log.h"
-#include "net.h"
+#include "output.h"
 #include "warudo.h"
 
 #define WRD_DB_RET_CALL(STMT, CALL, RET) \

@@ -1,4 +1,4 @@
-#include "../src/net.h"
+#include "../src/output.h"
 #include "test.h"
 
 static int formdata_result = WRD_OK;
@@ -7,7 +7,7 @@ int internal_parse_formdata_callback(const char *input, long int length, warudo 
     return formdata_result;
 }
 
-void *test_net(void *arg) {
+void *test_output(void *arg) {
     MOCK_CONFIG
 
     ATT_ASSERT(wrd_url_decode(NULL), NULL, "NULL")
