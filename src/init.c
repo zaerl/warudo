@@ -193,12 +193,9 @@ wrd_code wrd_accept_connection(warudo *config) {
 
     wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
 
-    // TODO: arrived here
-    //char buffer[1024] = {0};
-
     wrd_http_ok(config);
-    wrd_http_printf(config, "Hello %s\n", "World!");
-    // wrd_net_printf(config, "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello World\n");
+    wrd_http_printf(config, "Hello %s", "World!");
+    wrd_http_puts(config, "Hello World");
 
     // Read the HTTP request
     /*read(config->client_fd, buffer, 1024);

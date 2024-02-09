@@ -15,7 +15,7 @@
         wrd_log_error(config, "Failed to execute db query: %d/%d %s (%s, %d)\n", rc, RET, sqlite3_errmsg(config->db), __FUNCTION__, __LINE__); \
         if(must_finalize) sqlite3_finalize(STMT); \
         if(must_free) sqlite3_free((void*)query); \
-        if(must_output_error) wrd_http_bad_request("Failed to get data.", config); \
+        if(must_output_error) wrd_http_bad_request(config, "Failed to get data."); \
         return WRD_DB_ERROR; \
     } \
 
@@ -208,7 +208,7 @@ wrd_code wrd_parse_json(warudo *config) {
         }
     }
 
-    wrd_http_created(wrd_last_insert_rowid(config), config);
+    wrd_http_created(config, wrd_last_insert_rowid(config));
     free(json);
 
     return WRD_OK;
@@ -241,7 +241,7 @@ wrd_code wrd_add_index(const char *filename, warudo *config) {
     WRD_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
     WRD_DB_RET_CALL(stmt, sqlite3_step(stmt), SQLITE_DONE);
 
-    wrd_http_created(wrd_last_insert_rowid(config), config);
+    wrd_http_created(config, wrd_last_insert_rowid(config));
     free(json);
 
     return WRD_OK;
@@ -273,7 +273,7 @@ wrd_code wrd_add_entry(int entry_type, warudo *config) {
     WRD_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, json, length, SQLITE_STATIC));
     WRD_DB_RET_CALL(stmt, sqlite3_step(stmt), SQLITE_DONE);
 
-    wrd_http_created(wrd_last_insert_rowid(config), config);
+    wrd_http_created(config, wrd_last_insert_rowid(config));
     free(json);
 
     return WRD_OK;
@@ -321,7 +321,7 @@ wrd_code wrd_add_entries(int entry_type, warudo *config) {
     } else {
         // wrd_http_ok(config);
         // wrd_fcgi_puts(input, config);
-        wrd_http_multi_created(count, config);
+        wrd_http_multi_created(config, count);
     }
 
     if(input) {

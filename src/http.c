@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "http.h"
 #include "fcgi.h"
@@ -18,7 +19,7 @@
 
 wrd_code wrd_http_buffer_printf(warudo *config, wrd_buffer *buffer, const char *format, ...);
 
-wrd_code wrd_http_status(const char *status, warudo *config) {
+wrd_code wrd_http_status(warudo *config, const char *status) {
     WRD_CHECK_CONNECTION(config)
 
     wrd_http_buffer_printf(config, &config->net_headers_buffer, "HTTP/1.1 %s\r\n", status);
@@ -26,7 +27,7 @@ wrd_code wrd_http_status(const char *status, warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_http_content_type(const char *content_type, warudo *config) {
+wrd_code wrd_http_content_type(warudo *config, const char *content_type) {
     WRD_CHECK_CONNECTION(config)
 
     if(config->access_origin != NULL) {
@@ -39,11 +40,11 @@ wrd_code wrd_http_content_type(const char *content_type, warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_http_header(const char *status, const char *content_type, warudo *config) {
+wrd_code wrd_http_header(warudo *config, const char *status, const char *content_type) {
     WRD_CHECK_CONNECTION(config)
 
-    wrd_http_status(status, config);
-    wrd_http_content_type(content_type, config);
+    wrd_http_status(config, status);
+    wrd_http_content_type(config, content_type);
 
     return WRD_OK;
 }
@@ -51,51 +52,50 @@ wrd_code wrd_http_header(const char *status, const char *content_type, warudo *c
 wrd_code wrd_http_ok(warudo *config) {
     WRD_CHECK_CONNECTION(config)
 
-    return wrd_http_header("200 OK", "application/json", config);
+    return wrd_http_header(config, "200 OK", "application/json");
 }
 
-wrd_code wrd_http_created(unsigned long long int id, warudo *config) {
+wrd_code wrd_http_created(warudo *config, unsigned long long int id) {
     WRD_CHECK_CONNECTION(config)
 
-    wrd_http_header("201 Created", "application/json", config);
-    wrd_fcgi_printf(config, "{\"status\":\"success\",\"id\":%lld}", id);
+    wrd_http_header(config, "201 Created", "application/json");
+    wrd_http_printf(config, "{\"status\":\"success\",\"id\":%lld}", id);
 
     return WRD_OK;
 }
 
-wrd_code wrd_http_multi_created(unsigned long int count, warudo *config) {
+wrd_code wrd_http_multi_created(warudo *config, unsigned long int count) {
     WRD_CHECK_CONNECTION(config)
 
-    wrd_http_header("201 Created", "application/json", config);
-    wrd_fcgi_printf(config, "{\"status\":\"success\",\"count\":%lld}", count);
+    wrd_http_header(config, "201 Created", "application/json");
+    wrd_http_printf(config, "{\"status\":\"success\",\"count\":%lld}", count);
 
     return WRD_OK;
 }
 
-wrd_code wrd_http_not_allowed(const char *allowed, warudo *config) {
+wrd_code wrd_http_not_allowed(warudo *config, const char *allowed) {
     WRD_CHECK_CONNECTION(config)
 
-    wrd_http_status("405 Method Not Allowed", config);
-    wrd_fcgi_printf(config, "Allow: %s\r\n", allowed);
-    wrd_http_content_type("text/type", config);
-    wrd_fcgi_puts("Not allowed.", config);
+    wrd_http_header(config, "405 Method Not Allowed", "text/type");
+    wrd_http_buffer_printf(config, &config->net_headers_buffer, "Allow: %s\r\n", allowed);
+    wrd_http_puts(config, "Not allowed.");
 
     return WRD_HTTP_NOT_ALLOWED;
 }
 
-wrd_code wrd_http_server_error(const char *description, warudo *config) {
+wrd_code wrd_http_server_error(warudo *config, const char *description) {
     WRD_CHECK_CONNECTION(config)
 
-    wrd_http_header("500 Internal Server Error", "text/plain", config);
-    wrd_fcgi_puts(description, config);
+    wrd_http_header(config, "500 Internal Server Error", "text/plain");
+    wrd_http_puts(config, description);
 
     return WRD_HTTP_INTERNAL_ERROR;
 }
 
-wrd_code wrd_http_bad_request(const char *description, warudo *config) {
+wrd_code wrd_http_bad_request(warudo *config, const char *description) {
     WRD_CHECK_CONNECTION(config)
 
-    wrd_http_header("400 Bad Request", "application/json", config);
+    wrd_http_header(config, "400 Bad Request", "application/json");
     wrd_fcgi_printf(config, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
 
     return WRD_HTTP_BAD_REQUEST;
@@ -104,8 +104,8 @@ wrd_code wrd_http_bad_request(const char *description, warudo *config) {
 wrd_code wrd_http_not_found(warudo *config) {
     WRD_CHECK_CONNECTION(config)
 
-    wrd_http_header("404 Not Found", "text/plain", config);
-    wrd_fcgi_puts("Unknown.", config);
+    wrd_http_header(config, "404 Not Found", "text/plain");
+    wrd_http_puts(config, "Unknown.");
 
     return WRD_HTTP_NOT_FOUND;
 }
@@ -123,6 +123,19 @@ wrd_code wrd_http_buffer_printf(warudo *config, wrd_buffer *buffer, const char *
     va_end(args);
 
     buffer->position += written;
+
+    return WRD_OK;
+}
+
+wrd_code wrd_http_puts(warudo *config, const char *str) {
+    WRD_CHECK_CONNECTION(config)
+
+    char *str_buffer = config->net_buffer.buffer + config->net_buffer.position;
+    size_t buffer_size = config->net_buffer.size - config->net_buffer.position;
+    size_t str_length = strlen(str);
+
+    strncpy(str_buffer, str, str_length);
+    config->net_buffer.position += str_length;
 
     return WRD_OK;
 }
