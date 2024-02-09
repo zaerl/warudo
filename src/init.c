@@ -1,9 +1,10 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "warudo.h"
+
 #include "db.h"
+#include "env.h"
 #include "fcgi.h"
 #include "log.h"
 #include "net.h"
@@ -67,40 +68,17 @@ wrd_code wrd_init(const char *filename, warudo **config) {
     pdb->query_sort = NULL;
 
     // Environment variables
-    pdb->access_origin = WRD_DEFAULT_CORS;
-    pdb->log_level = WRD_DEFAULT_LOG_LEVEL;
-
-    env = getenv("WARUDO_LOG_LEVEL");
-
-    if(env != NULL) {
-        int log_level = atoi(env);
-        pdb->log_level = log_level;
-    }
+    pdb->access_origin = wrd_get_env_string("WARUDO_CORS", WRD_DEFAULT_CORS);
+    pdb->log_level = wrd_get_env_int("WARUDO_LOG_LEVEL", WRD_DEFAULT_LOG_LEVEL);
 
     wrd_log_info(pdb, "Starting warudo %s\n", WRD_VERSION);
-
-    if(env != NULL) { // TODO: check?
-        wrd_log_info(pdb, "Log level: %u\n", pdb->log_level);
-    }
-
-    env = getenv("WARUDO_CORS");
-
-    if(env != NULL) {
-        wrd_log_info(pdb, "Access origin: \"%s\"\n", env);
-        pdb->access_origin = env;
-    }
+    wrd_log_info(pdb, "Access origin: %s\n", pdb->access_origin ? pdb->access_origin : "disabled");
+    wrd_log_info(pdb, "Log level: %u\n", pdb->log_level);
 
     // HTTP headers memory.
     pdb->net_headers_buffer.buffer = calloc(1, pdb->net_headers_buffer.size);
     pdb->net_headers_buffer.size = WRD_NET_HEADERS_BUFFER_SIZE;
-
-    env = getenv("WRD_NET_BUFFER_SIZE");
-
-    if(env != NULL) {
-        pdb->net_buffer.size = atoi(env);
-    } else {
-        pdb->net_buffer.size = WRD_NET_BUFFER_SIZE;
-    }
+    pdb->net_buffer.size = wrd_get_env_int("WRD_NET_BUFFER_SIZE", WRD_NET_BUFFER_SIZE);
 
     // HTTP content memory.
     pdb->net_buffer.size *= 1048576;
