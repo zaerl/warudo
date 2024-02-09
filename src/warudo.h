@@ -22,7 +22,11 @@ extern "C" {
 #define WRD_DB_FILE "file:warudo.db"
 #define WRD_HCTREE_DB_FILE "file:warudo.db?hctree=1"
 #define WRD_MAX_COLUMNS 64
-#define WRD_SOCKET_PATH ":6251"
+// #define WRD_SOCKET_PATH ":6251"
+#define WRD_SOCKET_PORT 6251
+#define WRD_NET_HEADERS_BUFFER_SIZE 4096 // In bytes
+#define WRD_NET_BUFFER_SIZE 1 // In MB
+#define WRD_LISTEN_BACKLOG 1024 // TODO: 1024?
 #define WRD_TIMING 1
 #define WRD_MAX_QUERY_KEYS 16
 // Default tables
@@ -39,11 +43,13 @@ extern "C" {
 #include <fcgiapp.h>
 #endif
 
-#include "sqlite3/sqlite3.h"
-
 #ifdef WRD_TIMING
 #include <time.h>
 #endif
+
+#include <netinet/in.h>
+
+#include "sqlite3/sqlite3.h"
 
 typedef enum {
     WRD_LOG_LEVEL_NO_LOG = 0,
@@ -68,30 +74,35 @@ typedef enum {
 
     // Error codes
     WRD_ERROR = -1,
-    WRD_ACCEPT_ERROR = -2,
-    WRD_ADD_ERROR = -3,
-    WRD_DB_CLOSE_ERROR = -4,
-    WRD_DB_ERROR = -5,
-    WRD_DB_INIT_ERROR = -6,
-    WRD_DB_OPEN_ERROR = -7,
-    WRD_EMPTY_CONTENT_ERROR = -8,
-    WRD_EMPTY_QUERY_STRING_ERROR = -9,
-    WRD_FCGI_INIT_ERROR = -10,
-    WRD_INIT_REQUEST_ERROR = -11,
-    WRD_READ_ERROR = -12,
-    WRD_SOCKET_ERROR = -13,
+    WRD_ADD_ERROR = -2,
+    WRD_DB_CLOSE_ERROR = -3,
+    WRD_DB_ERROR = -4,
+    WRD_DB_INIT_ERROR = -5,
+    WRD_DB_OPEN_ERROR = -6,
+    WRD_EMPTY_CONTENT_ERROR = -7,
+    WRD_EMPTY_QUERY_STRING_ERROR = -8,
+    WRD_FCGI_INIT_ERROR = -9,
+    WRD_INIT_REQUEST_ERROR = -10,
+    WRD_READ_ERROR = -11,
 
     // Parser error codes
-    WRD_PARSER_EMPTY = -14,
-    WRD_PARSER_EMPTY_BOUNDARY = -15,
-    WRD_PARSER_VOID = -16,
-    WRD_PARSER_NO_BOUNDARY = -17,
-    WRD_PARSER_MISSING_END = -18,
-    WRD_PARSER_MISSING_CONTENT = -19,
-    WRD_PARSER_MISSING_BODY = -20,
+    WRD_PARSER_EMPTY = -12,
+    WRD_PARSER_EMPTY_BOUNDARY = -13,
+    WRD_PARSER_VOID = -14,
+    WRD_PARSER_NO_BOUNDARY = -15,
+    WRD_PARSER_MISSING_END = -16,
+    WRD_PARSER_MISSING_CONTENT = -17,
+    WRD_PARSER_MISSING_BODY = -18,
+
+    // Network error codes
+    WRD_SOCKET_ERROR = -19,
+    WRD_BIND_ERROR = -20,
+    WRD_LISTEN_ERROR = -21,
+    WRD_ACCEPT_ERROR = -22,
+    WRD_CLOSE_ERROR = -23,
 
     // Unknown error codes
-    WRD_UNKNOWN_ERROR = -21
+    WRD_UNKNOWN_ERROR = -24
 } wrd_code;
 
 // HTTP request methods
@@ -143,6 +154,14 @@ struct wrd_column {
 
 typedef struct wrd_column wrd_column;
 
+struct wrd_buffer {
+    char *buffer;
+    unsigned int size;
+    unsigned int position;
+};
+
+typedef struct wrd_buffer wrd_buffer;
+
 typedef struct {
     sqlite3 *db;
     sqlite3_stmt *insert_stmt;
@@ -155,9 +174,17 @@ typedef struct {
     wrd_log_level log_level;
 
 #ifdef WRD_USE_LIBFCGI
-    FCGX_Request request;
+    FCGX_Request request; // REMOVE
 #endif
-    int socket;
+    // Network
+    int server_fd;
+    int client_fd;
+    struct sockaddr_in address;
+
+    wrd_buffer net_headers_buffer;
+    wrd_buffer net_buffer;
+
+    int socket; // REMOVE
     int page;
     int request_method;
     const char *script_name;

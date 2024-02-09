@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-wrd_code wrd_fcgi_init(void);
-wrd_code wrd_fcgi_open_socket(const char *path, int backlog);
-wrd_code wrd_fcgi_init_request(warudo *config);
 wrd_code wrd_fcgi_accept(warudo *config);
 wrd_code wrd_fcgi_finish_request(warudo *config);
 wrd_code wrd_fcgi_free_request(warudo *config);

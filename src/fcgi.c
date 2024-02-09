@@ -3,40 +3,6 @@
 
 #include "fcgi.h"
 
-wrd_code wrd_fcgi_init(void) {
-#ifdef WRD_USE_LIBFCGI
-    int res = FCGX_Init();
-
-    return res == 0 ? WRD_OK : WRD_FCGI_INIT_ERROR;
-#endif
-
-    return WRD_OK;
-}
-
-wrd_code wrd_fcgi_open_socket(const char *path, int backlog) {
-    int socket = -1;
-
-#ifdef WRD_USE_LIBFCGI
-    socket = FCGX_OpenSocket(path, backlog);
-#endif
-
-    return socket == -1 ? WRD_SOCKET_ERROR : socket;
-}
-
-wrd_code wrd_fcgi_init_request(warudo *config) {
-    CHECK_CONFIG
-
-    int res = WRD_OK;
-
-#ifdef WRD_USE_LIBFCGI
-    res = FCGX_InitRequest(&config->request, config->socket, 0);
-
-    return res == 0 ? WRD_OK : WRD_INIT_REQUEST_ERROR;
-#endif
-
-    return res;
-}
-
 wrd_code wrd_fcgi_accept(warudo *config) {
     CHECK_CONFIG
 

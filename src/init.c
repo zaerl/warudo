@@ -10,49 +10,47 @@
 #include "db.h"
 #include "fcgi.h"
 #include "log.h"
+#include "net.h"
+
+// TODO: remove
+#include "http.h"
+
+// TODO: remove
+#include <unistd.h>
 
 wrd_code wrd_init(const char *filename, warudo **config) {
-    if(!config) {
-        return WRD_ERROR;
-    }
+    CHECK_CONFIG
 
     warudo *pdb;
+    char *env;
     int res;
 
     pdb = malloc(sizeof(warudo));
     pdb->columns_count = 0;
     pdb->requests_count = 0;
+
+    pdb->net_buffer.buffer = NULL;
+    pdb->net_headers_buffer.buffer = NULL;
+
 #ifdef WRD_TIMING
     pdb->timing_count = 0;
     pdb->timing_end_count = 0;
 #endif
 
+    int backlog = WRD_LISTEN_BACKLOG;
+    env = getenv("WARUDO_LISTEN_BACKLOG");
+
+    if(env != NULL) {
+        backlog = atoi(env);
+    }
+
     // Load FCGI
-    res = wrd_fcgi_init();
+    res = wrd_net_init(pdb, backlog);
 
     if(res != WRD_OK) {
         wrd_close(pdb);
 
         return res;
-    }
-
-    // Create a socket to listen for connections
-    int socket = wrd_fcgi_open_socket(WRD_SOCKET_PATH, 1024);
-
-    if(socket == WRD_SOCKET_ERROR) {
-        wrd_close(pdb);
-
-        return WRD_SOCKET_ERROR;
-    }
-
-    pdb->socket = socket;
-
-    res = wrd_fcgi_init_request(pdb);
-
-    if(res != WRD_OK) {
-        wrd_close(pdb);
-
-        return WRD_INIT_REQUEST_ERROR;
     }
 
     pdb->page = -1;
@@ -74,17 +72,16 @@ wrd_code wrd_init(const char *filename, warudo **config) {
     pdb->access_origin = WRD_DEFAULT_CORS;
     pdb->log_level = WRD_DEFAULT_LOG_LEVEL;
 
-    char *env = getenv("WARUDO_LOG_LEVEL");
+    env = getenv("WARUDO_LOG_LEVEL");
 
     if(env != NULL) {
         int log_level = atoi(env);
         pdb->log_level = log_level;
-        wrd_log_info(pdb, "Log level %u\n", log_level);
     }
 
     wrd_log_info(pdb, "Starting warudo %s\n", WRD_VERSION);
 
-    if(env != NULL) {
+    if(env != NULL) { // TODO: check?
         wrd_log_info(pdb, "Log level: %u\n", pdb->log_level);
     }
 
@@ -95,6 +92,24 @@ wrd_code wrd_init(const char *filename, warudo **config) {
         pdb->access_origin = env;
     }
 
+    // HTTP headers memory.
+    pdb->net_headers_buffer.buffer = calloc(1, pdb->net_headers_buffer.size);
+    pdb->net_headers_buffer.size = WRD_NET_HEADERS_BUFFER_SIZE;
+
+    env = getenv("WRD_NET_BUFFER_SIZE");
+
+    if(env != NULL) {
+        pdb->net_buffer.size = atoi(env);
+    } else {
+        pdb->net_buffer.size = WRD_NET_BUFFER_SIZE;
+    }
+
+    // HTTP content memory.
+    pdb->net_buffer.size *= 1048576;
+    pdb->net_buffer.buffer = calloc(1, pdb->net_buffer.size);
+
+    wrd_log_info(pdb, "Net buffer size: %u bytes\n", pdb->net_buffer.size);
+    wrd_log_info(pdb, "Net headers size: %u bytes\n", pdb->net_headers_buffer.size);
     wrd_log_info(pdb, "Loading DB: \"%s\"\n", filename);
 
     // Load database
@@ -169,7 +184,7 @@ wrd_code wrd_accept_connection(warudo *config) {
     // WRD_FREE_QUERY_STRING_VALUES(keys)
     // WRD_FREE_QUERY_STRING_VALUES(values)
 
-    wrd_code accepted = wrd_fcgi_accept(config);
+    wrd_code accepted = wrd_net_accept(config);
 
     if(accepted != WRD_OK) {
         return accepted;
@@ -179,6 +194,24 @@ wrd_code wrd_accept_connection(warudo *config) {
     wrd_start_time(config);
 #endif
 
+    wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
+
+    // TODO: arrived here
+    //char buffer[1024] = {0};
+
+    wrd_http_ok(config);
+    wrd_http_printf(config, "Hello %s\n", "World!");
+    // wrd_net_printf(config, "HTTP/1.1 200 OK\nContent-Type: text/plain\nContent-Length: 12\n\nHello World\n");
+
+    // Read the HTTP request
+    /*read(config->client_fd, buffer, 1024);
+    puts(buffer);
+
+    // Send a response
+    send(config->client_fd, response, strlen(response), 0);
+    puts("<<-Response sent\n");*/
+
+    /*
     const char *script_name = wrd_fcgi_get_param("SCRIPT_NAME", config);
     const char *query_string = wrd_fcgi_get_param("QUERY_STRING", config);
     const char *request_method = wrd_fcgi_get_param("REQUEST_METHOD", config);
@@ -210,7 +243,7 @@ wrd_code wrd_accept_connection(warudo *config) {
     }
 
     config->script_name = script_name;
-    config->query_string = query_string;
+    config->query_string = query_string;*/
 
     return WRD_OK;
 }
@@ -218,7 +251,8 @@ wrd_code wrd_accept_connection(warudo *config) {
 wrd_code wrd_after_connection(warudo *config) {
     CHECK_CONFIG
 
-    wrd_fcgi_finish_request(config);
+    wrd_http_flush(config);
+    wrd_net_finish_request(config);
 
 #ifdef WRD_TIMING
     wrd_end_time(config, 1000, "after finish request");
@@ -260,8 +294,16 @@ wrd_code wrd_end_time(warudo *config, double ms, const char *message) {
 wrd_code wrd_close(warudo *config) {
     CHECK_CONFIG
 
-    wrd_fcgi_free_request(config);
+    wrd_net_close(config);
     wrd_db_close(config);
+
+    if(config->net_buffer.buffer != NULL) {
+        free(config->net_buffer.buffer);
+    }
+
+    if(config->net_headers_buffer.buffer != NULL) {
+        free(config->net_headers_buffer.buffer);
+    }
 
     free(config);
 

@@ -7,7 +7,7 @@
 #include "db.h"
 #include "http.h"
 #include "log.h"
-#include "net.h"
+#include "output.h"
 
 #ifdef _WIN32
 #include <process.h>
@@ -30,13 +30,18 @@ int main(void) {
         return ret;
     }
 
+    while(wrd_accept_connection(config) == WRD_OK) {
+        wrd_after_connection(config);
+    }
+
+    /*
     while(wrd_accept_connection(config) >= 0) {
         /*char **envp = config->request.envp;
 
         while(*envp) {
             wrd_log_debug(config, "%s\n", *envp);
             ++envp;
-        }*/
+        }*
         if(config->page == WRD_PAGE_APP) {
             ret = wrd_page_app(WRD_ENTRY_TYPE_DATA, config);
         } else if(config->page == WRD_PAGE_APP_KEYS) {
@@ -46,7 +51,7 @@ int main(void) {
         } else if(config->page == WRD_PAGE_ROOT) {
             ret = wrd_page_home(config);
         } else {
-            ret = wrd_not_found(config);
+            ret = wrd_http_not_found(config);
         }
 
         wrd_after_connection(config);
@@ -57,8 +62,8 @@ int main(void) {
             wrd_log_error(config, "Failed to accept request %llu. Code %s\n",
                 config->requests_count, wrd_error_description(ret, 0));
         }
-    }
-
+    }*/
+    wrd_log_info(config, "Bye %s!\n", WRD_VERSION);
     wrd_close(config);
 
     return WRD_OK;
