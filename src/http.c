@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include "http.h"
-#include "fcgi.h"
 #include "log.h"
 #include "net.h"
 
@@ -96,7 +95,7 @@ wrd_code wrd_http_bad_request(warudo *config, const char *description) {
     WRD_CHECK_CONNECTION(config)
 
     wrd_http_header(config, "400 Bad Request", "application/json");
-    wrd_fcgi_printf(config, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
+    wrd_http_printf(config, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
 
     return WRD_HTTP_BAD_REQUEST;
 }

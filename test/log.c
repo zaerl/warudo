@@ -1,11 +1,10 @@
 #include "../src/log.h"
-#include "../src/warudo.h"
 #include "test.h"
 
 void *test_log(void *arg) {
+    /*
     MOCK_CONFIG
-
-    /*ASSERT_CODE("NULL", WRD_OK, wrd_log, NULL, 0, "")
+    ASSERT_CODE("NULL", WRD_OK, wrd_log, NULL, 0, "")
     ASSERT_CODE("NULL format", WRD_ERROR, wrd_log, &config, 0, NULL)
     ASSERT_CODE("no log", WRD_OK, wrd_log, &config, 0, "")
 

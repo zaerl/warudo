@@ -214,9 +214,6 @@ typedef struct {
 // Init the system
 wrd_code wrd_init(const char *filename, warudo **config);
 
-// Parse the query string
-wrd_code wrd_parse_query_string(char *query_string, warudo *config);
-
 // Accept a FCGI connection
 wrd_code wrd_accept_connection(warudo *config);
 

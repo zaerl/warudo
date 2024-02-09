@@ -1,4 +1,3 @@
-#include "../src/fcgi.h"
 #include "test.h"
 
 void *test_net(void *arg) {
