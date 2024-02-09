@@ -29,9 +29,10 @@ DECLARE_TEST(warudo)
 int main(int argc, const char *argv[]) {
     struct timespec start, end;
     double elapsed;
+    unsigned int verbosity = 2;
 
     clock_gettime(CLOCK_MONOTONIC, &start);
-    att_set_verbose(2);
+    att_set_verbose(verbosity);
 
     #define RUN_TEST(NAME) \
         pthread_t thread_##NAME; \
@@ -58,7 +59,7 @@ int main(int argc, const char *argv[]) {
     /* Green if valid and red if not */
     const char *color_code = valid ? "\x1B[32m" : "\x1B[31m";
 
-    printf("Tests valid/run: %s%d/%d\n\x1B[0m", color_code, tests_valid, tests_total);
+    printf("%sTests valid/run: %s%d/%d\n\x1B[0m", verbosity == 1 ? "\n" : "", color_code, tests_valid, tests_total);
 
     clock_gettime(CLOCK_MONOTONIC, &end);
     elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;

@@ -3,20 +3,6 @@
 
 #include "fcgi.h"
 
-wrd_code wrd_fcgi_accept(warudo *config) {
-    CHECK_CONFIG
-
-    int accepted = WRD_OK;
-
-#ifdef WRD_USE_LIBFCGI
-    if(FCGX_Accept_r(&config->request) < 0) {
-        accepted = WRD_ACCEPT_ERROR;
-    }
-#endif
-
-    return accepted;
-}
-
 wrd_code wrd_fcgi_finish_request(warudo *config) {
     CHECK_CONFIG
 
@@ -41,7 +27,7 @@ wrd_code wrd_fcgi_free_request(warudo *config) {
     return res;
 }
 
-char *wrd_fcgi_get_param(const char *name, warudo *config) {
+char *wrd_fcgi_get_param(warudo *config, const char *name) {
     if(!config) {
         return NULL;
     }
@@ -53,7 +39,7 @@ char *wrd_fcgi_get_param(const char *name, warudo *config) {
     return NULL;
 }
 
-wrd_code wrd_fcgi_getstr(char *str, int length, warudo *config) {
+wrd_code wrd_fcgi_getstr(warudo *config, char *str, int length) {
     CHECK_CONFIG
 
 #ifdef WRD_USE_LIBFCGI
@@ -63,7 +49,7 @@ wrd_code wrd_fcgi_getstr(char *str, int length, warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_fcgi_puts(const char *str, warudo *config) {
+wrd_code wrd_fcgi_puts(warudo *config, const char *str) {
     CHECK_CONFIG
 
 #ifdef WRD_USE_LIBFCGI

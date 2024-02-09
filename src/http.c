@@ -114,7 +114,7 @@ wrd_code wrd_http_buffer_printf(warudo *config, wrd_buffer *buffer, const char *
     WRD_CHECK_CONNECTION(config)
 
     char *str_buffer = buffer->buffer + buffer->position;
-    size_t buffer_size = buffer->size - buffer->position;
+    size_t buffer_size = buffer->size - buffer->position - 1;
 
     va_list args;
 
@@ -131,10 +131,10 @@ wrd_code wrd_http_puts(warudo *config, const char *str) {
     WRD_CHECK_CONNECTION(config)
 
     char *str_buffer = config->net_buffer.buffer + config->net_buffer.position;
-    size_t buffer_size = config->net_buffer.size - config->net_buffer.position;
+    size_t buffer_size = config->net_buffer.size - config->net_buffer.position - 1;
     size_t str_length = strlen(str);
 
-    strncpy(str_buffer, str, str_length);
+    memcpy(str_buffer, str, str_length < buffer_size ? str_length : buffer_size);
     config->net_buffer.position += str_length;
 
     return WRD_OK;
@@ -144,7 +144,7 @@ wrd_code wrd_http_printf(warudo *config, const char *format, ...) {
     WRD_CHECK_CONNECTION(config)
 
     char *str_buffer = config->net_buffer.buffer + config->net_buffer.position;
-    size_t buffer_size = config->net_buffer.size - config->net_buffer.position;
+    size_t buffer_size = config->net_buffer.size - config->net_buffer.position - 1;
 
     va_list args;
 

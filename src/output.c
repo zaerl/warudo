@@ -183,7 +183,7 @@ wrd_code wrd_environ(warudo *config) {
 }
 
 long wrd_content_length(warudo *config) {
-    char *length = wrd_fcgi_get_param("CONTENT_LENGTH", config);
+    char *length = wrd_fcgi_get_param(config, "CONTENT_LENGTH");
     long int len = 0;
 
     if(length != NULL) {
@@ -203,7 +203,7 @@ char *wrd_read_content(long int length, warudo *config) {
 
     char *data = malloc(len);
 
-    wrd_fcgi_getstr(data, len, config);
+    wrd_fcgi_getstr(config, data, len);
 
     return data;
 }

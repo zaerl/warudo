@@ -20,7 +20,7 @@ wrd_code wrd_page_app(int entry_type, warudo *config) {
         }
     }
 
-    return wrd_http_not_allowed("GET, POST", config);
+    return wrd_http_not_allowed(config, "GET, POST");
 }
 
 wrd_code wrd_page_app_keys(warudo *config) {
@@ -30,5 +30,5 @@ wrd_code wrd_page_app_keys(warudo *config) {
         return wrd_get_keys(config);
     }
 
-    return wrd_http_not_allowed("GET", config);
+    return wrd_http_not_allowed(config, "GET");
 }
