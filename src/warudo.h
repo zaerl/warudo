@@ -14,6 +14,7 @@ extern "C" {
 #endif
 
 // Version
+#define WRD_NAME "Warudo"
 #define WRD_VERSION "0.1.0"
 
 // Configurations

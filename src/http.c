@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "http.h"
 #include "log.h"
@@ -16,6 +17,7 @@
         return WRD_ERROR; \
     }
 
+wrd_code wrd_http_buffer_puts(warudo *config, wrd_buffer *buffer, const char *str);
 wrd_code wrd_http_buffer_printf(warudo *config, wrd_buffer *buffer, const char *format, ...);
 
 wrd_code wrd_http_status(warudo *config, const char *status) {
@@ -26,8 +28,26 @@ wrd_code wrd_http_status(warudo *config, const char *status) {
     return WRD_OK;
 }
 
-wrd_code wrd_http_content_type(warudo *config, const char *content_type) {
+wrd_code wrd_http_additional(warudo *config) {
     WRD_CHECK_CONNECTION(config)
+
+    char date_string[50];
+    time_t current_time;
+    struct tm *timeinfo;
+
+    time(&current_time);
+    timeinfo = gmtime(&current_time); // UTC time
+
+    strftime(date_string, sizeof(date_string), "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", timeinfo);
+    wrd_http_buffer_puts(config, &config->net_headers_buffer, "Cache-Control: no-cache\r\n");
+    wrd_http_buffer_puts(config, &config->net_headers_buffer, date_string);
+    wrd_http_buffer_printf(config, &config->net_headers_buffer, "Server: %s %s\r\n", WRD_NAME, WRD_VERSION);
+
+    return WRD_OK;
+}
+
+wrd_code wrd_http_content_type(warudo *config, const char *content_type) {
+     WRD_CHECK_CONNECTION(config)
 
     if(config->access_origin != NULL) {
         wrd_http_buffer_printf(config, &config->net_headers_buffer, "Access-Control-Allow-Origin: %s\r\n",
@@ -44,6 +64,7 @@ wrd_code wrd_http_header(warudo *config, const char *status, const char *content
 
     wrd_http_status(config, status);
     wrd_http_content_type(config, content_type);
+    wrd_http_additional(config);
 
     return WRD_OK;
 }
@@ -107,6 +128,19 @@ wrd_code wrd_http_not_found(warudo *config) {
     wrd_http_puts(config, "Unknown.");
 
     return WRD_HTTP_NOT_FOUND;
+}
+
+wrd_code wrd_http_buffer_puts(warudo *config, wrd_buffer *buffer, const char *str) {
+    WRD_CHECK_CONNECTION(config)
+
+    char *str_buffer = buffer->buffer + buffer->position;
+    size_t buffer_size = buffer->size - buffer->position - 1;
+    size_t str_length = strlen(str);
+
+    memcpy(str_buffer, str, str_length < buffer_size ? str_length : buffer_size);
+    buffer->position += str_length;
+
+    return WRD_OK;
 }
 
 wrd_code wrd_http_buffer_printf(warudo *config, wrd_buffer *buffer, const char *format, ...) {

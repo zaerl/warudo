@@ -108,6 +108,8 @@ wrd_code wrd_accept_connection(warudo *config) {
     wrd_code accepted = wrd_net_accept(config);
 
     if(accepted != WRD_OK) {
+        wrd_log_error(config, "Request not accepted %llu\n", config->requests_count);
+
         return accepted;
     }
 
