@@ -2,15 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef WRD_TIMING
-#include <time.h>
-#endif
-
 #include "warudo.h"
 #include "db.h"
 #include "fcgi.h"
 #include "log.h"
 #include "net.h"
+#include "time.h"
 
 // TODO: remove
 #include "http.h"
@@ -166,6 +163,16 @@ wrd_code wrd_parse_query_string(char *query_string, warudo *config) {
 wrd_code wrd_accept_connection(warudo *config) {
     CHECK_CONFIG
 
+    wrd_code accepted = wrd_net_accept(config);
+
+    if(accepted != WRD_OK) {
+        return accepted;
+    }
+
+#ifdef WRD_TIMING
+    wrd_start_time(config);
+#endif
+
     config->page = -1;
     config->request_method = WRD_REQUEST_UNKNOWN;
     config->script_name = NULL;
@@ -183,16 +190,6 @@ wrd_code wrd_accept_connection(warudo *config) {
     WRD_FREE_QUERY_STRING_VALUE(sort)
     // WRD_FREE_QUERY_STRING_VALUES(keys)
     // WRD_FREE_QUERY_STRING_VALUES(values)
-
-    wrd_code accepted = wrd_net_accept(config);
-
-    if(accepted != WRD_OK) {
-        return accepted;
-    }
-
-#ifdef WRD_TIMING
-    wrd_start_time(config);
-#endif
 
     wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
 
@@ -255,41 +252,11 @@ wrd_code wrd_after_connection(warudo *config) {
     wrd_net_finish_request(config);
 
 #ifdef WRD_TIMING
-    wrd_end_time(config, 1000, "after finish request");
+    wrd_end_time(config, "after finish request");
 #endif
 
     return WRD_OK;
 }
-
-#ifdef WRD_TIMING
-wrd_code wrd_start_time(warudo *config) {
-    CHECK_CONFIG
-
-    ++config->timing_count;
-    config->timing_end_count = 0;
-    clock_gettime(CLOCK_MONOTONIC, &config->start);
-
-    return WRD_OK;
-}
-
-wrd_code wrd_end_time(warudo *config, double ms, const char *message) {
-    CHECK_CONFIG
-
-    struct timespec end;
-    clock_gettime(CLOCK_MONOTONIC, &end);
-
-    ++config->timing_end_count;
-    double time_taken = (end.tv_sec - config->start.tv_sec) * 1000.0;
-    time_taken += (end.tv_nsec - config->start.tv_nsec) / 1000000.0;
-
-    if(ms && time_taken > ms) {
-        wrd_log_info(config, "%llu: %llu time %.0lf ms %s\n", config->timing_count,
-            config->timing_end_count, time_taken, message ? message : "");
-    }
-
-    return WRD_OK;
-}
-#endif
 
 wrd_code wrd_close(warudo *config) {
     CHECK_CONFIG

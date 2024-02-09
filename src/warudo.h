@@ -232,13 +232,6 @@ wrd_code wrd_page_app(int entry_type, warudo *config);
 // Keys JSON endpoint
 wrd_code wrd_page_app_keys(warudo *config);
 
-// Timing functions
-#ifdef WRD_TIMING
-wrd_code wrd_start_time(warudo *config);
-
-wrd_code wrd_end_time(warudo *config, double ms, const char *message);
-#endif
-
 // Close the system
 wrd_code wrd_close(warudo *config);
 
