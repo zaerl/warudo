@@ -58,14 +58,7 @@ wrd_code wrd_init(const char *filename, warudo **config) {
     pdb->query_string = NULL;
 
     // Query string
-    pdb->query_id = 0;
-    pdb->query_offset = 0;
-    pdb->query_multi = 0;
-    pdb->query_limit = 0;
-    pdb->query_key = NULL;
-    pdb->query_value = NULL;
-    pdb->query_orderby = NULL;
-    pdb->query_sort = NULL;
+    wrd_parse_query_string(pdb, NULL);
 
     // Environment variables
     pdb->access_origin = wrd_get_env_string("WARUDO_CORS", WRD_DEFAULT_CORS);
@@ -123,65 +116,12 @@ wrd_code wrd_accept_connection(warudo *config) {
     config->query_string = NULL;
     ++config->requests_count;
 
-    // Query string
-    WRD_FREE_QUERY_ULLINT_VALUE(id, 0)
-    WRD_FREE_QUERY_INT_VALUE(limit, WRD_DEFAULT_QUERY_LIMIT)
-    WRD_FREE_QUERY_ULLINT_VALUE(offset, 0)
-    WRD_FREE_QUERY_ULLINT_VALUE(multi, WRD_DEFAULT_QUERY_MULTI)
-    WRD_FREE_QUERY_STRING_VALUE(key)
-    WRD_FREE_QUERY_STRING_VALUE(value)
-    WRD_FREE_QUERY_STRING_VALUE(orderby)
-    WRD_FREE_QUERY_STRING_VALUE(sort)
-    // WRD_FREE_QUERY_STRING_VALUES(keys)
-    // WRD_FREE_QUERY_STRING_VALUES(values)
-
+    wrd_parse_query_string(config, NULL);
     wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
 
     wrd_http_ok(config);
     wrd_http_printf(config, "Hello %s", "World!");
     wrd_http_puts(config, "Hello World");
-
-    // Read the HTTP request
-    /*read(config->client_fd, buffer, 1024);
-    puts(buffer);
-
-    // Send a response
-    send(config->client_fd, response, strlen(response), 0);
-    puts("<<-Response sent\n");*/
-
-    /*
-    const char *script_name = wrd_fcgi_get_param("SCRIPT_NAME", config);
-    const char *query_string = wrd_fcgi_get_param("QUERY_STRING", config);
-    const char *request_method = wrd_fcgi_get_param("REQUEST_METHOD", config);
-
-    if(script_name != NULL && strcmp(script_name, "/") == 0) {
-        config->page = WRD_PAGE_ROOT;
-    } else if(script_name != NULL && strcmp(script_name, "/app/entries") == 0) {
-        config->page = WRD_PAGE_APP;
-    } else if(script_name != NULL && strcmp(script_name, "/app/keys") == 0) {
-        config->page = WRD_PAGE_APP_KEYS;
-    } else if(script_name != NULL && strcmp(script_name, "/app/dashboards") == 0) {
-        config->page = WRD_PAGE_APP_VIEWS;
-    } else {
-        config->page = WRD_PAGE_NOT_FOUND;
-    }
-
-    if(request_method != NULL) {
-        if(strcmp(request_method, "GET") == 0) {
-            config->request_method = WRD_REQUEST_GET;
-        } else if(strcmp(request_method, "POST") == 0) {
-            config->request_method = WRD_REQUEST_POST;
-        } else {
-            config->request_method = WRD_REQUEST_UNKNOWN;
-        }
-    }
-
-    if(query_string != NULL) {
-        wrd_parse_query_string(config, (char*)query_string);
-    }
-
-    config->script_name = script_name;
-    config->query_string = query_string;*/
 
     return WRD_OK;
 }

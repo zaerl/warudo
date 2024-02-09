@@ -3,11 +3,29 @@
 wrd_code wrd_parse_query_string(warudo *config, char *query_string) {
     CHECK_CONFIG
 
+    config->query.id = 0;
+    config->query.offset = 0;
+    config->query.limit = 0;
+    config->query.multi = 0;
+    config->query.key = NULL;
+    config->query.value = NULL;
+    config->query.orderby = NULL;
+    config->query.sort = NULL;
+
+    config->valid_query.id = 0;
+    config->valid_query.offset = 0;
+    config->valid_query.limit = 0;
+    config->valid_query.multi = 0;
+    config->valid_query.key = NULL;
+    config->valid_query.value = NULL;
+    config->valid_query.orderby = NULL;
+    config->valid_query.sort = NULL;
+
     if(query_string == NULL) {
         return WRD_EMPTY_QUERY_STRING_ERROR;
     }
 
-    char *saveptr;
+    /*char *saveptr;
     char *parameter = strtok_r(query_string, "&", &saveptr);
 
     while(parameter != NULL) {
@@ -32,7 +50,7 @@ wrd_code wrd_parse_query_string(warudo *config, char *query_string) {
         }
 
         parameter = strtok_r(NULL, "&", &saveptr);
-    }
+    }*/
 
     return WRD_OK;
 }

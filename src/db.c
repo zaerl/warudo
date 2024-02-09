@@ -342,10 +342,10 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
     sqlite3_stmt *stmt;
     int count = 0;
     int limit_index = 0;
-    int has_search = !config->query_id && config->query_key != NULL && config->query_value != NULL;
+    int has_search = !config->query.id && config->query.key != NULL && config->query.value != NULL;
     const char *table_name = entry_type == WRD_ENTRY_TYPE_DATA ? "entries" : "dashboards";
-    const char *order_by = config->query_orderby ? config->query_orderby : "id";
-    const char *sort = config->query_sort ? config->query_sort : "ASC";
+    const char *order_by = config->query.orderby ? config->query.orderby : "id";
+    const char *sort = config->query.sort ? config->query.sort : "ASC";
 
     /*
      * Has search
@@ -360,7 +360,7 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
     if(has_search) {
         query = sqlite3_mprintf("SELECT id, created, modified, JSON(data) FROM %q WHERE CAST(data ->> ?1 AS TEXT) LIKE ?2 ORDER BY %q %q LIMIT ?3 OFFSET ?4;", table_name, order_by, sort);
         limit_index = 3;
-    } else if(config->query_id) {
+    } else if(config->query.id) {
         query = sqlite3_mprintf("SELECT id, created, modified, JSON(data) FROM %q WHERE id = ?1;", table_name);
     } else {
         query = sqlite3_mprintf("SELECT id, created, modified, JSON(data) FROM %q ORDER BY %q %q LIMIT ?1 OFFSET ?2;", table_name, order_by, sort);
@@ -370,21 +370,21 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
     WRD_DB_CALL(stmt, sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
     if(has_search) {
-        char *query_key = wrd_url_decode(config->query_key);
-        char *query_value = wrd_url_decode(config->query_value);
+        char *query_key = wrd_url_decode(config->query.key);
+        char *query_value = wrd_url_decode(config->query.value);
 
-        WRD_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, config->query_key, strlen(config->query_key), SQLITE_STATIC));
-        WRD_DB_CALL(stmt, sqlite3_bind_text(stmt, 2, config->query_value, strlen(config->query_value), SQLITE_STATIC));
+        WRD_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, config->query.key, strlen(config->query.key), SQLITE_STATIC));
+        WRD_DB_CALL(stmt, sqlite3_bind_text(stmt, 2, config->query.value, strlen(config->query.value), SQLITE_STATIC));
 
         free(query_key);
         free(query_value);
-    } else if(config->query_id) {
-        WRD_DB_CALL(stmt, sqlite3_bind_int64(stmt, 1, config->query_id));
+    } else if(config->query.id) {
+        WRD_DB_CALL(stmt, sqlite3_bind_int64(stmt, 1, config->query.id));
     }
 
     if(limit_index) {
-        WRD_DB_CALL(stmt, sqlite3_bind_int(stmt, limit_index, config->query_limit));
-        WRD_DB_CALL(stmt, sqlite3_bind_int64(stmt, limit_index + 1, config->query_offset));
+        WRD_DB_CALL(stmt, sqlite3_bind_int(stmt, limit_index, config->query.limit));
+        WRD_DB_CALL(stmt, sqlite3_bind_int64(stmt, limit_index + 1, config->query.offset));
     }
 
     wrd_http_ok(config);

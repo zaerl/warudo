@@ -13,7 +13,7 @@ wrd_code wrd_page_app(int entry_type, warudo *config) {
     if(config->request_method == WRD_REQUEST_GET) {
         return wrd_get_entries(entry_type, config);
     } else if(config->request_method == WRD_REQUEST_POST) {
-        if(config->query_multi && entry_type == WRD_ENTRY_TYPE_DATA) {
+        if(config->query.multi && entry_type == WRD_ENTRY_TYPE_DATA) {
             return wrd_add_entries(entry_type, config);
         } else {
             return wrd_add_entry(entry_type, config);

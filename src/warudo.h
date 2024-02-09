@@ -30,6 +30,7 @@ extern "C" {
 #define WRD_LISTEN_BACKLOG 1024 // TODO: 1024?
 #define WRD_TIMING 1
 #define WRD_MAX_QUERY_KEYS 16
+
 // Default tables
 #define WRD_DASHBOARDS_TABLE "dashboards"
 #define WRD_ENTRIES_TABLE "entries"
@@ -146,6 +147,19 @@ struct wrd_buffer {
 
 typedef struct wrd_buffer wrd_buffer;
 
+struct wrd_query {
+    unsigned long long int id;
+    unsigned long long int offset;
+    unsigned int limit;
+    unsigned int multi;
+    const char *key;
+    const char *value;
+    const char *orderby;
+    const char *sort;
+};
+
+typedef struct wrd_query wrd_query;
+
 typedef struct {
     sqlite3 *db;
     sqlite3_stmt *insert_stmt;
@@ -183,16 +197,8 @@ typedef struct {
 #endif
 
     // Query string
-    WRD_QUERY_VALUE(unsigned long long int, id)
-    WRD_QUERY_VALUE(unsigned long long int, offset)
-    WRD_QUERY_VALUE(unsigned int, limit)
-    WRD_QUERY_VALUE(unsigned int, multi)
-    WRD_QUERY_VALUE(const char*, key)
-    WRD_QUERY_VALUE(const char*, value)
-    WRD_QUERY_VALUE(const char*, orderby)
-    WRD_QUERY_VALUE(const char*, sort)
-    // WRD_QUERY_VALUES(const char*, keys, WRD_MAX_QUERY_KEYS)
-    // WRD_QUERY_VALUES(const char*, values, WRD_MAX_QUERY_KEYS)
+    wrd_query query;
+    wrd_query valid_query;
 } warudo;
 
 // Init the system
