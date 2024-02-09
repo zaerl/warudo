@@ -27,6 +27,7 @@ extern "C" {
 #define WRD_SOCKET_PORT 6251
 #define WRD_NET_HEADERS_BUFFER_SIZE 4096 // In bytes
 #define WRD_NET_BUFFER_SIZE 1 // In MB
+#define WRD_NET_INPUT_BUFFER_SIZE 1 // In MB
 #define WRD_LISTEN_BACKLOG 1024 // TODO: 1024?
 #define WRD_TIMING 1
 #define WRD_MAX_QUERY_KEYS 16
@@ -181,6 +182,7 @@ typedef struct {
 
     wrd_buffer net_headers_buffer;
     wrd_buffer net_buffer;
+    wrd_buffer net_input_buffer;
 
     int socket; // REMOVE
     int page;

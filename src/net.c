@@ -1,6 +1,8 @@
 #include <unistd.h>
+#include <stdlib.h>
 #include <string.h>
 
+#include "env.h"
 #include "log.h"
 #include "net.h"
 
@@ -8,6 +10,31 @@
 
 wrd_code wrd_net_init(warudo *config, int backlog) {
     CHECK_CONFIG
+
+    config->net_headers_buffer.buffer = NULL;
+    config->net_buffer.buffer = NULL;
+    config->net_input_buffer.buffer = NULL;
+
+    config->net_headers_buffer.position = 0;
+    config->net_buffer.position = 0;
+    config->net_input_buffer.position = 0;
+
+    // HTTP headers memory.
+    config->net_headers_buffer.size = wrd_get_env_int("WRD_NET_HEADERS_BUFFER_SIZE", WRD_NET_HEADERS_BUFFER_SIZE);
+    config->net_buffer.size = wrd_get_env_int("WRD_NET_BUFFER_SIZE", WRD_NET_BUFFER_SIZE);
+    config->net_input_buffer.size = wrd_get_env_int("WRD_NET_INPUT_BUFFER_SIZE", WRD_NET_INPUT_BUFFER_SIZE);
+
+    // config->net_buffer.size
+    config->net_buffer.size *= 1048576;
+    config->net_input_buffer.size *= 1048576;
+
+    config->net_headers_buffer.buffer = calloc(1, config->net_headers_buffer.size);
+    config->net_buffer.buffer = calloc(1, config->net_buffer.size);
+    config->net_input_buffer.buffer = calloc(1, config->net_input_buffer.size);
+
+    memset(config->net_headers_buffer.buffer, 0, config->net_headers_buffer.size);
+    memset(config->net_buffer.buffer, 0, config->net_buffer.size);
+    memset(config->net_input_buffer.buffer, 0, config->net_input_buffer.size);
 
     int res = WRD_OK;
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -78,6 +105,15 @@ wrd_code wrd_net_finish_request(warudo *config) {
             return WRD_CLOSE_ERROR;
         }
     }
+
+    return WRD_OK;
+}
+
+wrd_code wrd_net_read(warudo *config) {
+    CHECK_CONFIG
+
+    ssize_t res = read(config->client_fd, config->net_input_buffer.buffer, config->net_input_buffer.size);
+    config->net_input_buffer.position = res;
 
     return WRD_OK;
 }
