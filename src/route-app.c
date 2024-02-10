@@ -5,6 +5,7 @@
 #include "db.h"
 #include "http.h"
 #include "output.h"
+#include "server.h"
 #include "warudo.h"
 
 wrd_code wrd_page_app(int entry_type, warudo *config) {

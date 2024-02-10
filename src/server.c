@@ -1,14 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "warudo.h"
-
 #include "db.h"
 #include "env.h"
-#include "fcgi.h"
 #include "log.h"
 #include "net.h"
 #include "query.h"
+#include "server.h"
 #include "time.h"
 
 // TODO: remove

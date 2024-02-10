@@ -1,19 +1,12 @@
-#define NO_FCGI_DEFINES
-
 #include <stdio.h>
-#include "sqlite3/sqlite3.h"
 
 #include "code.h"
 #include "db.h"
 #include "http.h"
 #include "log.h"
 #include "output.h"
-
-#ifdef _WIN32
-#include <process.h>
-#else
-extern char **environ;
-#endif
+#include "server.h"
+#include "sqlite3/sqlite3.h"
 
 // /opt/homebrew/opt/nginx/bin/nginx -g "daemon off;"
 // /opt/homebrew/opt/lighttpd/bin/lighttpd -D -f /opt/homebrew/etc/lighttpd/lighttpd.conf

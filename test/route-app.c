@@ -1,3 +1,4 @@
+#include "../src/server.h"
 #include "test.h"
 
 void *test_route_app(void *arg) {

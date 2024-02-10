@@ -54,6 +54,10 @@ extern "C" {
 
 #include "sqlite3/sqlite3.h"
 
+// Tables
+#define WRD_ENTRY_TYPE_DATA 0
+#define WRD_ENTRY_TYPE_VIEW 1
+
 typedef enum {
     WRD_LOG_LEVEL_NO_LOG = 0,
     WRD_LOG_LEVEL_ERROR = 1,
@@ -107,29 +111,6 @@ typedef enum {
     // Unknown error codes
     WRD_UNKNOWN_ERROR = -24
 } wrd_code;
-
-// HTTP request methods
-#define WRD_REQUEST_UNKNOWN 0
-#define WRD_REQUEST_GET 1
-#define WRD_REQUEST_POST 2
-
-// Pages
-#define WRD_PAGE_NOT_FOUND 0
-#define WRD_PAGE_ROOT 1
-#define WRD_PAGE_APP 2
-#define WRD_PAGE_APP_KEYS 3
-#define WRD_PAGE_APP_VIEWS 4
-
-// Tables
-#define WRD_ENTRY_TYPE_DATA 0
-#define WRD_ENTRY_TYPE_VIEW 1
-
-// Query string
-#define WRD_DEFAULT_QUERY_LIMIT 10
-#define WRD_DEFAULT_QUERY_MULTI 0
-
-#define WRD_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
-// #define WRD_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
 
 #define CHECK_CONFIG if(!config) return WRD_ERROR;
 
@@ -202,27 +183,6 @@ typedef struct {
     wrd_query query;
     wrd_query valid_query;
 } warudo;
-
-// Init the system
-wrd_code wrd_init(const char *filename, warudo **config);
-
-// Accept a FCGI connection
-wrd_code wrd_accept_connection(warudo *config);
-
-// Run at the end of a connection
-wrd_code wrd_after_connection(warudo *config);
-
-// Homepage error page
-wrd_code wrd_page_home(warudo *config);
-
-// Root JSON endpoints
-wrd_code wrd_page_app(int entry_type, warudo *config);
-
-// Keys JSON endpoint
-wrd_code wrd_page_app_keys(warudo *config);
-
-// Close the system
-wrd_code wrd_close(warudo *config);
 
 #ifdef __cplusplus
 }
