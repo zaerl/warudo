@@ -36,6 +36,10 @@ wrd_code wrd_http_not_found(warudo *config);
 wrd_code wrd_http_puts(warudo *config, const char *str);
 wrd_code wrd_http_printf(warudo *config, const char *format, ...);
 
+// Get param
+wrd_code wrd_http_get(warudo *config, char *str, int length);
+const char *wrd_http_get_param(warudo *config, char *name);
+
 // Write headers and content to the network
 wrd_code wrd_http_flush(warudo *config);
 

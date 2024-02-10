@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include "db.h"
-#include "fcgi.h"
 #include "http.h"
 #include "log.h"
 #include "output.h"
@@ -312,7 +311,7 @@ wrd_code wrd_add_entries(int entry_type, warudo *config) {
     }
 
     char *input = wrd_read_content(length, config);
-    const char *boundary = wrd_get_formdata_boundary(wrd_fcgi_get_param(config, "CONTENT_TYPE"));
+    const char *boundary = wrd_get_formdata_boundary(wrd_http_get_param(config, "CONTENT_TYPE"));
 
     count = wrd_parse_formdata(input, length, boundary, &wrd_formdata_callback, config);
 
@@ -320,7 +319,7 @@ wrd_code wrd_add_entries(int entry_type, warudo *config) {
         wrd_http_bad_request(config, "No entries created.");
     } else {
         // wrd_http_ok(config);
-        // wrd_fcgi_puts(input, config);
+        // wrd_http_puts(input, config);
         wrd_http_multi_created(config, count);
     }
 
@@ -401,7 +400,7 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
             wrd_http_puts(config, ",");
         }
 
-        wrd_fcgi_printf(config, "{\"id\":%lld,\"created\":%lld,\"modified\":%lld,\"data\":%s}",
+        wrd_http_printf(config, "{\"id\":%lld,\"created\":%lld,\"modified\":%lld,\"data\":%s}",
             id, created, modified, data ? data : "{}");
         ++count;
     }
@@ -445,7 +444,7 @@ wrd_code wrd_get_keys(warudo *config) {
             wrd_http_puts(config, ",");
         }
 
-        wrd_fcgi_printf(config, "{\"name\":\"%s\",\"value\":%lld}", key_name, key_count);
+        wrd_http_printf(config, "{\"name\":\"%s\",\"value\":%lld}", key_name, key_count);
         ++count;
     }
 

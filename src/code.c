@@ -33,8 +33,6 @@ const char *wrd_error_description(wrd_code code, int extended) {
             return extended ? "Empty content" : "EMPTY_CONTENT_ERROR";
         case WRD_EMPTY_QUERY_STRING_ERROR:
             return extended ? "Empty query string" : "EMPTY_QUERY_STRING_ERROR";
-        case WRD_FCGI_INIT_ERROR:
-            return extended ? "Error while initializing FastCGI" : "FCGI_INIT_ERROR";
         case WRD_INIT_REQUEST_ERROR:
             return extended ? "Error while initializing the request" : "INIT_REQUEST_ERROR";
         case WRD_READ_ERROR:

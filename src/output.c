@@ -4,10 +4,8 @@
 #include <ctype.h>
 #include <unistd.h>
 
-extern char **environ;
-
+#include "http.h"
 #include "output.h"
-#include "fcgi.h"
 
 // Function to escape special characters in a string for HTML
 char *wrd_escape_html(const char *input) {
@@ -159,24 +157,8 @@ const char *wrd_get_formdata_boundary(const char *content_type) {
     return boundary;
 }
 
-unsigned long wrd_process_id(void) {
-#ifdef _WIN32
-    return (unsigned long)GetCurrentProcessId();
-#elif __linux__ || __APPLE__
-    return (unsigned long)getpid();
-#endif
-}
-
-wrd_code wrd_environ(warudo *config) {
-    wrd_fcgi_printf(config, "<!--db: %s-->\n", WRD_DB_FILE);
-    wrd_fcgi_printf(config, "<!--config: %s-->\n", WRD_CONFIG_FILE);
-    wrd_fcgi_printf(config, "<!--pid: %lu-->\n", wrd_process_id());
-
-    return WRD_OK;
-}
-
 long wrd_content_length(warudo *config) {
-    char *length = wrd_fcgi_get_param(config, "CONTENT_LENGTH");
+    const char *length = wrd_http_get_param(config, "CONTENT_LENGTH");
     long int len = 0;
 
     if(length != NULL) {
@@ -196,7 +178,7 @@ char *wrd_read_content(long int length, warudo *config) {
 
     char *data = malloc(len);
 
-    wrd_fcgi_getstr(config, data, len);
+    wrd_http_get(config, data, len);
 
     return data;
 }

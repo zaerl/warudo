@@ -9,10 +9,6 @@ extern "C" {
 #error "Windows is not supported"
 #endif
 
-#ifndef WRD_USE_LIBFCGI
-#define WRD_USE_LIBFCGI 1
-#endif
-
 // Version
 #define WRD_NAME "Warudo"
 #define WRD_VERSION "0.1.0"
@@ -41,10 +37,6 @@ extern "C" {
 #define WRD_AUTH_DEFAULT_USER "admin"
 #define WRD_AUTH_DEFAULT_PASS "admin"
 #define WRD_AUTH_DEFAULT_ROLE "admin"
-
-#ifdef WRD_USE_LIBFCGI
-#include <fcgiapp.h>
-#endif
 
 #ifdef WRD_TIMING
 #include <time.h>
@@ -88,28 +80,27 @@ typedef enum {
     WRD_DB_OPEN_ERROR = -6,
     WRD_EMPTY_CONTENT_ERROR = -7,
     WRD_EMPTY_QUERY_STRING_ERROR = -8,
-    WRD_FCGI_INIT_ERROR = -9,
-    WRD_INIT_REQUEST_ERROR = -10,
-    WRD_READ_ERROR = -11,
+    WRD_INIT_REQUEST_ERROR = -9,
+    WRD_READ_ERROR = -10,
 
     // Parser error codes
-    WRD_PARSER_EMPTY = -12,
-    WRD_PARSER_EMPTY_BOUNDARY = -13,
-    WRD_PARSER_VOID = -14,
-    WRD_PARSER_NO_BOUNDARY = -15,
-    WRD_PARSER_MISSING_END = -16,
-    WRD_PARSER_MISSING_CONTENT = -17,
-    WRD_PARSER_MISSING_BODY = -18,
+    WRD_PARSER_EMPTY = -11,
+    WRD_PARSER_EMPTY_BOUNDARY = -12,
+    WRD_PARSER_VOID = -13,
+    WRD_PARSER_NO_BOUNDARY = -14,
+    WRD_PARSER_MISSING_END = -15,
+    WRD_PARSER_MISSING_CONTENT = -16,
+    WRD_PARSER_MISSING_BODY = -17,
 
     // Network error codes
-    WRD_SOCKET_ERROR = -19,
-    WRD_BIND_ERROR = -20,
-    WRD_LISTEN_ERROR = -21,
-    WRD_ACCEPT_ERROR = -22,
-    WRD_CLOSE_ERROR = -23,
+    WRD_SOCKET_ERROR = -18,
+    WRD_BIND_ERROR = -19,
+    WRD_LISTEN_ERROR = -20,
+    WRD_ACCEPT_ERROR = -21,
+    WRD_CLOSE_ERROR = -22,
 
     // Unknown error codes
-    WRD_UNKNOWN_ERROR = -24
+    WRD_UNKNOWN_ERROR = -23
 } wrd_code;
 
 #define CHECK_CONFIG if(!config) return WRD_ERROR;
@@ -153,9 +144,6 @@ typedef struct {
     const char *access_origin;
     wrd_log_level log_level;
 
-#ifdef WRD_USE_LIBFCGI
-    FCGX_Request request; // REMOVE
-#endif
     // Network
     int server_fd;
     int client_fd;

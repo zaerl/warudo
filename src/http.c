@@ -10,7 +10,6 @@
     if(request.in == NULL || \
         request.out == NULL || \
         request.err == NULL) { \
-        return WRD_FCGI_INIT_ERROR; \
     }*/
 #define WRD_CHECK_CONNECTION(config) \
     if(config->client_fd <= 0) { \
@@ -188,6 +187,16 @@ wrd_code wrd_http_printf(warudo *config, const char *format, ...) {
     config->net_buffer.position += written;
 
     return WRD_OK;
+}
+
+wrd_code wrd_http_get(warudo *config, char *str, int length) {
+    // TODO: missing
+    return WRD_OK;
+}
+
+const char *wrd_http_get_param(warudo *config, char *name) {
+    // TODO: missing
+    return "";
 }
 
 wrd_code wrd_http_flush(warudo *config) {

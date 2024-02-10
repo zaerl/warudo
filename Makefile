@@ -11,9 +11,6 @@ TEST_CFLAGS_2 = -Wno-void-pointer-to-int-cast -Wno-incompatible-pointer-types-di
 TEST_CFLAGS_3 = -Wno-unused-parameter -Wno-gnu-zero-variadic-macro-arguments
 
 HCTREE_CFLAGS = -Wno-unused-parameter
-LDFLAGS = -L/opt/homebrew/opt/fastcgi/lib
-LDLIBS = -lfcgi
-FCGI_INCLUDE_PATH = /opt/homebrew/opt/fastcgi/include
 
 SRC_DIR = src
 TEST_SRC_DIR = test
@@ -87,18 +84,18 @@ $(BIN_DIR):
 
 # Compile all the source files into object files
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
-	$(CC) $(CFLAGS) -c -I$(FCGI_INCLUDE_PATH) $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 # Compile all the source files into object files
 $(TEST_BUILD_DIR)/%.o: $(TEST_SRC_DIR)/%.c
-	$(CC) $(CFLAGS) $(TEST_CFLAGS) $(TEST_CFLAGS_2) $(TEST_CFLAGS_3) -c -I$(FCGI_INCLUDE_PATH) $< -o $@
+	$(CC) $(CFLAGS) $(TEST_CFLAGS) $(TEST_CFLAGS_2) $(TEST_CFLAGS_3) -c $< -o $@
 
 # Link all the object files into the final executable
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 $(TEST_TARGET): $(OBJS) $(TEST_OBJS)
-	$(CC) $(CFLAGS) -L$(FCGI_INCLUDE_PATH) $(LDFLAGS) $(LDLIBS) $(filter-out build/main.o, $^) -o $@
+	$(CC) $(CFLAGS) $(filter-out build/main.o, $^) -o $@
 
 test: $(BIN_DIR) $(BUILD_DIR) $(BUILD_SUBDIRS) $(TEST_BUILD_DIR) $(TEST_TARGET)
 	$(TEST_TARGET)
