@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "code.h"
 #include "db.h"
 #include "env.h"
 #include "log.h"
@@ -18,58 +19,55 @@
 wrd_code wrd_init(const char *filename, warudo **config) {
     CHECK_CONFIG
 
-    warudo *pdb;
+    *config = malloc(sizeof(warudo));
     int res;
 
-    pdb = malloc(sizeof(warudo));
-    pdb->columns_count = 0;
-    pdb->requests_count = 0;
+    (*config)->columns_count = 0;
+    (*config)->requests_count = 0;
 
 #ifdef WRD_TIMING
-    pdb->timing_count = 0;
-    pdb->timing_end_count = 0;
+    (*config)->timing_count = 0;
+    (*config)->timing_end_count = 0;
 #endif
 
     // Load net
-    res = wrd_net_init(pdb, wrd_get_env_int("WARUDO_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
+    res = wrd_net_init(*config, wrd_get_env_int("WARUDO_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
 
     if(res != WRD_OK) {
-        wrd_close(pdb);
+        wrd_close(*config);
 
         return res;
     }
 
-    pdb->page = -1;
-    pdb->request_method = WRD_REQUEST_UNKNOWN;
-    pdb->script_name = NULL;
-    pdb->query_string = NULL;
+    (*config)->page = -1;
+    (*config)->request_method = WRD_REQUEST_UNKNOWN;
+    (*config)->script_name = NULL;
+    (*config)->query_string = NULL;
 
     // Query string
-    wrd_parse_query_string(pdb, NULL);
+    wrd_parse_query_string(*config, NULL);
 
     // Environment variables
-    pdb->access_origin = wrd_get_env_string("WARUDO_CORS", WRD_DEFAULT_CORS);
-    pdb->log_level = wrd_get_env_int("WARUDO_LOG_LEVEL", WRD_DEFAULT_LOG_LEVEL);
+    (*config)->access_origin = wrd_get_env_string("WARUDO_CORS", WRD_DEFAULT_CORS);
+    (*config)->log_level = wrd_get_env_int("WARUDO_LOG_LEVEL", WRD_DEFAULT_LOG_LEVEL);
 
-    wrd_log_info(pdb, "Starting warudo %s\n", WRD_VERSION);
-    wrd_log_info(pdb, "Access origin: %s\n", pdb->access_origin ? pdb->access_origin : "disabled");
-    wrd_log_info(pdb, "Log level: %u\n", pdb->log_level);
+    wrd_log_info(*config, "Starting warudo %s\n", WRD_VERSION);
+    wrd_log_info(*config, "Access origin: %s\n", (*config)->access_origin ? (*config)->access_origin : "disabled");
+    wrd_log_info(*config, "Log level: %u\n", (*config)->log_level);
 
-    wrd_log_info(pdb, "Net buffer size: %u bytes\n", pdb->net_buffer.size);
-    wrd_log_info(pdb, "Net input buffer size: %u bytes\n", pdb->net_buffer.size);
-    wrd_log_info(pdb, "Net headers size: %u bytes\n", pdb->net_headers_buffer.size);
-    wrd_log_info(pdb, "Loading DB: \"%s\"\n", filename);
+    wrd_log_info(*config, "Net buffer size: %u bytes\n", (*config)->net_buffer.size);
+    wrd_log_info(*config, "Net input buffer size: %u bytes\n", (*config)->net_buffer.size);
+    wrd_log_info(*config, "Net headers size: %u bytes\n", (*config)->net_headers_buffer.size);
+    wrd_log_info(*config, "Loading DB: \"%s\"\n", filename);
 
     // Load database
-    res = wrd_db_init(filename, pdb);
+    res = wrd_db_init(filename, *config);
 
     if(res != WRD_OK) {
-        wrd_close(pdb);
+        wrd_close(*config);
 
         return WRD_DB_INIT_ERROR;
     }
-
-    *config = pdb;
 
     return WRD_OK;
 }
@@ -80,7 +78,8 @@ wrd_code wrd_accept_connection(warudo *config) {
     wrd_code accepted = wrd_net_accept(config);
 
     if(accepted != WRD_OK) {
-        wrd_log_error(config, "Request not accepted %llu\n", config->requests_count);
+        wrd_log_error(config, "Failed to accept request %llu. Code %s\n",
+                config->requests_count, wrd_error_description(accepted, 0));
 
         return accepted;
     }
@@ -96,10 +95,10 @@ wrd_code wrd_accept_connection(warudo *config) {
     ++config->requests_count;
 
     wrd_net_read(config);
-    fputs("--------->", stdout);
+    // fputs("--------->", stdout);
     // fputs(config->net_input_buffer.buffer, stdout);
-    fputs("gatto", stdout);
-    fputs("<---------", stdout);
+    //fputs("gatto", stdout);
+    // fputs("<---------", stdout);
     wrd_parse_query_string(config, NULL);
     wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
 

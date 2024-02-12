@@ -52,8 +52,8 @@ extern "C" {
 
 typedef enum {
     WRD_LOG_LEVEL_NO_LOG = 0,
-    WRD_LOG_LEVEL_ERROR = 1,
-    WRD_LOG_LEVEL_INFO = 2,
+    WRD_LOG_LEVEL_INFO = 1,
+    WRD_LOG_LEVEL_ERROR = 2,
     WRD_LOG_LEVEL_DEBUG = 3
 } wrd_log_level;
 
@@ -105,22 +105,18 @@ typedef enum {
 
 #define CHECK_CONFIG if(!config) return WRD_ERROR;
 
-struct wrd_column {
+typedef struct wrd_column {
     char *name;
     char *type;
-};
+} wrd_column;
 
-typedef struct wrd_column wrd_column;
-
-struct wrd_buffer {
+typedef struct wrd_buffer {
     char *buffer;
     unsigned int size;
     unsigned int position;
-};
+} wrd_buffer;
 
-typedef struct wrd_buffer wrd_buffer;
-
-struct wrd_query {
+typedef struct wrd_query {
     unsigned long long int id;
     unsigned long long int offset;
     unsigned int limit;
@@ -129,16 +125,17 @@ struct wrd_query {
     const char *value;
     const char *orderby;
     const char *sort;
-};
+} wrd_query;
 
-typedef struct wrd_query wrd_query;
-
-typedef struct {
+typedef struct warudo {
     sqlite3 *db;
     sqlite3_stmt *insert_stmt;
     sqlite3_stmt *insert_dashboard_stmt;
     sqlite3_stmt *add_index_stmt;
     sqlite3_stmt *parse_json_stmt;
+
+    sqlite3 *query_db;
+    sqlite3_stmt *insert_query_stmt;
 
     // Environment variables
     const char *access_origin;
@@ -149,11 +146,11 @@ typedef struct {
     int client_fd;
     struct sockaddr_in address;
 
+    // Buffers
     wrd_buffer net_headers_buffer;
     wrd_buffer net_buffer;
     wrd_buffer net_input_buffer;
 
-    int socket; // REMOVE
     int page;
     int request_method;
     const char *script_name;

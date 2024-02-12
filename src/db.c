@@ -21,6 +21,7 @@
 #define WRD_DB_CALL(STMT, CALL) WRD_DB_RET_CALL(STMT, CALL, SQLITE_OK)
 
 // wrd_code wrd_load_columns(warudo *config);
+wrd_code wrd_query_db_init(warudo *config);
 
 wrd_code wrd_db_init(const char *filename, warudo *config) {
     CHECK_CONFIG
@@ -88,14 +89,47 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
         return WRD_DB_OPEN_ERROR;
     }
 
-    WRD_DB_CALL(config->insert_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_ENTRIES_TABLE "(data) VALUES(jsonb(?1));", -1, &config->insert_stmt, NULL));
-    WRD_DB_CALL(config->insert_dashboard_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_DASHBOARDS_TABLE "(data) VALUES(jsonb(?1));", -1, &config->insert_dashboard_stmt, NULL));
+    WRD_DB_CALL(config->insert_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_ENTRIES_TABLE "(data) VALUES(json(?1));", -1, &config->insert_stmt, NULL));
+    WRD_DB_CALL(config->insert_dashboard_stmt, sqlite3_prepare_v2(config->db, "INSERT INTO " WRD_DASHBOARDS_TABLE "(data) VALUES(json(?1));", -1, &config->insert_dashboard_stmt, NULL));
     WRD_DB_CALL(config->add_index_stmt, sqlite3_prepare_v2(config->db, "ALTER TABLE " WRD_ENTRIES_TABLE
-        " add column \"?1\" as (jsonb_extract(value, ?1));"
+        " add column \"?1\" as (json_extract(value, ?1));"
         "create index ?1 on " WRD_ENTRIES_TABLE "(?1);", -1, &config->add_index_stmt, NULL));
     WRD_DB_CALL(config->parse_json_stmt, sqlite3_prepare_v2(config->db, "SELECT * FROM json_each(?1) WHERE type='true';", -1, &config->parse_json_stmt, NULL));
 
     // return wrd_load_columns(config);
+    return wrd_query_db_init(config);
+}
+
+wrd_code wrd_query_db_init(warudo *config) {
+    CHECK_CONFIG
+
+    int rc = sqlite3_open(":memory:", &config->query_db);
+    char *error_msg = 0;
+
+    if(rc != SQLITE_OK) {
+        wrd_log_error(config, "Can't open query database: %s\n", sqlite3_errmsg(config->query_db));
+
+        return WRD_DB_OPEN_ERROR;
+    }
+
+    const char *sql = "CREATE TABLE http_query(name TEXT PRIMARY KEY, value TEXT)";
+
+    rc = sqlite3_exec(config->query_db, sql, 0, 0, &error_msg);
+
+    if(rc != SQLITE_OK) {
+        wrd_log_error(config, "SQL error: %s\n", error_msg);
+
+        return WRD_DB_OPEN_ERROR;
+    }
+
+    rc = sqlite3_prepare_v2(config->query_db, "INSERT INTO http_query(name, value) VALUES(?1, ?2);", -1, &config->insert_query_stmt, NULL);
+
+    if(rc != SQLITE_OK) {
+        wrd_log_error(config, "SQL error: %s\n", sqlite3_errmsg(config->query_db));
+
+        return WRD_DB_OPEN_ERROR;
+    }
+
     return WRD_OK;
 }
 

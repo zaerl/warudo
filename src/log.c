@@ -1,4 +1,6 @@
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #include <stdarg.h>
 
 #include "warudo.h"
@@ -18,6 +20,10 @@ wrd_code wrd_log(warudo *config, wrd_log_level level, const char *format, ...) {
     va_start(args, format);
     vfprintf(stdout, format, args);
     va_end(args);
+
+    if(log_level == WRD_LOG_LEVEL_DEBUG && errno != 0) {
+        strerror(errno);
+    }
 
     return WRD_OK;
 }
