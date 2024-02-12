@@ -5,7 +5,7 @@
 #include "db.h"
 #include "http.h"
 #include "log.h"
-#include "output.h"
+#include "query.h"
 #include "warudo.h"
 
 #define WRD_DB_RET_CALL(STMT, CALL, RET) \
@@ -112,7 +112,7 @@ wrd_code wrd_query_db_init(warudo *config) {
         return WRD_DB_OPEN_ERROR;
     }
 
-    const char *sql = "CREATE TABLE http_query(name TEXT PRIMARY KEY, value TEXT)";
+    const char *sql = "CREATE TABLE IF NOT EXISTS http_query(name TEXT PRIMARY KEY, value TEXT)";
 
     rc = sqlite3_exec(config->query_db, sql, 0, 0, &error_msg);
 

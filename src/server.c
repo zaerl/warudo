@@ -103,8 +103,7 @@ wrd_code wrd_accept_connection(warudo *config) {
     wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
 
     wrd_http_ok(config);
-    wrd_http_printf(config, "Hello %s", "World!");
-    wrd_http_puts(config, "Hello World");
+    wrd_http_puts(config, "{\"Hello\": \"World\"}");
 
     return WRD_OK;
 }

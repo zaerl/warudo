@@ -29,12 +29,12 @@ int main(void) {
 
     /*
     while(wrd_accept_connection(config) >= 0) {
-        /*char **envp = config->request.envp;
+        char **envp = config->request.envp;
 
         while(*envp) {
             wrd_log_debug(config, "%s\n", *envp);
             ++envp;
-        }*
+        }
         if(config->page == WRD_PAGE_APP) {
             ret = wrd_route_app(WRD_ENTRY_TYPE_DATA, config);
         } else if(config->page == WRD_PAGE_APP_KEYS) {
@@ -56,8 +56,6 @@ int main(void) {
                 config->requests_count, wrd_error_description(ret, 0));
         }
     }*/
-
-    /*
 
     // Query string
     /*WRD_FREE_QUERY_ULLINT_VALUE(id, 0)
