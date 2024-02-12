@@ -18,6 +18,7 @@ DECLARE_TEST(code)
 DECLARE_TEST(data)
 DECLARE_TEST(db)
 DECLARE_TEST(env)
+DECLARE_TEST(http)
 DECLARE_TEST(log)
 DECLARE_TEST(net)
 DECLARE_TEST(output)
@@ -26,7 +27,6 @@ DECLARE_TEST(route_app)
 DECLARE_TEST(route_home)
 DECLARE_TEST(server)
 DECLARE_TEST(time)
-DECLARE_TEST(warudo)
 
 int main(int argc, const char *argv[]) {
     struct timespec start, end;
@@ -46,6 +46,7 @@ int main(int argc, const char *argv[]) {
     RUN_TEST(data)
     RUN_TEST(db)
     RUN_TEST(env)
+    RUN_TEST(http)
     RUN_TEST(log)
     RUN_TEST(net)
     RUN_TEST(output)
@@ -54,7 +55,6 @@ int main(int argc, const char *argv[]) {
     RUN_TEST(route_home)
     RUN_TEST(server)
     RUN_TEST(time)
-    RUN_TEST(warudo)
 
     unsigned int tests_valid = att_get_valid_tests();
     unsigned int tests_total = att_get_total_tests();
