@@ -67,7 +67,7 @@ ATT_API unsigned int att_assert_p_c(char* result, char* expected, const char *de
     int test = att_assert("char*", ((result == expected) || ((result && expected) ? strcmp(result, expected) == 0 : 0)), description);
 
     if(!test) {
-        ATT_ERROR_MESSAGE(result, "%p", expected);
+        ATT_ERROR_MESSAGE(result, ATT_STRING_AS_POINTERS == 1 ? "%p" : "\"%s\"", expected);
     }
 
     return test;

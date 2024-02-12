@@ -32,6 +32,10 @@ extern "C" {
 #define ATT_SHOW_ERROR 1
 #endif
 
+#ifndef ATT_STRING_AS_POINTERS
+#define ATT_STRING_AS_POINTERS 0
+#endif
+
 #define ATT_ASSERT(VALUE, EXPECTED, MESSAGE) _Generic((0, VALUE), \
     char: att_assert_c, \
     unsigned char: att_assert_u_c, \

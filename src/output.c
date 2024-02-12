@@ -13,13 +13,13 @@ char *wrd_escape_html(const char *input) {
     size_t len = strlen(input);
     size_t escaped_len = len * 6 + 1;
     char *escaped = malloc(len);
+    size_t j = 0;
 
     if(escaped == NULL) {
         return NULL;
     }
 
-    size_t j = 0;
-    for (size_t i = 0; i < len; i++) {
+    for(size_t i = 0; i < len; i++) {
         switch (input[i]) {
             case '&':
                 strncpy(&escaped[j], "&amp;", 5);
