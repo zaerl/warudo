@@ -36,13 +36,13 @@ wrd_code wrd_accept_connection(warudo *config);
 wrd_code wrd_after_connection(warudo *config);
 
 // Homepage error page
-wrd_code wrd_page_home(warudo *config);
+wrd_code wrd_route_home(warudo *config);
 
 // Root JSON endpoints
-wrd_code wrd_page_app(int entry_type, warudo *config);
+wrd_code wrd_route_app(int entry_type, warudo *config);
 
 // Keys JSON endpoint
-wrd_code wrd_page_app_keys(warudo *config);
+wrd_code wrd_route_app_keys(warudo *config);
 
 // Close the system
 wrd_code wrd_close(warudo *config);

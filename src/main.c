@@ -36,13 +36,13 @@ int main(void) {
             ++envp;
         }*
         if(config->page == WRD_PAGE_APP) {
-            ret = wrd_page_app(WRD_ENTRY_TYPE_DATA, config);
+            ret = wrd_route_app(WRD_ENTRY_TYPE_DATA, config);
         } else if(config->page == WRD_PAGE_APP_KEYS) {
-            ret = wrd_page_app_keys(config);
+            ret = wrd_route_app_keys(config);
         } else if(config->page == WRD_PAGE_APP_VIEWS) {
-            ret = wrd_page_app(WRD_ENTRY_TYPE_VIEW, config);
+            ret = wrd_route_app(WRD_ENTRY_TYPE_VIEW, config);
         } else if(config->page == WRD_PAGE_ROOT) {
-            ret = wrd_page_home(config);
+            ret = wrd_route_home(config);
         } else {
             ret = wrd_http_not_found(config);
         }
