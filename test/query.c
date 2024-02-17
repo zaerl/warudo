@@ -7,11 +7,7 @@ int internal_parse_formdata_callback(const char *input, long int length, warudo 
     return formdata_result;
 }
 
-void *test_query(void *arg) {
-    MOCK_CONFIG
-
-    ASSERT_CODE(wrd_parse_query_string(NULL, NULL), WRD_ERROR, "wrd_parse_query_string NULL")
-
+void test_url_decode() {
     ATT_ASSERT(wrd_url_decode(NULL), NULL, "NULL")
     ATT_ASSERT(wrd_url_decode("valid"), "valid", "valid simple string")
     ATT_ASSERT(wrd_url_decode("https%3A%2F%2Fexample.com%2F%3Fex%3Dex%23ex%3Dex%2Bex"), "https://example.com/?ex=ex#ex=ex+ex", "valid full URL")
@@ -26,6 +22,9 @@ void *test_query(void *arg) {
     ATT_ASSERT(wrd_url_decode("%E2%82%AC%20%25%20%40"), "€ % @", "valid various")
     ATT_ASSERT(wrd_url_decode("%C3%B6%20%3D%20%25%20%40"), "ö = % @", "valid umlaut = % @")
     ATT_ASSERT(wrd_url_decode("%20%2F%20%3F%20%23%20%5B%20%5D"), " / ? # [ ]", "valid / ? # [ ]")
+}
+
+void test_form() {
 
     ATT_ASSERT((char*)wrd_get_formdata_boundary(""), NULL, "too short #1")
     ATT_ASSERT((char*)wrd_get_formdata_boundary("\r"), NULL, "too short #2")
@@ -85,6 +84,15 @@ void *test_query(void *arg) {
 
     test = "--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b\r\nContent-Disposition: form-data; name=\"a\"\r\n\r\n{}\r\n--b--\r\n";
     ASSERT_CODE(wrd_parse_formdata(test, strlen(test), "b", internal_parse_formdata_callback, &config), 2, "valid #2")
+}
+
+void *test_query(void *arg) {
+    MOCK_CONFIG
+
+    ASSERT_CODE(wrd_parse_query_string(NULL, NULL), WRD_ERROR, "wrd_parse_query_string NULL")
+
+    test_url_decode();
+    test_form();
 
     return NULL;
 }

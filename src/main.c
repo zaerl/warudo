@@ -5,6 +5,7 @@
 #include "http.h"
 #include "log.h"
 #include "output.h"
+#include "query.h"
 #include "server.h"
 #include "sqlite3/sqlite3.h"
 
@@ -24,6 +25,16 @@ int main(void) {
     }
 
     while(wrd_accept_connection(config) == WRD_OK) {
+        // fputs("--------->", stdout);
+        // fputs(config->net_input_buffer.buffer, stdout);
+        //fputs("gatto", stdout);
+        // fputs("<---------", stdout);
+        wrd_http_parse_query_headers(config);
+        wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
+
+        wrd_http_ok(config);
+        wrd_http_puts(config, "{\"Hello\": \"World\"}");
+
         wrd_after_connection(config);
     }
 

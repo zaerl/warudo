@@ -189,14 +189,16 @@ wrd_code wrd_http_printf(warudo *config, const char *format, ...) {
     return WRD_OK;
 }
 
-wrd_code wrd_http_get(warudo *config, char *str, int length) {
-    // TODO: missing
+wrd_code wrd_http_parse_query_headers(warudo *config) {
+    CHECK_CONFIG
+
     return WRD_OK;
 }
 
-const char *wrd_http_get_param(warudo *config, char *name) {
-    // TODO: missing
-    return "";
+wrd_code wrd_http_get_header(warudo *config, const char *name, char **value) {
+    CHECK_CONFIG
+
+    return WRD_OK;
 }
 
 wrd_code wrd_http_flush(warudo *config) {

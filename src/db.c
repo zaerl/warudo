@@ -21,7 +21,7 @@
 #define WRD_DB_CALL(STMT, CALL) WRD_DB_RET_CALL(STMT, CALL, SQLITE_OK)
 
 // wrd_code wrd_load_columns(warudo *config);
-wrd_code wrd_query_db_init(warudo *config);
+wrd_code wrd_db_query_init(warudo *config);
 
 wrd_code wrd_db_init(const char *filename, warudo *config) {
     CHECK_CONFIG
@@ -97,10 +97,10 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
     WRD_DB_CALL(config->parse_json_stmt, sqlite3_prepare_v2(config->db, "SELECT * FROM json_each(?1) WHERE type='true';", -1, &config->parse_json_stmt, NULL));
 
     // return wrd_load_columns(config);
-    return wrd_query_db_init(config);
+    return wrd_db_query_init(config);
 }
 
-wrd_code wrd_query_db_init(warudo *config) {
+wrd_code wrd_db_query_init(warudo *config) {
     CHECK_CONFIG
 
     int rc = sqlite3_open(":memory:", &config->query_db);
@@ -158,6 +158,24 @@ wrd_code wrd_db_close(warudo *config) {
     if(sqlite3_shutdown() != SQLITE_OK) {
         return WRD_DB_CLOSE_ERROR;
     }
+
+    return WRD_OK;
+}
+
+wrd_code wrd_db_add_header(warudo *config, const char *name, const char *value) {
+    CHECK_CONFIG
+
+    int must_free = 0;
+    int must_finalize = 0;
+    int must_output_error = 1;
+    const char *query = NULL;
+    int rc;
+    sqlite3_stmt *stmt = config->insert_query_stmt;
+    sqlite3_reset(stmt);
+
+    WRD_DB_CALL(stmt, sqlite3_bind_text(stmt, 1, name, strlen(name), SQLITE_STATIC));
+    WRD_DB_CALL(stmt, sqlite3_bind_text(stmt, 2, value, strlen(value), SQLITE_STATIC));
+    WRD_DB_RET_CALL(stmt, sqlite3_step(stmt), SQLITE_DONE);
 
     return WRD_OK;
 }
@@ -345,8 +363,13 @@ wrd_code wrd_add_entries(int entry_type, warudo *config) {
     }
 
     char *input = wrd_read_content(length, config);
-    const char *boundary = wrd_get_formdata_boundary(wrd_http_get_param(config, "CONTENT_TYPE"));
+    char **value = NULL;
 
+    if(wrd_http_get_header(config, "content-length", value) != WRD_OK) {
+        wrd_http_bad_request(config, "Failed to get content length.");
+    }
+
+    const char *boundary = wrd_get_formdata_boundary(&value);
     count = wrd_parse_formdata(input, length, boundary, &wrd_formdata_callback, config);
 
     if(count <= 0) {

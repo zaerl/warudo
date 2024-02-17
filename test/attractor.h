@@ -1,5 +1,5 @@
 /**
- * 2024-02-06
+ * 2024-02-14
  *
  * The attractor unit test library
  *
@@ -34,6 +34,10 @@ extern "C" {
 
 #ifndef ATT_STRING_AS_POINTERS
 #define ATT_STRING_AS_POINTERS 0
+#endif
+
+#ifndef ATT_USE_IOCTL
+#define ATT_USE_IOCTL 0
 #endif
 
 #define ATT_ASSERT(VALUE, EXPECTED, MESSAGE) _Generic((0, VALUE), \

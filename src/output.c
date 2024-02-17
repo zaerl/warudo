@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "http.h"
 #include "output.h"
@@ -10,17 +11,16 @@ char *wrd_escape_html(const char *input) {
         return NULL;
     }
 
-    size_t len = strlen(input);
-    size_t escaped_len = len * 6 + 1;
-    char *escaped = malloc(len);
+    size_t input_length = strlen(input);
+    char *escaped = malloc(input_length * 6 + 1);
     size_t j = 0;
 
     if(escaped == NULL) {
         return NULL;
     }
 
-    for(size_t i = 0; i < len; i++) {
-        switch (input[i]) {
+    for(size_t i = 0; i < input_length; ++i) {
+        switch(input[i]) {
             case '&':
                 strncpy(&escaped[j], "&amp;", 5);
                 j += 5;
@@ -38,27 +38,12 @@ char *wrd_escape_html(const char *input) {
                 j += 6;
                 break;
             case '\'':
-                strncpy(&escaped[j], "&#39;", 5);
-                j += 5;
+                strncpy(&escaped[j], "&apos;", 6);
+                j += 6;
                 break;
             default:
                 escaped[j] = input[i];
-                j++;
-                break;
-        }
-
-        if(j >= escaped_len - 6) {
-            // Increase buffer size if necessary
-            escaped_len *= 2;
-            char *temp = realloc(escaped, escaped_len);
-
-            if(temp == NULL) {
-                free(escaped);
-
-                return NULL;
-            }
-
-            escaped = temp;
+                ++j;
         }
     }
 

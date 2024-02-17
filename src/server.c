@@ -95,15 +95,6 @@ wrd_code wrd_accept_connection(warudo *config) {
     ++config->requests_count;
 
     wrd_net_read(config);
-    // fputs("--------->", stdout);
-    // fputs(config->net_input_buffer.buffer, stdout);
-    //fputs("gatto", stdout);
-    // fputs("<---------", stdout);
-    wrd_parse_query_string(config, NULL);
-    wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
-
-    wrd_http_ok(config);
-    wrd_http_puts(config, "{\"Hello\": \"World\"}");
 
     return WRD_OK;
 }

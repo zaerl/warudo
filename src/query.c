@@ -148,34 +148,6 @@ const char *wrd_get_formdata_boundary(const char *content_type) {
     return boundary;
 }
 
-long wrd_content_length(warudo *config) {
-    /*const char *length = wrd_http_get_param(config, "CONTENT_LENGTH");
-    long int len = 0;
-
-    if(length != NULL) {
-        len = strtol(length, NULL, 10);
-    }
-
-    return len;*/
-    return 0;
-}
-
-
-char *wrd_read_content(long int length, warudo *config) {
-    /*long int len = length == 0 ? wrd_content_length(config) : length;
-
-    if(len <= 0) {
-        return NULL;
-    }
-
-    char *data = malloc(len);
-
-    wrd_http_get(config, data, len);
-
-    return data;*/
-    return "";
-}
-
 wrd_code wrd_parse_formdata(const char *input, long int length, const char *boundary,
     wrd_parse_formdata_callback callback, warudo *config) {
     char *full_boundary = NULL;
@@ -273,4 +245,30 @@ error:
     }
 
     return res;
+}
+
+long wrd_content_length(warudo *config) {
+    /*const char *length = wrd_http_get_param(config, "CONTENT_LENGTH");
+    long int len = 0;
+
+    if(length != NULL) {
+        len = strtol(length, NULL, 10);
+    }
+
+    return len;*/
+    return 0;
+}
+
+
+char *wrd_read_content(long int length, warudo *config) {
+    /*long int len = length == 0 ? wrd_content_length(config) : length;
+
+    if(len <= 0) {
+        return NULL;
+    }
+
+    char *data = malloc(len);
+
+    return data;*/
+    return "";
 }
