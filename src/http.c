@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 
+#include "timing.h"
 #include "http.h"
 #include "log.h"
 #include "net.h"

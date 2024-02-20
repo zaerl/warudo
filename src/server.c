@@ -8,7 +8,7 @@
 #include "net.h"
 #include "query.h"
 #include "server.h"
-#include "time.h"
+#include "timing.h"
 
 // TODO: remove
 #include "http.h"

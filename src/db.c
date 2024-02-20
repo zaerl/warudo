@@ -369,7 +369,7 @@ wrd_code wrd_add_entries(int entry_type, warudo *config) {
         wrd_http_bad_request(config, "Failed to get content length.");
     }
 
-    const char *boundary = wrd_get_formdata_boundary(&value);
+    const char *boundary = wrd_get_formdata_boundary(*value);
     count = wrd_parse_formdata(input, length, boundary, &wrd_formdata_callback, config);
 
     if(count <= 0) {

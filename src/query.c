@@ -248,6 +248,10 @@ error:
 }
 
 long wrd_content_length(warudo *config) {
+    if(!config) {
+        return 0;
+    }
+
     /*const char *length = wrd_http_get_param(config, "CONTENT_LENGTH");
     long int len = 0;
 
@@ -261,7 +265,7 @@ long wrd_content_length(warudo *config) {
 
 
 char *wrd_read_content(long int length, warudo *config) {
-    /*long int len = length == 0 ? wrd_content_length(config) : length;
+    long int len = length == 0 ? wrd_content_length(config) : length;
 
     if(len <= 0) {
         return NULL;
@@ -269,6 +273,5 @@ char *wrd_read_content(long int length, warudo *config) {
 
     char *data = malloc(len);
 
-    return data;*/
-    return "";
+    return data;;
 }

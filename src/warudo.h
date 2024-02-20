@@ -9,9 +9,7 @@ extern "C" {
 #error "Windows is not supported"
 #endif
 
-// Version
-#define WRD_NAME "Warudo"
-#define WRD_VERSION "0.1.0"
+#include "config.h"
 
 // Configurations
 #define WRD_BUFFLEN 8192
@@ -38,11 +36,9 @@ extern "C" {
 #define WRD_AUTH_DEFAULT_PASS "admin"
 #define WRD_AUTH_DEFAULT_ROLE "admin"
 
-#ifdef WRD_TIMING
 #include <time.h>
-#endif
-
 #include <netinet/in.h>
+#include <stddef.h>
 
 #include "sqlite3/sqlite3.h"
 
@@ -158,11 +154,9 @@ typedef struct warudo {
     wrd_column columns[WRD_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;
-#ifdef WRD_TIMING
     struct timespec start;
     unsigned long long int timing_count;
     unsigned long long int timing_end_count;
-#endif
 
     // Query string
     wrd_query query;

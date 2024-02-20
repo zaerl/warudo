@@ -7,7 +7,7 @@ int internal_parse_formdata_callback(const char *input, long int length, warudo 
     return formdata_result;
 }
 
-void test_url_decode() {
+void test_url_decode(void) {
     ATT_ASSERT(wrd_url_decode(NULL), NULL, "NULL")
     ATT_ASSERT(wrd_url_decode("valid"), "valid", "valid simple string")
     ATT_ASSERT(wrd_url_decode("https%3A%2F%2Fexample.com%2F%3Fex%3Dex%23ex%3Dex%2Bex"), "https://example.com/?ex=ex#ex=ex+ex", "valid full URL")
@@ -24,7 +24,8 @@ void test_url_decode() {
     ATT_ASSERT(wrd_url_decode("%20%2F%20%3F%20%23%20%5B%20%5D"), " / ? # [ ]", "valid / ? # [ ]")
 }
 
-void test_form() {
+void test_form(void) {
+    MOCK_CONFIG
 
     ATT_ASSERT((char*)wrd_get_formdata_boundary(""), NULL, "too short #1")
     ATT_ASSERT((char*)wrd_get_formdata_boundary("\r"), NULL, "too short #2")
@@ -87,8 +88,6 @@ void test_form() {
 }
 
 void *test_query(void *arg) {
-    MOCK_CONFIG
-
     ASSERT_CODE(wrd_parse_query_string(NULL, NULL), WRD_ERROR, "wrd_parse_query_string NULL")
 
     test_url_decode();

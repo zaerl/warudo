@@ -24,7 +24,7 @@ void *test_auth(void *arg) {
     };
 
     for(int i = 0; i < 6; ++i) {
-        ATT_ASSERT(wrd_base64_encode(input[i]), output[i], input[i]);
+        ATT_ASSERT(wrd_base64_encode(input[i]), (char*)output[i], input[i]);
     }
 
     ATT_ASSERT(wrd_base64_decode(NULL), NULL, "NULL")
@@ -34,7 +34,7 @@ void *test_auth(void *arg) {
     ATT_ASSERT(wrd_base64_decode("ABC"), NULL, "three characters")
 
     for(int i = 0; i < 6; ++i) {
-        ATT_ASSERT(wrd_base64_decode(output[i]), input[i], output[i])
+        ATT_ASSERT(wrd_base64_decode(output[i]), (char*)input[i], output[i])
     }
 
     ATT_ASSERT(wrd_base64_decode("$%&/()=?"), NULL, "string with invalid chars")
