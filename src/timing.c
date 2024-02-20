@@ -1,11 +1,8 @@
-#ifdef WRD_TIMING
 #include <time.h>
-#endif
 
 #include "log.h"
-#include "time.h"
+#include "timing.h"
 
-#ifdef WRD_TIMING
 wrd_code wrd_start_time(warudo *config) {
     CHECK_CONFIG
 
@@ -32,4 +29,3 @@ wrd_code wrd_end_time(warudo *config, const char *message) {
 
     return WRD_OK;
 }
-#endif

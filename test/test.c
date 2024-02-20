@@ -26,7 +26,7 @@ DECLARE_TEST(query)
 DECLARE_TEST(route_app)
 DECLARE_TEST(route_home)
 DECLARE_TEST(server)
-DECLARE_TEST(time)
+DECLARE_TEST(timing)
 
 int main(int argc, const char *argv[]) {
     struct timespec start, end;
@@ -54,7 +54,7 @@ int main(int argc, const char *argv[]) {
     RUN_TEST(route_app)
     RUN_TEST(route_home)
     RUN_TEST(server)
-    RUN_TEST(time)
+    RUN_TEST(timing)
 
     unsigned int tests_valid = att_get_valid_tests();
     unsigned int tests_total = att_get_total_tests();
@@ -84,8 +84,8 @@ void wrd_assert_code(int result, int expected, const char *description) {
         char str1[20];
         char str2[20];
 
-        char *result_desc = wrd_error_description(result, 0);
-        char *expected_desc = wrd_error_description(expected, 0);
+        const char *result_desc = wrd_error_description(result, 0);
+        const char *expected_desc = wrd_error_description(expected, 0);
 
         if(result_desc == NULL) {
             sprintf(str1, "%d", result);
