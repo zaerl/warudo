@@ -1,12 +1,18 @@
 cmake_minimum_required(VERSION 3.5)
 project(Warudo
-    VERSION 0.1.1
-    DESCRIPTION "A webserver written in C"
+    VERSION 0.1.2
+    DESCRIPTION "A webserver written in C11"
     LANGUAGES C
 )
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+
+# Various
+set(BIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+set(CONFIG_DIR "${PROJECT_BINARY_DIR}/config")
+set(SRC_DIR "src")
+set(CLI_DIR "cli")
 
 # Compiler flags
 set(CMAKE_C_FLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter")
@@ -18,15 +24,15 @@ configure_file("config/config.h.in" "config/config.h")
 include_directories("src")
 
 # Warudo library
-file(GLOB SOURCES "src/*.c")
-list(REMOVE_ITEM SOURCES "src/main.c")
+file(GLOB SOURCES "${SRC_DIR}/*.c")
+list(REMOVE_ITEM SOURCES "${SRC_DIR}/main.c")
 add_library(warudo_lib STATIC ${SOURCES})
-target_include_directories(warudo_lib PUBLIC "${PROJECT_BINARY_DIR}/config")
+target_include_directories(warudo_lib PUBLIC ${CONFIG_DIR})
 
-# SQLite3 library
-file(GLOB SQLITE3_SOURCES "src/sqlite3/*.c")
-add_library(warudo_sqlite3 STATIC ${SQLITE3_SOURCES})
-target_compile_options(warudo_sqlite3
+# SQLite library
+file(GLOB SQLITE3_SOURCES "${SRC_DIR}/sqlite3/*.c")
+add_library(warudo_sqlite STATIC ${SQLITE3_SOURCES})
+target_compile_options(warudo_sqlite
     PRIVATE
     -DSQLITE_DEFAULT_MEMSTATUS=0
     -DSQLITE_DQS=0
@@ -42,25 +48,25 @@ target_compile_options(warudo_sqlite3
 )
 
 # Data library
-file(GLOB DATA_SOURCES "cli/*.c")
-list(REMOVE_ITEM DATA_SOURCES "cli/main.c")
-add_library(data_lib STATIC ${DATA_SOURCES})
+file(GLOB DATA_SOURCES "${CLI_DIR}/*.c")
+list(REMOVE_ITEM DATA_SOURCES "${CLI_DIR}/main.c")
+add_library(warudo_data_lib STATIC ${DATA_SOURCES})
 
 # warudo
-add_executable(warudo "src/main.c")
-target_link_libraries(warudo PRIVATE warudo_lib warudo_sqlite3)
-set_target_properties(warudo PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+add_executable(warudo "${SRC_DIR}/main.c")
+target_link_libraries(warudo PRIVATE warudo_lib warudo_sqlite)
+set_target_properties(warudo PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
 
 # warudo-test
 file(GLOB TEST_SOURCES "test/*.c")
 add_executable(warudo-test ${TEST_SOURCES})
-target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite3 data_lib)
-set_target_properties(warudo-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-target_include_directories(warudo-test PUBLIC "${PROJECT_BINARY_DIR}/config")
+target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite warudo_data_lib)
+set_target_properties(warudo-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
+target_include_directories(warudo-test PUBLIC ${CONFIG_DIR})
 
 # warudo-cli
-add_executable(warudo-cli "cli/main.c")
+add_executable(warudo-cli "${CLI_DIR}/main.c")
 
 find_package(CURL REQUIRED)
-target_link_libraries(warudo-cli PRIVATE data_lib ${CURL_LIBRARIES})
-set_target_properties(warudo-cli PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
+target_link_libraries(warudo-cli PRIVATE warudo_data_lib ${CURL_LIBRARIES})
+set_target_properties(warudo-cli PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
