@@ -1,4 +1,5 @@
 #include <stdlib.h>
+
 #include "env.h"
 
 int wrd_get_env_int(const char *name, int default_value) {

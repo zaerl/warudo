@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdarg.h>
 
-#include "warudo.h"
+#include "log.h"
 
 wrd_code wrd_log(warudo *config, wrd_log_level level, const char *format, ...) {
     if(format == NULL) {
