@@ -15,23 +15,31 @@ set(SQLITE_CFLAGS_3 "-DSQLITE_OMIT_SHARED_CACHE -DSQLITE_USE_ALLOCA -DSQLITE_OMI
 set(CFLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SQLITE_CFLAGS} ${SQLITE_CFLAGS_2} ${SQLITE_CFLAGS_3} ${CFLAGS}")
 
-# Executable
-include_directories("src")
-file(GLOB_RECURSE SOURCES "src/*.c")
-add_executable(warudo ${SOURCES})
-set_target_properties(warudo PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-
 # Config file
 configure_file("config/config.h.in" "config/config.h")
-target_include_directories(warudo PUBLIC "${PROJECT_BINARY_DIR}/config")
+
+## Main files
+include_directories("src")
+
+# Warudo library
+file(GLOB SOURCES "src/*.c")
+list(REMOVE_ITEM SOURCES "src/main.c")
+add_library(warudo_lib STATIC ${SOURCES})
+target_include_directories(warudo_lib PUBLIC "${PROJECT_BINARY_DIR}/config")
+
+# SQLite3 library
+file(GLOB SQLITE3_SOURCES "src/sqlite3/*.c")
+add_library(warudo_sqlite3 STATIC ${SQLITE3_SOURCES})
+
+add_executable(warudo "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
+target_link_libraries(warudo PRIVATE warudo_lib warudo_sqlite3)
+set_target_properties(warudo PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 
 # Create the test target
-file(GLOB_RECURSE TEST_SOURCES "test/*.c")
-list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.c")
-add_executable(warudo-test ${SOURCES} ${TEST_SOURCES})
+file(GLOB TEST_SOURCES "test/*.c")
+add_executable(warudo-test ${TEST_SOURCES})
+target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite3)
 set_target_properties(warudo-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-
-# Config file
 target_include_directories(warudo-test PUBLIC "${PROJECT_BINARY_DIR}/config")
 
 enable_testing()
