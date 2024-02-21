@@ -1,4 +1,4 @@
-#include "../src/data.h"
+#include "../cli/data.h"
 #include "test.h"
 
 long test_file_size(FILE *file) {

@@ -5,7 +5,7 @@
 #include <time.h>
 #include <getopt.h>
 
-#include "src/data.h"
+#include "data.h"
 
 // Server URL
 #define VERSION "0.1.1"
