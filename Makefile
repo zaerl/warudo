@@ -15,7 +15,7 @@ $(BIN_DIR):
 	mkdir -p $@
 
 start: compile
-	WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 $(BIN_DIR)/warudo
+	WRD_CORS="*" WRD_LOG_LEVEL=3 $(BIN_DIR)/warudo
 
 test: compile
 	cd $(BIN_DIR) && ./warudo-test

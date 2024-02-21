@@ -31,7 +31,7 @@ wrd_code wrd_init(const char *filename, warudo **config) {
 #endif
 
     // Load net
-    res = wrd_net_init(*config, wrd_get_env_int("WARUDO_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
+    res = wrd_net_init(*config, wrd_get_env_int("WRD_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
 
     if(res != WRD_OK) {
         wrd_close(*config);
@@ -48,8 +48,8 @@ wrd_code wrd_init(const char *filename, warudo **config) {
     wrd_parse_query_string(*config, NULL);
 
     // Environment variables
-    (*config)->access_origin = wrd_get_env_string("WARUDO_CORS", WRD_DEFAULT_CORS);
-    (*config)->log_level = wrd_get_env_int("WARUDO_LOG_LEVEL", WRD_DEFAULT_LOG_LEVEL);
+    (*config)->access_origin = wrd_get_env_string("WRD_CORS", WRD_DEFAULT_CORS);
+    (*config)->log_level = wrd_get_env_int("WRD_LOG_LEVEL", WRD_DEFAULT_LOG_LEVEL);
 
     wrd_log_info(*config, "Starting warudo %s\n", WRD_VERSION);
     wrd_log_info(*config, "Access origin: %s\n", (*config)->access_origin ? (*config)->access_origin : "disabled");

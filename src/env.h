@@ -1,8 +1,6 @@
 #ifndef WRD_ENV_H
 #define WRD_ENV_H
 
-#include "warudo.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

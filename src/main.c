@@ -11,7 +11,7 @@
 
 // /opt/homebrew/opt/nginx/bin/nginx -g "daemon off;"
 // /opt/homebrew/opt/lighttpd/bin/lighttpd -D -f /opt/homebrew/etc/lighttpd/lighttpd.conf
-// make && WARUDO_CORS="*" WARUDO_LOG_LEVEL=3 bin/warudo.cgi
+// make && WRD_CORS="*" WRD_LOG_LEVEL=3 bin/warudo.cgi
 int main(void) {
     warudo *config = NULL;
     wrd_code ret;
