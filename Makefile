@@ -14,6 +14,10 @@ $(BUILD_DIR):
 $(BIN_DIR):
 	mkdir -p $@
 
+# Generate warudo.json file
+generate_defaults: $(BUILD_DIR) $(BIN_DIR)
+	cd $(BUILD_DIR) && cmake -DWARUDO_GENERATE_DEFAULT_CONFIG=ON ..
+
 start: compile
 	WRD_CORS="*" WRD_LOG_LEVEL=3 $(BIN_DIR)/warudo
 

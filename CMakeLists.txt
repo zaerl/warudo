@@ -14,11 +14,29 @@ set(CONFIG_DIR "${PROJECT_BINARY_DIR}/config")
 set(SRC_DIR "src")
 set(CLI_DIR "cli")
 
+# Configurations
+set(WRD_CONFIG_PATH "warudo.json")
+set(WRD_DB_PATH "file:warudo.db")
+set(WRD_LISTEN_BACKLOG 1024)
+set(WRD_MAX_COLUMNS 64)
+set(WRD_NET_BUFFER_SIZE 1)
+set(WRD_NET_HEADERS_BUFFER_SIZE 4096)
+set(WRD_NET_INPUT_BUFFER_SIZE 1)
+set(WRD_SOCKET_PORT 6251)
+
 # Compiler flags
 set(CMAKE_C_FLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter")
 
-# Config file
+# Options
+option(WARUDO_GENERATE_DEFAULT_CONFIG "Generate default configuration file" OFF)
+
+# Config files
 configure_file("config/config.h.in" "config/config.h")
+
+if(WARUDO_GENERATE_DEFAULT_CONFIG)
+    message(STATUS "Generating default configuration file")
+    configure_file("config/warudo.json.in" "${CMAKE_CURRENT_SOURCE_DIR}/warudo.json.default")
+endif()
 
 ## Main files
 include_directories("src")

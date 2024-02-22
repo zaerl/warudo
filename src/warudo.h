@@ -13,16 +13,9 @@ extern "C" {
 
 // Configurations
 #define WRD_BUFFLEN 8192
-#define WRD_CONFIG_FILE "warudo.conf"
-#define WRD_DB_FILE "file:warudo.db"
+
 #define WRD_HCTREE_DB_FILE "file:warudo.db?hctree=1"
-#define WRD_MAX_COLUMNS 64
 // #define WRD_SOCKET_PATH ":6252"
-#define WRD_SOCKET_PORT 6252
-#define WRD_NET_HEADERS_BUFFER_SIZE 4096 // In bytes
-#define WRD_NET_BUFFER_SIZE 1 // In MB
-#define WRD_NET_INPUT_BUFFER_SIZE 1 // In MB
-#define WRD_LISTEN_BACKLOG 1024 // TODO: 1024?
 #define WRD_TIMING 1
 #define WRD_MAX_QUERY_KEYS 16
 

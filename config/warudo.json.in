@@ -1,0 +1,9 @@
+{
+    "db_path": "@WRD_DB_PATH@",
+    "listen_backlog": @WRD_LISTEN_BACKLOG@,
+    "max_columns": @WRD_MAX_COLUMNS@,
+    "net_buffer_size": @WRD_NET_BUFFER_SIZE@,
+    "net_headers_buffer_size": @WRD_NET_HEADERS_BUFFER_SIZE@,
+    "net_input_buffer_size": @WRD_NET_INPUT_BUFFER_SIZE@,
+    "socket_port": @WRD_SOCKET_PORT@
+}
