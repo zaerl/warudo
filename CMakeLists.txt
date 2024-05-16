@@ -35,7 +35,7 @@ configure_file("config/config.h.in" "config/config.h")
 
 if(WARUDO_GENERATE_DEFAULT_CONFIG)
     message(STATUS "Generating default configuration file")
-    configure_file("config/warudo.json.in" "${CMAKE_CURRENT_SOURCE_DIR}/warudo.json.default")
+    configure_file("config/warudo.conf.in" "${CMAKE_CURRENT_SOURCE_DIR}/warudo.conf.default")
 endif()
 
 ## Main files
