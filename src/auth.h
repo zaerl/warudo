@@ -1,6 +1,8 @@
 #ifndef WRD_AUTH_H
 #define WRD_AUTH_H
 
+#include "warudo.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
