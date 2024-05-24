@@ -14,7 +14,7 @@ $(BUILD_DIR):
 $(BIN_DIR):
 	mkdir -p $@
 
-# Generate warudo.json file
+# Generate warudo.conf.default file
 generate_defaults: $(BUILD_DIR) $(BIN_DIR)
 	cd $(BUILD_DIR) && cmake -DWARUDO_GENERATE_DEFAULT_CONFIG=ON ..
 
@@ -26,5 +26,6 @@ test: compile
 
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm src/*-generated.c
 
 .PHONY: all clean

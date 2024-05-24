@@ -15,6 +15,7 @@
 
 DECLARE_TEST(auth)
 DECLARE_TEST(code)
+DECLARE_TEST(conf)
 DECLARE_TEST(data)
 DECLARE_TEST(db)
 DECLARE_TEST(env)
@@ -43,6 +44,7 @@ int main(int argc, const char *argv[]) {
 
     RUN_TEST(auth)
     RUN_TEST(code)
+    RUN_TEST(conf)
     RUN_TEST(data)
     RUN_TEST(db)
     RUN_TEST(env)

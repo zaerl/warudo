@@ -41,8 +41,33 @@ endif()
 ## Main files
 include_directories("src")
 
+# re2c library
+set(GENERATED_C_FILES)
+file(GLOB_RECURSE RE_FILES "${SRC_DIR}/*.re")
+
+foreach(RE_FILE ${RE_FILES})
+    get_filename_component(RE_FILE_NAME ${RE_FILE} NAME)
+    string(REPLACE ".re" "-generated.c" C_FILE_NAME ${RE_FILE_NAME})
+    set(C_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}/${C_FILE_NAME}")
+
+    # Add the .c file to the list of generated files
+    list(APPEND GENERATED_C_FILES ${C_FILE})
+
+    # Add a custom command to compile the .re file to a .c file
+    add_custom_command(
+        OUTPUT ${C_FILE}
+        COMMAND re2c ${RE_FILE} -o ${C_FILE}
+        DEPENDS ${RE_FILE}
+        COMMENT "Compiling ${RE_FILE} to ${C_FILE}"
+        VERBATIM
+    )
+endforeach()
+
+add_custom_target(re2c_compile ALL DEPENDS ${GENERATED_C_FILES})
+
 # Warudo library
 file(GLOB SOURCES "${SRC_DIR}/*.c")
+list(APPEND SOURCES ${GENERATED_C_FILES})
 list(REMOVE_ITEM SOURCES "${SRC_DIR}/main.c")
 add_library(warudo_lib STATIC ${SOURCES})
 target_include_directories(warudo_lib PUBLIC ${CONFIG_DIR})
@@ -75,6 +100,7 @@ add_library(warudo_data_lib STATIC ${DATA_SOURCES})
 
 # warudo
 add_executable(warudo "${SRC_DIR}/main.c")
+add_dependencies(warudo re2c_compile)
 target_link_libraries(warudo PRIVATE warudo_lib warudo_sqlite)
 set_target_properties(warudo PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
 

@@ -95,3 +95,6 @@ hctree.fossil
 hctree.fossil-journal
 hctree-src/
 hctree-build/
+
+# re2c
+*-generated.c
