@@ -38,6 +38,24 @@ void wrd_assert_code(int result, int expected, const char *description);
 // Generate a temporary file with the given content.
 char *wrd_mock_file(const char *content);
 
+// Tests
+void *test_auth(void *arg);
+void *test_code(void *arg);
+void *test_conf(void *arg);
+void *test_data(void *arg);
+void *test_db(void *arg);
+void *test_env(void *arg);
+void *test_hpack(void *arg);
+void *test_http(void *arg);
+void *test_log(void *arg);
+void *test_net(void *arg);
+void *test_output(void *arg);
+void *test_query(void *arg);
+void *test_route_app(void *arg);
+void *test_route_home(void *arg);
+void *test_server(void *arg);
+void *test_timing(void *arg);
+
 #ifdef __cplusplus
 }
 #endif

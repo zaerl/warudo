@@ -11,25 +11,6 @@
 #include "attractor.h"
 #include "../src/code.h"
 
-#define DECLARE_TEST(NAME) void *test_##NAME(void *arg);
-
-DECLARE_TEST(auth)
-DECLARE_TEST(code)
-DECLARE_TEST(conf)
-DECLARE_TEST(data)
-DECLARE_TEST(db)
-DECLARE_TEST(env)
-DECLARE_TEST(hpack)
-DECLARE_TEST(http)
-DECLARE_TEST(log)
-DECLARE_TEST(net)
-DECLARE_TEST(output)
-DECLARE_TEST(query)
-DECLARE_TEST(route_app)
-DECLARE_TEST(route_home)
-DECLARE_TEST(server)
-DECLARE_TEST(timing)
-
 int main(int argc, const char *argv[]) {
     struct timespec start, end;
     double elapsed;
