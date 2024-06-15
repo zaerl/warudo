@@ -80,6 +80,7 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
         "PRAGMA journal_mode = WAL;"
         "PRAGMA synchronous = NORMAL;"
         "PRAGMA busy_timeout = 5000;";
+    // TODO: https://sqlite.org/lang_analyze.html#pragopt
     rc = sqlite3_exec(config->db, sql, 0, 0, &error_msg);
 
     if(rc != SQLITE_OK) {
