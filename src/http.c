@@ -48,9 +48,9 @@ wrd_code wrd_http_additional(warudo *config) {
 wrd_code wrd_http_content_type(warudo *config, const char *content_type) {
      WRD_CHECK_CONNECTION(config)
 
-    if(config->access_origin != NULL) {
+    if(config->config.access_origin != NULL) {
         wrd_http_buffer_printf(config, &config->net_headers_buffer, "Access-Control-Allow-Origin: %s\r\n",
-            config->access_origin);
+            config->config.access_origin);
     }
 
     wrd_http_buffer_printf(config, &config->net_headers_buffer, "Content-type: %s;charset=utf-8\r\n", content_type);

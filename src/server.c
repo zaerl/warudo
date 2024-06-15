@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "code.h"
+#include "conf.h"
 #include "db.h"
 #include "env.h"
 #include "log.h"
@@ -16,7 +17,7 @@
 // TODO: remove
 #include <unistd.h>
 
-wrd_code wrd_init(const char *filename, warudo **config) {
+wrd_code wrd_init(warudo **config) {
     CHECK_CONFIG
 
     *config = malloc(sizeof(warudo));
@@ -30,8 +31,11 @@ wrd_code wrd_init(const char *filename, warudo **config) {
     (*config)->timing_end_count = 0;
 #endif
 
+    wrd_load_config(&(*config)->config, NULL);
+
     // Load net
-    res = wrd_net_init(*config, wrd_get_env_int("WRD_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
+    // res = wrd_net_init(*config, wrd_get_env_int("WRD_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
+    res = wrd_net_init(*config, (*config)->config.listen_backlog);
 
     if(res != WRD_OK) {
         wrd_close(*config);
@@ -47,21 +51,18 @@ wrd_code wrd_init(const char *filename, warudo **config) {
     // Query string
     wrd_parse_query_string(*config, NULL);
 
-    // Environment variables
-    (*config)->access_origin = wrd_get_env_string("WRD_CORS", WRD_DEFAULT_CORS);
-    (*config)->log_level = wrd_get_env_int("WRD_LOG_LEVEL", WRD_DEFAULT_LOG_LEVEL);
-
     wrd_log_info(*config, "Starting warudo %s\n", WRD_VERSION);
-    wrd_log_info(*config, "Access origin: %s\n", (*config)->access_origin ? (*config)->access_origin : "disabled");
-    wrd_log_info(*config, "Log level: %u\n", (*config)->log_level);
+    // TODO: check NULL
+    wrd_log_info(*config, "Access origin: %s\n", (*config)->config.access_origin ? (*config)->config.access_origin : "disabled");
+    wrd_log_info(*config, "Log level: %u\n", (*config)->config.log_level);
 
     wrd_log_info(*config, "Net buffer size: %u bytes\n", (*config)->net_buffer.size);
     wrd_log_info(*config, "Net input buffer size: %u bytes\n", (*config)->net_buffer.size);
     wrd_log_info(*config, "Net headers size: %u bytes\n", (*config)->net_headers_buffer.size);
-    wrd_log_info(*config, "Loading DB: \"%s\"\n", filename);
+    wrd_log_info(*config, "Loading DB: \"%s\"\n", (*config)->config.db_path);
 
     // Load database
-    res = wrd_db_init(filename, *config);
+    res = wrd_db_init((*config)->config.db_path, *config);
 
     if(res != WRD_OK) {
         wrd_close(*config);

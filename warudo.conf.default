@@ -11,7 +11,7 @@
 # Database
 db_path = file:warudo.db
 
-# Log level can be one of the following [0, 1, 2, 3]: no log, info, error, debug
+# Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
 log_level = 0
 
 # Net

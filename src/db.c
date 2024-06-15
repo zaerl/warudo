@@ -145,12 +145,22 @@ wrd_code wrd_db_close(warudo *config) {
 
     config->columns_count = 0;
 
+    // Finalize database queries
     sqlite3_finalize(config->insert_stmt);
     sqlite3_finalize(config->insert_dashboard_stmt);
     sqlite3_finalize(config->add_index_stmt);
     sqlite3_finalize(config->parse_json_stmt);
 
+    // Close database.
     if(sqlite3_close(config->db) != SQLITE_OK) {
+        return WRD_DB_CLOSE_ERROR;
+    }
+
+    // Finalize query database queries
+    sqlite3_finalize(config->insert_query_stmt);
+
+    // Close query database.
+    if(sqlite3_close(config->query_db) != SQLITE_OK) {
         return WRD_DB_CLOSE_ERROR;
     }
 

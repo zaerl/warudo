@@ -19,9 +19,12 @@ wrd_code wrd_net_init(warudo *config, int backlog) {
     config->net_input_buffer.position = 0;
 
     // HTTP headers memory.
-    config->net_headers_buffer.size = wrd_get_env_int("WRD_NET_HEADERS_BUFFER_SIZE", WRD_NET_HEADERS_BUFFER_SIZE);
-    config->net_buffer.size = wrd_get_env_int("WRD_NET_BUFFER_SIZE", WRD_NET_BUFFER_SIZE);
-    config->net_input_buffer.size = wrd_get_env_int("WRD_NET_INPUT_BUFFER_SIZE", WRD_NET_INPUT_BUFFER_SIZE);
+    // config->net_headers_buffer.size = wrd_get_env_int("WRD_NET_HEADERS_BUFFER_SIZE", WRD_NET_HEADERS_BUFFER_SIZE);
+    // config->net_buffer.size = wrd_get_env_int("WRD_NET_BUFFER_SIZE", WRD_NET_BUFFER_SIZE);
+    // config->net_input_buffer.size = wrd_get_env_int("WRD_NET_INPUT_BUFFER_SIZE", WRD_NET_INPUT_BUFFER_SIZE);
+    config->net_headers_buffer.size = config->config.net_headers_buffer_size;
+    config->net_buffer.size = config->config.net_buffer_size;
+    config->net_input_buffer.size = config->config.net_input_buffer_size;
 
     // config->net_buffer.size
     config->net_buffer.size *= 1048576;
@@ -48,7 +51,7 @@ wrd_code wrd_net_init(warudo *config, int backlog) {
     // Set up the address struct
     config->address.sin_family = AF_INET;
     config->address.sin_addr.s_addr = INADDR_ANY;
-    config->address.sin_port = htons(WRD_SOCKET_PORT);
+    config->address.sin_port = htons(config->config.socket_port);
 
     // Bind the socket
     if(bind(config->server_fd, (struct sockaddr*)&config->address, sizeof(config->address)) < 0) {

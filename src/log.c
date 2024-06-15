@@ -10,7 +10,7 @@ wrd_code wrd_log(warudo *config, wrd_log_level level, const char *format, ...) {
         return WRD_ERROR;
     }
 
-    wrd_log_level log_level = config ? config->log_level : WRD_DEFAULT_LOG_LEVEL;
+    wrd_log_level log_level = config ? config->config.log_level : WRD_DEFAULT_LOG_LEVEL;
 
     if(log_level == WRD_LOG_LEVEL_NO_LOG || level > log_level) {
         return WRD_OK;

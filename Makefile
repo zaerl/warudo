@@ -3,7 +3,7 @@ BIN_DIR = bin
 
 all: compile
 
-compile: $(BUILD_DIR) $(BIN_DIR)
+compile: $(BUILD_DIR) $(BIN_DIR) generate_config
 	cd $(BUILD_DIR) && cmake .. && make
 
 # Create build directory if it doesn't exist
@@ -13,6 +13,11 @@ $(BUILD_DIR):
 # Create bin directory if it doesn't exist
 $(BIN_DIR):
 	mkdir -p $@
+
+generate_config:
+	php tools/generate-config.php h > src/conf.h
+	php tools/generate-config.php c > src/conf.c
+	php tools/generate-config.php conf > warudo.conf.default
 
 # Generate warudo.conf.default file
 generate_defaults: $(BUILD_DIR) $(BIN_DIR)
@@ -26,6 +31,6 @@ test: compile
 
 clean:
 	rm -rf $(BUILD_DIR) $(BIN_DIR)
-	rm src/*-generated.c
+	rm src/conf.h src/conf.c warudo.conf.default
 
 .PHONY: all clean

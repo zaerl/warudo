@@ -9,7 +9,12 @@ extern "C" {
 #error "Windows is not supported"
 #endif
 
-#include "config.h"
+#define WRD_NAME "Warudo"
+#define WRD_VERSION_MAJOR 0
+#define WRD_VERSION_MINOR 1
+#define WRD_VERSION "0.1"
+
+#include "conf.h"
 
 // Configurations
 #define WRD_BUFFLEN 8192
@@ -39,16 +44,8 @@ extern "C" {
 #define WRD_ENTRY_TYPE_DATA 0
 #define WRD_ENTRY_TYPE_VIEW 1
 
-typedef enum {
-    WRD_LOG_LEVEL_NO_LOG = 0,
-    WRD_LOG_LEVEL_INFO = 1,
-    WRD_LOG_LEVEL_ERROR = 2,
-    WRD_LOG_LEVEL_DEBUG = 3
-} wrd_log_level;
-
 // Environment variables
 #define WRD_DEFAULT_CORS NULL
-#define WRD_DEFAULT_LOG_LEVEL WRD_LOG_LEVEL_NO_LOG
 
 typedef enum {
     // Success code
@@ -116,19 +113,21 @@ typedef struct wrd_query {
     const char *sort;
 } wrd_query;
 
+// Main Warudo confuguration.
 typedef struct warudo {
+    // Main database.
     sqlite3 *db;
     sqlite3_stmt *insert_stmt;
     sqlite3_stmt *insert_dashboard_stmt;
     sqlite3_stmt *add_index_stmt;
     sqlite3_stmt *parse_json_stmt;
 
+    // HTTP query in-memory database.
     sqlite3 *query_db;
     sqlite3_stmt *insert_query_stmt;
 
-    // Environment variables
-    const char *access_origin;
-    wrd_log_level log_level;
+    // Configurations
+    wrd_config config;
 
     // Network
     int server_fd;
@@ -140,11 +139,12 @@ typedef struct warudo {
     wrd_buffer net_buffer;
     wrd_buffer net_input_buffer;
 
+    // HTTP various.
     int page;
     int request_method;
     const char *script_name;
     const char *query_string;
-    wrd_column columns[WRD_MAX_COLUMNS];
+    wrd_column columns[WRD_DEFAULT_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;
     struct timespec start;
