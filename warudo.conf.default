@@ -3,7 +3,7 @@
 
 # A configuration is in the `name = value` form. `name=value` form is ok.
 # The file must be UTF-8 encoded, line ending can be \n, \r\n. Multiple spaces
-# at the end of a line are ignored
+# at the end of a line are ignored.
 
 # All configuration can also be passed as an environment variable to the
 # executable. Example socket_port can be passed as WRD_SOCKET_PORT variable.
@@ -11,7 +11,11 @@
 # Database
 db_path = file:warudo.db
 
+# Log level can be one of the following [0, 1, 2, 3]: no log, info, error, debug
+log_level = 0
+
 # Net
+access_origin = 
 listen_backlog = 1024
 max_columns = 64
 net_buffer_size = 1
