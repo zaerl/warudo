@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "../src/warudo.h"
-#include "attractor.h"
+#include "./attractor/attractor.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "attractor.h"
 #include "test.h"
 #include "../src/code.h"
 

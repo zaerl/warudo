@@ -79,7 +79,7 @@ target_link_libraries(warudo PRIVATE warudo_lib warudo_sqlite)
 set_target_properties(warudo PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
 
 # warudo-test
-file(GLOB TEST_SOURCES "test/*.c")
+file(GLOB_RECURSE TEST_SOURCES "test/*.c")
 add_executable(warudo-test ${TEST_SOURCES})
 target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite warudo_data_lib)
 set_target_properties(warudo-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
