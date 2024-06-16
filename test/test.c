@@ -22,9 +22,9 @@ int main(int argc, const char *argv[]) {
         pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
         pthread_join(thread_##NAME, NULL);
 
-    RUN_TEST(conf)
-    /*RUN_TEST(auth)
+    RUN_TEST(auth)
     RUN_TEST(code)
+    RUN_TEST(conf)
     RUN_TEST(data)
     RUN_TEST(db)
     RUN_TEST(env)
@@ -37,7 +37,7 @@ int main(int argc, const char *argv[]) {
     RUN_TEST(route_app)
     RUN_TEST(route_home)
     RUN_TEST(server)
-    RUN_TEST(timing)*/
+    RUN_TEST(timing)
 
     unsigned int tests_valid = att_get_valid_tests();
     unsigned int tests_total = att_get_total_tests();
