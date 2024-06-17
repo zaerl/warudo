@@ -49,7 +49,7 @@ function analyze_output($output, $verbose = false) {
                     echo $line, "\n    > ", $matches[2], "\n";
                 }
 
-                $coverage[$matches[2]] = 1;
+                $coverage[$matches[2]] = 0;
             } else {
                 if($verbose) {
                     echo $line . "\n";
@@ -61,11 +61,10 @@ function analyze_output($output, $verbose = false) {
     return $coverage;
 }
 
-function analyze_test($output, $verbose = false) {
+function analyze_test($output, $coverage, $verbose = false) {
     $lines = explode("\n", $output);
     // $pattern = '/\_Generic\(0 , (.+)\), char: att_assert_c.+/';
     $pattern = '/\_Generic\(\(0\s,\s(.+)\),\schar: att_assert_c/';
-    $coverage = [];
 
     foreach($lines as $i => $line) {
         if(
@@ -86,7 +85,11 @@ function analyze_test($output, $verbose = false) {
                         echo "\n    > ", $matches_2[1], "\n";
                     }
 
-                    $coverage[$matches_2[1]] = 1;
+                    if(!isset($coverage[$matches_2[1]])) {
+                        $coverage[$matches_2[1]] = 0;
+                    }
+
+                    ++$coverage[$matches_2[1]];
                 }
             }
         }
@@ -94,8 +97,6 @@ function analyze_test($output, $verbose = false) {
 
     return $coverage;
 }
-
-$coverage = [];
 
 $output = run_process('clang-query -f tools/src-query.txt ./src/*.h');
 
@@ -115,10 +116,36 @@ if(is_int($output)) {
     exit($output);
 }
 
-$tests_coverage = analyze_test($output);
+$coverage = analyze_test($output, $coverage);
+$total = 0;
+$max_name_length = 0;
 
 foreach($coverage as $key => $value) {
-    if(!isset($tests_coverage[$key])) {
-        echo "Missing test for $key\n";
-    }
+    $total += $value;
+    $max_name_length = max($max_name_length, strlen($key));
 }
+
+ksort($coverage);
+$bar = str_repeat('-', $max_name_length);
+$post = str_repeat(' ', $max_name_length - 5);
+$post_2 = str_repeat(' ', 5);
+?>
+# Test coverage
+
+| Test <?php echo $post ?> | Coverage |
+| <?php echo $bar ?> | -------- |
+<?php
+foreach($coverage as $key => $value) {
+    $post = str_repeat(' ', $max_name_length - strlen($key));
+    // echo $key, ' ', $value, "\n";
+    echo '| ', $key, $post, ' | ', $value;
+
+    $post = str_repeat(' ', 8 - strlen((string)$value));
+    echo $post, " |\n";
+}
+
+$post = str_repeat(' ', $max_name_length - 6);
+echo '| Total ', $post, ' | ', $total;
+
+$post = str_repeat(' ', 9 - strlen((string)$total));
+echo $post, "|\n";

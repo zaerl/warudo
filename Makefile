@@ -24,7 +24,7 @@ generate_defaults: $(BUILD_DIR) $(BIN_DIR)
 	cd $(BUILD_DIR) && cmake -DWARUDO_GENERATE_DEFAULT_CONFIG=ON ..
 
 code_coverage:
-	php tools/code-coverage.php
+	php tools/code-coverage.php > TESTS.md
 
 start: compile
 	WRD_CORS="*" WRD_LOG_LEVEL=3 $(BIN_DIR)/warudo
