@@ -1,7 +1,12 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.7...3.29)
+
+if(${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
+endif()
+
 project(Warudo
     VERSION 0.1.2
-    DESCRIPTION "A webserver written in C11"
+    DESCRIPTION "Warudo"
     LANGUAGES C
 )
 
@@ -10,33 +15,11 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 # Various
 set(BIN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/bin")
-set(CONFIG_DIR "${PROJECT_BINARY_DIR}/config")
 set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(CLI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/cli")
 
-# Configurations
-set(WRD_CONFIG_PATH "warudo.json")
-set(WRD_DB_PATH "file:warudo.db")
-set(WRD_LISTEN_BACKLOG 1024)
-set(WRD_MAX_COLUMNS 64)
-set(WRD_NET_BUFFER_SIZE 1)
-set(WRD_NET_HEADERS_BUFFER_SIZE 4096)
-set(WRD_NET_INPUT_BUFFER_SIZE 1)
-set(WRD_SOCKET_PORT 6251)
-
 # Compiler flags
 set(CMAKE_C_FLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter")
-
-# Options
-option(WARUDO_GENERATE_DEFAULT_CONFIG "Generate default configuration file" OFF)
-
-# Config files
-configure_file("config/config.h.in" "config/config.h")
-
-if(WARUDO_GENERATE_DEFAULT_CONFIG)
-    message(STATUS "Generating default configuration file")
-    configure_file("config/warudo.conf.in" "${CMAKE_CURRENT_SOURCE_DIR}/warudo.conf.default")
-endif()
 
 ## Main files
 include_directories("src")
@@ -45,7 +28,6 @@ include_directories("src")
 file(GLOB SOURCES "${SRC_DIR}/*.c")
 list(REMOVE_ITEM SOURCES "${SRC_DIR}/main.c")
 add_library(warudo_lib STATIC ${SOURCES})
-target_include_directories(warudo_lib PUBLIC ${CONFIG_DIR})
 
 # SQLite library
 file(GLOB SQLITE3_SOURCES "${SRC_DIR}/sqlite3/*.c")
@@ -83,7 +65,6 @@ file(GLOB_RECURSE TEST_SOURCES "test/*.c")
 add_executable(warudo-test ${TEST_SOURCES})
 target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite warudo_data_lib)
 set_target_properties(warudo-test PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${BIN_DIR})
-target_include_directories(warudo-test PUBLIC ${CONFIG_DIR})
 
 # warudo-cli
 add_executable(warudo-cli "${CLI_DIR}/main.c")
