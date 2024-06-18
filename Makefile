@@ -13,10 +13,10 @@ code_coverage:
 	php tools/code-coverage.php > TESTS.md
 
 start: compile
-	WRD_CORS="*" WRD_LOG_LEVEL=3 build/warudo
+	WRD_CORS="*" WRD_LOG_LEVEL=3 build/src/warudo
 
 test: compile
-	build/warudo-test
+	build/test/warudo-test
 
 clean:
 	rm -rf build

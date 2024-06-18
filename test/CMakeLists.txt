@@ -1,0 +1,24 @@
+set(TEST_SOURCES
+    attractor/attractor.c
+    auth.c
+    code.c
+    conf.c
+    data.c
+    db.c
+    env.c
+    hpack.c
+    http.c
+    log.c
+    net.c
+    output.c
+    query.c
+    route-app.c
+    route-home.c
+    server.c
+    test-utils.c
+    test.c
+    timing.c
+)
+
+add_executable(warudo-test ${TEST_SOURCES})
+target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite warudo_data_lib)

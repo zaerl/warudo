@@ -17,3 +17,7 @@ set(SOURCES
 )
 
 add_library(warudo_lib STATIC ${SOURCES})
+
+# warudo
+add_executable(warudo main.c)
+target_link_libraries(warudo PRIVATE warudo_lib warudo_sqlite)
