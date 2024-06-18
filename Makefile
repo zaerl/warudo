@@ -13,13 +13,13 @@ code_coverage:
 	php tools/code-coverage.php > TESTS.md
 
 start: compile
-	WRD_CORS="*" WRD_LOG_LEVEL=3 $(BIN_DIR)/warudo
+	WRD_CORS="*" WRD_LOG_LEVEL=3 build/warudo
 
 test: compile
-	cd $(BIN_DIR) && ./warudo-test
+	build/warudo-test
 
 clean:
-	rm -rf build bin
+	rm -rf build
 	rm src/conf.h src/conf.c warudo.conf.default
 
 .PHONY: all clean
