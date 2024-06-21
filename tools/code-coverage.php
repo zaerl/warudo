@@ -125,7 +125,26 @@ foreach($coverage as $key => $value) {
     $max_name_length = max($max_name_length, strlen($key));
 }
 
-ksort($coverage);
+uksort($coverage, function($a, $b) use ($coverage) {
+    if(
+        // true true
+        // false false
+        $coverage[$a] && $coverage[$b] ||
+        !$coverage[$a] && !$coverage[$b]
+    ) {
+        return strcmp($a, $b);
+    }
+
+    // true false
+    if($coverage[$a] && !$coverage[$b]) {
+        return -1;
+    }
+
+    // false true
+    if(!$coverage[$a] && $coverage[$b]) {
+        return 1;
+    }
+});
 $bar = str_repeat('-', $max_name_length);
 $post = str_repeat(' ', $max_name_length - 5);
 $post_2 = str_repeat(' ', 5);
