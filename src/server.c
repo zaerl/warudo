@@ -25,11 +25,8 @@ wrd_code wrd_init(warudo **config) {
 
     (*config)->columns_count = 0;
     (*config)->requests_count = 0;
-
-#ifdef WRD_TIMING
     (*config)->timing_count = 0;
     (*config)->timing_end_count = 0;
-#endif
 
     wrd_load_config(&(*config)->config, NULL);
 
@@ -85,9 +82,9 @@ wrd_code wrd_accept_connection(warudo *config) {
         return accepted;
     }
 
-#ifdef WRD_TIMING
-    wrd_start_time(config);
-#endif
+    if(config->config.timing) {
+        wrd_start_time(config);
+    }
 
     config->page = -1;
     config->request_method = WRD_REQUEST_UNKNOWN;
@@ -106,9 +103,9 @@ wrd_code wrd_after_connection(warudo *config) {
     wrd_http_flush(config);
     wrd_net_finish_request(config);
 
-#ifdef WRD_TIMING
-    wrd_end_time(config, "after finish request");
-#endif
+    if(config->config.timing) {
+        wrd_end_time(config, "after finish request");
+    }
 
     return WRD_OK;
 }

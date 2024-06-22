@@ -20,6 +20,7 @@ void wrd_init_config(wrd_config *config) {
     config->net_headers_buffer_size = wrd_get_env_int("WRD_NET_HEADERS_BUFFER_SIZE", WRD_DEFAULT_NET_HEADERS_BUFFER_SIZE);
     config->net_input_buffer_size = wrd_get_env_int("WRD_NET_INPUT_BUFFER_SIZE", WRD_DEFAULT_NET_INPUT_BUFFER_SIZE);
     config->socket_port = wrd_get_env_int("WRD_SOCKET_PORT", WRD_DEFAULT_SOCKET_PORT);
+    config->timing = wrd_get_env_int("WRD_TIMING", WRD_DEFAULT_TIMING);
 }
 
 // Load a configuration file.

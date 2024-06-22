@@ -18,19 +18,6 @@ extern "C" {
 
 #include "conf.h"
 
-// Configurations
-#define WRD_BUFFLEN 8192
-
-#define WRD_HCTREE_DB_FILE "file:warudo.db?hctree=1"
-// #define WRD_SOCKET_PATH ":6252"
-#define WRD_TIMING 1
-#define WRD_MAX_QUERY_KEYS 16
-
-// Default tables
-#define WRD_DASHBOARDS_TABLE "dashboards"
-#define WRD_ENTRIES_TABLE "entries"
-#define WRD_AUTH_TABLE "http_auth"
-
 // Headers
 #define WRD_AUTH_DEFAULT_USER "admin"
 #define WRD_AUTH_DEFAULT_PASS "admin"
@@ -45,9 +32,6 @@ extern "C" {
 // Tables
 #define WRD_ENTRY_TYPE_DATA 0
 #define WRD_ENTRY_TYPE_VIEW 1
-
-// Environment variables
-#define WRD_DEFAULT_CORS NULL
 
 typedef enum {
     // Success code

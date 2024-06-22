@@ -24,6 +24,7 @@ $map = [
     ['net_headers_buffer_size', 4096],
     ['net_input_buffer_size', 1],
     ['socket_port', 6251],
+    ['timing', 1],
 ];
 
 // Configuration file.

@@ -32,6 +32,7 @@ typedef enum {
 #define WRD_DEFAULT_NET_HEADERS_BUFFER_SIZE 4096
 #define WRD_DEFAULT_NET_INPUT_BUFFER_SIZE 1
 #define WRD_DEFAULT_SOCKET_PORT 6251
+#define WRD_DEFAULT_TIMING 1
 
 typedef struct wrd_config {
     // Database
@@ -46,6 +47,7 @@ typedef struct wrd_config {
     int net_headers_buffer_size;
     int net_input_buffer_size;
     int socket_port;
+    int timing;
 } wrd_config;
 
 // Load a configuration file.

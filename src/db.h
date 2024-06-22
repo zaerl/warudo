@@ -7,6 +7,15 @@
 extern "C" {
 #endif
 
+// Default tables
+#define WRD_DASHBOARDS_TABLE "dashboards"
+#define WRD_ENTRIES_TABLE "entries"
+#define WRD_AUTH_TABLE "http_auth"
+
+// Tables
+#define WRD_ENTRY_TYPE_DATA 0
+#define WRD_ENTRY_TYPE_VIEW 1
+
 wrd_code wrd_db_init(const char *filename, warudo *config);
 wrd_code wrd_db_close(warudo *config);
 wrd_code wrd_db_add_header(warudo *config, const char *name, const char *value);
