@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14...3.29)
 
 project(
     Warudo
-    VERSION 0.1.3
+    VERSION 0.1.0
     DESCRIPTION "Warudo"
     LANGUAGES C
 )

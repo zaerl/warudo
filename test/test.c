@@ -39,6 +39,7 @@ int main(int argc, const char *argv[]) {
     RUN_TEST(route_home)
     RUN_TEST(server)
     RUN_TEST(timing)
+    RUN_TEST(version)
 
     unsigned int tests_valid = att_get_valid_tests();
     unsigned int tests_total = att_get_total_tests();

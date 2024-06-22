@@ -12,7 +12,9 @@ extern "C" {
 #define WRD_NAME "Warudo"
 #define WRD_VERSION_MAJOR 0
 #define WRD_VERSION_MINOR 1
-#define WRD_VERSION "0.1"
+#define WRD_VERSION_RELEASE 0
+#define WRD_VERSION "0.1.0"
+#define WRD_VERSION_NUMBER 1000
 
 #include "conf.h"
 

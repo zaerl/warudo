@@ -14,6 +14,7 @@ set(SOURCES
     route-home.c
     server.c
     timing.c
+    version.c
 )
 
 add_library(warudo_lib STATIC ${SOURCES})

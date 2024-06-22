@@ -1,5 +1,5 @@
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef WRD_SERVER_H
+#define WRD_SERVER_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,4 +51,4 @@ wrd_code wrd_close(warudo *config);
 }
 #endif
 
-#endif // SERVER_H
+#endif // WRD_SERVER_H

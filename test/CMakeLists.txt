@@ -18,6 +18,7 @@ set(TEST_SOURCES
     test.c
     test-utils.c
     timing.c
+    version.c
 )
 
 add_executable(warudo-test ${TEST_SOURCES})
