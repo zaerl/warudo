@@ -22,6 +22,7 @@ int main(int argc, const char *argv[]) {
         pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
         pthread_join(thread_##NAME, NULL);
 
+    // Start tests declarations.
     RUN_TEST(auth)
     RUN_TEST(code)
     RUN_TEST(conf)

@@ -1,4 +1,5 @@
 <?php
+// phpcs:ignoreFile
 
 // Open the log file, or stdin for reading
 $file = fopen($argc < 2 || $argv[1] === '-' ? 'php://stdin' : $argv[1], 'r');

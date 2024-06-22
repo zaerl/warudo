@@ -15,8 +15,8 @@ set(TEST_SOURCES
     route-app.c
     route-home.c
     server.c
-    test-utils.c
     test.c
+    test-utils.c
     timing.c
 )
 

@@ -38,7 +38,7 @@ void wrd_assert_code(int result, int expected, const char *description);
 // Generate a temporary file with the given content.
 char *wrd_mock_file(const char *content);
 
-// Tests
+// Start tests declarations.
 void *test_auth(void *arg);
 void *test_code(void *arg);
 void *test_conf(void *arg);

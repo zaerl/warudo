@@ -9,6 +9,9 @@ generate_config:
 	php tools/generate-config.php c > src/conf.c
 	php tools/generate-config.php conf > warudo.conf.default
 
+generate_tests:
+	php tools/generate-tests.php
+
 code_coverage:
 	php tools/code-coverage.php > TESTS.md
 
