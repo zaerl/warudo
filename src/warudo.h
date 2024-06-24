@@ -29,10 +29,6 @@ extern "C" {
 
 #include "sqlite3/sqlite3.h"
 
-// Tables
-#define WRD_ENTRY_TYPE_DATA 0
-#define WRD_ENTRY_TYPE_VIEW 1
-
 typedef enum {
     // Success code
     WRD_OK = 0,

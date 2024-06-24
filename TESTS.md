@@ -14,6 +14,7 @@
 | wrd_is_valid_boundary        | 5        |
 | wrd_load_config              | 5        |
 | wrd_url_decode               | 13       |
+| wrd_version                  | 1        |
 | wrd_accept_connection        | 0        |
 | wrd_add_entries              | 0        |
 | wrd_add_entry                | 0        |
@@ -64,4 +65,4 @@
 | wrd_route_app_keys           | 0        |
 | wrd_route_home               | 0        |
 | wrd_start_time               | 0        |
-| Total                        | 63       |
+| Total                        | 64       |
