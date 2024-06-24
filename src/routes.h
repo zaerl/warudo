@@ -8,13 +8,13 @@ extern "C" {
 #include "warudo.h"
 
 // Homepage error page
-wrd_code wrd_route_home(warudo *config);
+WRD_API wrd_code wrd_route_home(warudo *config);
 
 // Root JSON endpoints
-wrd_code wrd_route_app(int entry_type, warudo *config);
+WRD_API wrd_code wrd_route_app(int entry_type, warudo *config);
 
 // Keys JSON endpoint
-wrd_code wrd_route_app_keys(warudo *config);
+WRD_API wrd_code wrd_route_app_keys(warudo *config);
 
 #ifdef __cplusplus
 }

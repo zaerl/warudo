@@ -11,6 +11,10 @@
 extern "C" {
 #endif
 
+#ifndef WRD_API
+#define WRD_API
+#endif
+
 // Database
 #define WRD_DEFAULT_DB_PATH "file:warudo.db"
 
@@ -51,10 +55,10 @@ typedef struct wrd_config {
 } wrd_config;
 
 // Load a configuration file.
-void wrd_init_config(wrd_config *config);
+WRD_API void wrd_init_config(wrd_config *config);
 
 // Load a configuration file.
-ssize_t wrd_load_config(wrd_config *config, const char *file_path);
+WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path);
 
 #ifdef __cplusplus
 }

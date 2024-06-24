@@ -114,7 +114,7 @@ typedef struct wrd_huffman_node {
 } wrd_huffman_node;
 
 static wrd_header_field wrd_dynamic_table[WRD_DYNAMIC_TABLE_SIZE];
-static int wrd_dynamic_table_size = 0;
+static WRD_API int wrd_dynamic_table_size = 0;
 
 static void wrd_add_header_to_dynamic_table(const char *name, const char *value) {
     if(wrd_dynamic_table_size >= WRD_DYNAMIC_TABLE_SIZE) {
@@ -133,7 +133,7 @@ static void wrd_add_header_to_dynamic_table(const char *name, const char *value)
     ++wrd_dynamic_table_size;
 }
 
-wrd_code wrd_compress_header(const char *name, const char *value, char *output) {
+WRD_API wrd_code wrd_compress_header(const char *name, const char *value, char *output) {
     // Check static table
     for(int i = 0; i < WRD_STATIC_TABLE_SIZE; ++i) {
         if (strcmp(name, wrd_static_table[i].name) == 0 && strcmp(value, wrd_static_table[i].value) == 0) {
@@ -159,7 +159,7 @@ wrd_code wrd_compress_header(const char *name, const char *value, char *output) 
     return WRD_OK;
 }
 
-wrd_code wrd_decompress_header(const char *input, char *name, char *value) {
+WRD_API wrd_code wrd_decompress_header(const char *input, char *name, char *value) {
     int index;
 
     if(sscanf(input, "%d", &index) == 1) {
@@ -181,7 +181,7 @@ wrd_code wrd_decompress_header(const char *input, char *name, char *value) {
     return WRD_OK;
 }
 
-wrd_huffman_node *build_huffman_tree(void) {
+WRD_API wrd_huffman_node *build_huffman_tree(void) {
     wrd_huffman_node *root = (wrd_huffman_node*)calloc(1, sizeof(wrd_huffman_node));
 
     for(int i = 0; i < 256; ++i) {
@@ -211,7 +211,7 @@ wrd_huffman_node *build_huffman_tree(void) {
     return root;
 }
 
-wrd_code wrd_free_huffman_tree(wrd_huffman_node *node) {
+WRD_API wrd_code wrd_free_huffman_tree(wrd_huffman_node *node) {
     if(node == NULL) {
         return WRD_ERROR;
     }
@@ -229,7 +229,7 @@ wrd_code wrd_free_huffman_tree(wrd_huffman_node *node) {
     return WRD_OK;
 }
 
-wrd_code wrd_huffman_encode(const char *input, uint8_t *output, size_t *output_len) {
+WRD_API wrd_code wrd_huffman_encode(const char *input, uint8_t *output, size_t *output_len) {
     uint32_t buffer = 0;
     int bits_left = 32;
     *output_len = 0;
@@ -255,7 +255,7 @@ wrd_code wrd_huffman_encode(const char *input, uint8_t *output, size_t *output_l
     return WRD_OK;
 }
 
-wrd_code huffman_decode(const uint8_t *input, size_t input_len, char *output) {
+WRD_API wrd_code huffman_decode(const uint8_t *input, size_t input_len, char *output) {
     wrd_huffman_node *root = build_huffman_tree();
     wrd_huffman_node *node = root;
     // int bit_pos = 0;

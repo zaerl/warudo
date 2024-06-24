@@ -6,7 +6,7 @@
 #include "output.h"
 
 // Function to escape special characters in a string for HTML
-char *wrd_escape_html(const char *input) {
+WRD_API char *wrd_escape_html(const char *input) {
     if(input == NULL) {
         return NULL;
     }

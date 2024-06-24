@@ -7,8 +7,8 @@
 extern "C" {
 #endif
 
-wrd_code wrd_compress_header(const char *name, const char *value, char *output);
-wrd_code wrd_decompress_header(const char *input, char *name, char *value);
+WRD_API wrd_code wrd_compress_header(const char *name, const char *value, char *output);
+WRD_API wrd_code wrd_decompress_header(const char *input, char *name, char *value);
 
 #ifdef __cplusplus
 }

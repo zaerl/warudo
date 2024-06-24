@@ -8,42 +8,42 @@ extern "C" {
 #endif
 
 // Headers
-wrd_code wrd_http_status(warudo *config, const char *status);
-wrd_code wrd_http_content_type(warudo *config, const char *content_type);
-wrd_code wrd_http_header(warudo *config, const char *status, const char *content_type);
+WRD_API wrd_code wrd_http_status(warudo *config, const char *status);
+WRD_API wrd_code wrd_http_content_type(warudo *config, const char *content_type);
+WRD_API wrd_code wrd_http_header(warudo *config, const char *status, const char *content_type);
 
 // 200 OK
-wrd_code wrd_http_ok(warudo *config);
+WRD_API wrd_code wrd_http_ok(warudo *config);
 
 // 201 Created
-wrd_code wrd_http_created(warudo *config, unsigned long long int id);
+WRD_API wrd_code wrd_http_created(warudo *config, unsigned long long int id);
 
 // 201 Created (multiple)
-wrd_code wrd_http_multi_created(warudo *config, unsigned long int count);
+WRD_API wrd_code wrd_http_multi_created(warudo *config, unsigned long int count);
 
 // 405 Method Not Allowed
-wrd_code wrd_http_not_allowed(warudo *config, const char *allowed);
+WRD_API wrd_code wrd_http_not_allowed(warudo *config, const char *allowed);
 
 // 500 Internal Server Error
-wrd_code wrd_http_server_error(warudo *config, const char *description);
+WRD_API wrd_code wrd_http_server_error(warudo *config, const char *description);
 
 // 400 Bad Request
-wrd_code wrd_http_bad_request(warudo *config, const char *description);
+WRD_API wrd_code wrd_http_bad_request(warudo *config, const char *description);
 
 // 404 Not Found
-wrd_code wrd_http_not_found(warudo *config);
+WRD_API wrd_code wrd_http_not_found(warudo *config);
 
-wrd_code wrd_http_puts(warudo *config, const char *str);
-wrd_code wrd_http_printf(warudo *config, const char *format, ...);
-
-// Parse the query headers
-wrd_code wrd_http_parse_query_headers(warudo *config);
+WRD_API wrd_code wrd_http_puts(warudo *config, const char *str);
+WRD_API wrd_code wrd_http_printf(warudo *config, const char *format, ...);
 
 // Parse the query headers
-wrd_code wrd_http_get_header(warudo *config, const char *name, char **value);
+WRD_API wrd_code wrd_http_parse_query_headers(warudo *config);
+
+// Parse the query headers
+WRD_API wrd_code wrd_http_get_header(warudo *config, const char *name, char **value);
 
 // Write headers and content to the network
-wrd_code wrd_http_flush(warudo *config);
+WRD_API wrd_code wrd_http_flush(warudo *config);
 
 #ifdef __cplusplus
 }

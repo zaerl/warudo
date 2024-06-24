@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-char *wrd_escape_html(const char *input);
+WRD_API char *wrd_escape_html(const char *input);
 
 #ifdef __cplusplus
 }

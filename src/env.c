@@ -2,7 +2,7 @@
 
 #include "env.h"
 
-int wrd_get_env_int(const char *name, int default_value) {
+WRD_API int wrd_get_env_int(const char *name, int default_value) {
     char *env = getenv(name);
 
     if(env != NULL) {
@@ -12,7 +12,7 @@ int wrd_get_env_int(const char *name, int default_value) {
     return default_value;
 }
 
-char* wrd_get_env_string(const char *name, char *default_value) {
+WRD_API char* wrd_get_env_string(const char *name, char *default_value) {
     char *env = getenv(name);
 
     if(env != NULL) {

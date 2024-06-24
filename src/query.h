@@ -29,17 +29,17 @@ extern "C" {
 typedef int (*wrd_parse_formdata_callback)(const char*, long int, warudo*);
 
 // Parse the query string
-wrd_code wrd_parse_query_string(warudo *config, char *query_string);
-char *wrd_url_decode(const char *input);
+WRD_API wrd_code wrd_parse_query_string(warudo *config, char *query_string);
+WRD_API char *wrd_url_decode(const char *input);
 
 // Forms
-int wrd_is_valid_boundary(const char *boundary);
-const char *wrd_get_formdata_boundary(const char *content_type);
-wrd_code wrd_parse_formdata(const char *input, long int length, const char *boundary,
+WRD_API int wrd_is_valid_boundary(const char *boundary);
+WRD_API const char *wrd_get_formdata_boundary(const char *content_type);
+WRD_API wrd_code wrd_parse_formdata(const char *input, long int length, const char *boundary,
     wrd_parse_formdata_callback callback, warudo *config);
 
-long wrd_content_length(warudo *config);
-char *wrd_read_content(long int length, warudo *config);
+WRD_API long wrd_content_length(warudo *config);
+WRD_API char *wrd_read_content(long int length, warudo *config);
 
 #ifdef __cplusplus
 }

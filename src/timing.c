@@ -3,7 +3,7 @@
 #include "log.h"
 #include "timing.h"
 
-wrd_code wrd_start_time(warudo *config) {
+WRD_API wrd_code wrd_start_time(warudo *config) {
     CHECK_CONFIG
 
     ++config->timing_count;
@@ -13,7 +13,7 @@ wrd_code wrd_start_time(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_end_time(warudo *config, const char *message) {
+WRD_API wrd_code wrd_end_time(warudo *config, const char *message) {
     CHECK_CONFIG
 
     struct timespec end;

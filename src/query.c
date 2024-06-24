@@ -6,7 +6,7 @@
 
 #include "query.h"
 
-wrd_code wrd_parse_query_string(warudo *config, char *query_string) {
+WRD_API wrd_code wrd_parse_query_string(warudo *config, char *query_string) {
     CHECK_CONFIG
 
     config->query.id = 0;
@@ -61,7 +61,7 @@ wrd_code wrd_parse_query_string(warudo *config, char *query_string) {
     return WRD_OK;
 }
 
-char *wrd_url_decode(const char *input) {
+WRD_API char *wrd_url_decode(const char *input) {
     if(input == NULL) {
         return NULL;
     }
@@ -106,7 +106,7 @@ char *wrd_url_decode(const char *input) {
     return decoded_url;
 }
 
-int wrd_is_valid_boundary(const char *boundary) {
+WRD_API int wrd_is_valid_boundary(const char *boundary) {
     if(boundary == NULL) {
         return 0;
     }
@@ -128,7 +128,7 @@ int wrd_is_valid_boundary(const char *boundary) {
 }
 
 // multipart/form-data; boundary=random string
-const char *wrd_get_formdata_boundary(const char *content_type) {
+WRD_API const char *wrd_get_formdata_boundary(const char *content_type) {
     if(content_type == NULL || strlen(content_type) < 31) {
         return NULL;
     }
@@ -148,7 +148,7 @@ const char *wrd_get_formdata_boundary(const char *content_type) {
     return boundary;
 }
 
-wrd_code wrd_parse_formdata(const char *input, long int length, const char *boundary,
+WRD_API wrd_code wrd_parse_formdata(const char *input, long int length, const char *boundary,
     wrd_parse_formdata_callback callback, warudo *config) {
     char *full_boundary = NULL;
     long int index = 0;
@@ -247,7 +247,7 @@ error:
     return res;
 }
 
-long wrd_content_length(warudo *config) {
+WRD_API long wrd_content_length(warudo *config) {
     if(!config) {
         return 0;
     }
@@ -263,8 +263,7 @@ long wrd_content_length(warudo *config) {
     return 0;
 }
 
-
-char *wrd_read_content(long int length, warudo *config) {
+WRD_API char *wrd_read_content(long int length, warudo *config) {
     long int len = length == 0 ? wrd_content_length(config) : length;
 
     if(len <= 0) {

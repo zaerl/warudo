@@ -1,6 +1,6 @@
 #include "code.h"
 
-const char *wrd_error_description(wrd_code code, int extended) {
+WRD_API const char *wrd_error_description(wrd_code code, int extended) {
     switch(code) {
         // Success code
         case WRD_OK:

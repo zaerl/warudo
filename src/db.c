@@ -19,10 +19,10 @@
 
 #define WRD_DB_CALL(STMT, CALL) WRD_DB_RET_CALL(STMT, CALL, SQLITE_OK)
 
-// wrd_code wrd_load_columns(warudo *config);
-wrd_code wrd_db_query_init(warudo *config);
+// WRD_API wrd_code wrd_load_columns(warudo *config);
+WRD_API wrd_code wrd_db_query_init(warudo *config);
 
-wrd_code wrd_db_init(const char *filename, warudo *config) {
+WRD_API wrd_code wrd_db_init(const char *filename, warudo *config) {
     CHECK_CONFIG
 
     // Load database
@@ -100,7 +100,7 @@ wrd_code wrd_db_init(const char *filename, warudo *config) {
     return wrd_db_query_init(config);
 }
 
-wrd_code wrd_db_query_init(warudo *config) {
+WRD_API wrd_code wrd_db_query_init(warudo *config) {
     CHECK_CONFIG
 
     int rc = sqlite3_open(":memory:", &config->query_db);
@@ -133,7 +133,7 @@ wrd_code wrd_db_query_init(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_db_close(warudo *config) {
+WRD_API wrd_code wrd_db_close(warudo *config) {
     CHECK_CONFIG
 
     for(unsigned int i = 0; i < config->columns_count; ++i) {
@@ -172,7 +172,7 @@ wrd_code wrd_db_close(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_db_add_header(warudo *config, const char *name, const char *value) {
+WRD_API wrd_code wrd_db_add_header(warudo *config, const char *name, const char *value) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -190,7 +190,7 @@ wrd_code wrd_db_add_header(warudo *config, const char *name, const char *value) 
     return WRD_OK;
 }
 
-/*wrd_code wrd_load_columns(warudo *config) {
+/*WRD_API wrd_code wrd_load_columns(warudo *config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -230,7 +230,7 @@ unsigned long long wrd_last_insert_rowid(warudo *config) {
     return sqlite3_last_insert_rowid(config->db);
 }
 
-wrd_code wrd_parse_json(warudo *config) {
+WRD_API wrd_code wrd_parse_json(warudo *config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -275,7 +275,7 @@ wrd_code wrd_parse_json(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_add_index(const char *filename, warudo *config) {
+WRD_API wrd_code wrd_add_index(const char *filename, warudo *config) {
     CHECK_CONFIG
 
     (void)filename;
@@ -308,7 +308,7 @@ wrd_code wrd_add_index(const char *filename, warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_add_entry(int entry_type, warudo *config) {
+WRD_API wrd_code wrd_add_entry(int entry_type, warudo *config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -340,7 +340,7 @@ wrd_code wrd_add_entry(int entry_type, warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_formdata_callback(const char *input, long int length, warudo *config) {
+WRD_API wrd_code wrd_formdata_callback(const char *input, long int length, warudo *config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -361,7 +361,7 @@ wrd_code wrd_formdata_callback(const char *input, long int length, warudo *confi
     return WRD_OK;
 }
 
-wrd_code wrd_add_entries(int entry_type, warudo *config) {
+WRD_API wrd_code wrd_add_entries(int entry_type, warudo *config) {
     CHECK_CONFIG
 
     (void)entry_type;
@@ -397,7 +397,7 @@ wrd_code wrd_add_entries(int entry_type, warudo *config) {
     return count ? WRD_OK : WRD_EMPTY_CONTENT_ERROR;
 }
 
-wrd_code wrd_get_entries(int entry_type, warudo *config) {
+WRD_API wrd_code wrd_get_entries(int entry_type, warudo *config) {
     CHECK_CONFIG
 
     int must_free = 1;
@@ -482,7 +482,7 @@ wrd_code wrd_get_entries(int entry_type, warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_get_keys(warudo *config) {
+WRD_API wrd_code wrd_get_keys(warudo *config) {
     CHECK_CONFIG
 
     int must_free = 0;
@@ -521,7 +521,7 @@ wrd_code wrd_get_keys(warudo *config) {
     return WRD_OK;
 }
 
-/*wrd_code wrd_add_index(const name, warudo *config) {
+/*WRD_API wrd_code wrd_add_index(const name, warudo *config) {
     char *query = "ALTER TABLE " WRD_ENTRIES_TABLE " ADD COLUMN ?1 TEXT;"
         "AS JSON_EXTRACT(data, '$.%q') AS %q;";
 }*/

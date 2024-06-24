@@ -8,7 +8,7 @@
 #include "server.h"
 #include "warudo.h"
 
-wrd_code wrd_route_app(int entry_type, warudo *config) {
+WRD_API wrd_code wrd_route_app(int entry_type, warudo *config) {
     CHECK_CONFIG
 
     if(config->request_method == WRD_REQUEST_GET) {
@@ -24,7 +24,7 @@ wrd_code wrd_route_app(int entry_type, warudo *config) {
     return wrd_http_not_allowed(config, "GET, POST");
 }
 
-wrd_code wrd_route_app_keys(warudo *config) {
+WRD_API wrd_code wrd_route_app_keys(warudo *config) {
     CHECK_CONFIG
 
     if(config->request_method == WRD_REQUEST_GET) {

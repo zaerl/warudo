@@ -109,6 +109,10 @@ if ($argv[1] === 'h'): ?>
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifndef WRD_API
+#define WRD_API
+#endif
 <?php echo join("\n", $defines), "\n"; ?>
 
 typedef struct wrd_config {
@@ -116,10 +120,10 @@ typedef struct wrd_config {
 } wrd_config;
 
 // Load a configuration file.
-void wrd_init_config(wrd_config *config);
+WRD_API void wrd_init_config(wrd_config *config);
 
 // Load a configuration file.
-ssize_t wrd_load_config(wrd_config *config, const char *file_path);
+WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path);
 
 #ifdef __cplusplus
 }
@@ -136,12 +140,12 @@ ssize_t wrd_load_config(wrd_config *config, const char *file_path);
 <?php echo $warning_message, "\n"; ?>
 
 // Init a configuration file with environment variables.
-void wrd_init_config(wrd_config *config) {
+WRD_API void wrd_init_config(wrd_config *config) {
 <?php echo join("\n", $init_configs), "\n"; ?>
 }
 
 // Load a configuration file.
-ssize_t wrd_load_config(wrd_config *config, const char *file_path) {
+WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path) {
     wrd_init_config(config);
 
     if(file_path == NULL) {

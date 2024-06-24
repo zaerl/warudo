@@ -8,7 +8,7 @@ extern "C" {
 #include "warudo.h"
 
 // Output the version
-int wrd_version(warudo *config);
+WRD_API int wrd_version(warudo *config);
 
 #ifdef __cplusplus
 }

@@ -7,7 +7,7 @@
 // This file automatically generated. Do not edit it manually.
 
 // Init a configuration file with environment variables.
-void wrd_init_config(wrd_config *config) {
+WRD_API void wrd_init_config(wrd_config *config) {
     // Database
     config->db_path = wrd_get_env_string("WRD_DB_PATH", WRD_DEFAULT_DB_PATH);
     // Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
@@ -24,7 +24,7 @@ void wrd_init_config(wrd_config *config) {
 }
 
 // Load a configuration file.
-ssize_t wrd_load_config(wrd_config *config, const char *file_path) {
+WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path) {
     wrd_init_config(config);
 
     if(file_path == NULL) {

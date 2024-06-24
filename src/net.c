@@ -7,7 +7,7 @@
 #include "log.h"
 #include "net.h"
 
-wrd_code wrd_net_init(warudo *config, int backlog) {
+WRD_API wrd_code wrd_net_init(warudo *config, int backlog) {
     CHECK_CONFIG
 
     config->net_headers_buffer.buffer = NULL;
@@ -65,7 +65,7 @@ wrd_code wrd_net_init(warudo *config, int backlog) {
     return res == 0 ? WRD_OK : WRD_SOCKET_ERROR;
 }
 
-wrd_code wrd_net_close(warudo *config) {
+WRD_API wrd_code wrd_net_close(warudo *config) {
     CHECK_CONFIG
 
     int res = WRD_OK;
@@ -81,7 +81,7 @@ wrd_code wrd_net_close(warudo *config) {
     return res;
 }
 
-wrd_code wrd_net_accept(warudo *config) {
+WRD_API wrd_code wrd_net_accept(warudo *config) {
     CHECK_CONFIG
 
     int addrlen = sizeof(config->address);
@@ -99,7 +99,7 @@ wrd_code wrd_net_accept(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_net_finish_request(warudo *config) {
+WRD_API wrd_code wrd_net_finish_request(warudo *config) {
     CHECK_CONFIG
 
     if(config->client_fd > 0) {
@@ -111,7 +111,7 @@ wrd_code wrd_net_finish_request(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_net_read(warudo *config) {
+WRD_API wrd_code wrd_net_read(warudo *config) {
     CHECK_CONFIG
 
     ssize_t res = read(config->client_fd, config->net_input_buffer.buffer, config->net_input_buffer.size);
@@ -120,7 +120,7 @@ wrd_code wrd_net_read(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_net_send(warudo *config, wrd_buffer *buffer) {
+WRD_API wrd_code wrd_net_send(warudo *config, wrd_buffer *buffer) {
     CHECK_CONFIG
 
     if(buffer->position) {

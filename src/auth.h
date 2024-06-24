@@ -7,9 +7,8 @@
 extern "C" {
 #endif
 
-//char* wrd_base64_encode(const char *input);
-char* wrd_base64_encode(const char *input);
-char* wrd_base64_decode(const char *input);
+WRD_API char* wrd_base64_encode(const char *input);
+WRD_API char* wrd_base64_decode(const char *input);
 
 #ifdef __cplusplus
 }

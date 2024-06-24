@@ -80,7 +80,7 @@ uint8_t wrd_base64_decode_char(char c) {
     }
 }
 
-char* wrd_base64_decode(const char *input) {
+WRD_API char* wrd_base64_decode(const char *input) {
     if(input == NULL) {
         return NULL;
     }

@@ -8,8 +8,8 @@ extern "C" {
 #endif
 
 // Timing functions
-wrd_code wrd_start_time(warudo *config);
-wrd_code wrd_end_time(warudo *config, const char *message);
+WRD_API wrd_code wrd_start_time(warudo *config);
+WRD_API wrd_code wrd_end_time(warudo *config, const char *message);
 
 #ifdef __cplusplus
 }

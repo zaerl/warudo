@@ -27,25 +27,25 @@ extern "C" {
 // #define WRD_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
 
 // Init the system
-wrd_code wrd_init(warudo **config);
+WRD_API wrd_code wrd_init(warudo **config);
 
 // Accept an HTTP connection
-wrd_code wrd_accept_connection(warudo *config);
+WRD_API wrd_code wrd_accept_connection(warudo *config);
 
 // Run at the end of a connection
-wrd_code wrd_after_connection(warudo *config);
+WRD_API wrd_code wrd_after_connection(warudo *config);
 
 // Homepage error page
-wrd_code wrd_route_home(warudo *config);
+WRD_API wrd_code wrd_route_home(warudo *config);
 
 // Root JSON endpoints
-wrd_code wrd_route_app(int entry_type, warudo *config);
+WRD_API wrd_code wrd_route_app(int entry_type, warudo *config);
 
 // Keys JSON endpoint
-wrd_code wrd_route_app_keys(warudo *config);
+WRD_API wrd_code wrd_route_app_keys(warudo *config);
 
 // Close the system
-wrd_code wrd_close(warudo *config);
+WRD_API wrd_code wrd_close(warudo *config);
 
 #ifdef __cplusplus
 }

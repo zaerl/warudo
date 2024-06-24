@@ -9,6 +9,10 @@ extern "C" {
 #error "Windows is not supported"
 #endif
 
+#ifndef WRD_API
+#define WRD_API
+#endif
+
 #define WRD_NAME "Warudo"
 #define WRD_VERSION_MAJOR 0
 #define WRD_VERSION_MINOR 1

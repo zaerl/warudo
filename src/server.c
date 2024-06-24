@@ -17,7 +17,7 @@
 // TODO: remove
 #include <unistd.h>
 
-wrd_code wrd_init(warudo **config) {
+WRD_API wrd_code wrd_init(warudo **config) {
     CHECK_CONFIG
 
     *config = malloc(sizeof(warudo));
@@ -70,7 +70,7 @@ wrd_code wrd_init(warudo **config) {
     return WRD_OK;
 }
 
-wrd_code wrd_accept_connection(warudo *config) {
+WRD_API wrd_code wrd_accept_connection(warudo *config) {
     CHECK_CONFIG
 
     wrd_code accepted = wrd_net_accept(config);
@@ -97,7 +97,7 @@ wrd_code wrd_accept_connection(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_after_connection(warudo *config) {
+WRD_API wrd_code wrd_after_connection(warudo *config) {
     CHECK_CONFIG
 
     wrd_http_flush(config);
@@ -110,7 +110,7 @@ wrd_code wrd_after_connection(warudo *config) {
     return WRD_OK;
 }
 
-wrd_code wrd_close(warudo *config) {
+WRD_API wrd_code wrd_close(warudo *config) {
     CHECK_CONFIG
 
     wrd_net_close(config);

@@ -5,7 +5,7 @@
 
 #include "log.h"
 
-wrd_code wrd_log(warudo *config, wrd_log_level level, const char *format, ...) {
+WRD_API wrd_code wrd_log(warudo *config, wrd_log_level level, const char *format, ...) {
     if(format == NULL) {
         return WRD_ERROR;
     }
