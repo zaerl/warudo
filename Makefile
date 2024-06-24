@@ -1,8 +1,14 @@
-all: compile
+BUILD_DIR ?= build
 
-compile: generate_config
-	cmake -S . -B build
-	cmake --build build
+all: configure build
+
+configure: generate_config
+	@cmake -S . -B $(BUILD_DIR)
+
+build: configure
+	@cmake --build $(BUILD_DIR)
+
+rebuild: clean_build all
 
 generate_config:
 	php tools/generate-config.php h > src/conf.h
@@ -21,8 +27,11 @@ start: compile
 test: compile
 	build/test/warudo-test
 
+clean_build:
+	@cmake --build $(BUILD_DIR) --target clean
+
 clean:
-	rm -rf build
+	rm -rf $(BUILD_DIR)
 	rm src/conf.h src/conf.c warudo.conf.default
 
-.PHONY: all clean
+.PHONY: all configure build clean rebuild
