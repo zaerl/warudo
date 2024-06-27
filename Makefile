@@ -1,9 +1,10 @@
 BUILD_DIR ?= build
+BUILD_TYPE ?= Release
 
 all: configure build
 
 configure: generate_config
-	@cmake -S . -B $(BUILD_DIR)
+	@cmake -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 build: configure
 	@cmake --build $(BUILD_DIR)
@@ -21,10 +22,11 @@ generate_tests:
 code_coverage:
 	php tools/code-coverage.php > TESTS.md
 
-start: compile
+start: configure build
 	WRD_CORS="*" WRD_LOG_LEVEL=3 build/src/warudo
 
-test: compile
+test: BUILD_TYPE = Test
+test: configure build
 	build/test/warudo-test
 
 clean_build:

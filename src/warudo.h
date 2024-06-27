@@ -10,7 +10,11 @@ extern "C" {
 #endif
 
 #ifndef WRD_API
-#define WRD_API
+#ifdef WRD_TEST
+# define WRD_API __attribute__((weak))
+#else
+# define WRD_API
+#endif
 #endif
 
 #define WRD_NAME "Warudo"

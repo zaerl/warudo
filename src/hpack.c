@@ -114,7 +114,7 @@ typedef struct wrd_huffman_node {
 } wrd_huffman_node;
 
 static wrd_header_field wrd_dynamic_table[WRD_DYNAMIC_TABLE_SIZE];
-static WRD_API int wrd_dynamic_table_size = 0;
+static int wrd_dynamic_table_size = 0;
 
 static void wrd_add_header_to_dynamic_table(const char *name, const char *value) {
     if(wrd_dynamic_table_size >= WRD_DYNAMIC_TABLE_SIZE) {
