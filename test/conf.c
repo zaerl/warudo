@@ -10,6 +10,9 @@ void *test_conf(void *arg) {
     MOCK_FILE_S("")
     ATT_ASSERT(wrd_load_config(&config.config, tmp_mock_file), 0, "wrd_load_config empty")
 
+    MOCK_FILE_S("\n\n\n\n")
+    ATT_ASSERT(wrd_load_config(&config.config, tmp_mock_file), 0, "wrd_load_config empty")
+
     MOCK_FILE_S("test")
     ATT_ASSERT(wrd_load_config(&config.config, tmp_mock_file), 0, "wrd_load_config test")
 

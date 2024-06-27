@@ -8,6 +8,7 @@
 #include "data.h"
 
 // Server URL
+// TODO: check
 #define VERSION "0.1.1"
 
 // CLI commands
@@ -143,20 +144,20 @@ int main(int argc, char* argv[]) {
     char *url = DEFAULT_SERVER_URL;
 
     struct option long_options[] = {
-        { "debug", no_argument, 0, 'd' },
-        { "entries", required_argument, 0, 'e' },
-        { "help", no_argument, 0, 'h' },
-        { "max-requests", required_argument, 0, 'm' },
-        { "quiet", no_argument, 0, 'q' },
-        { "url", required_argument, 0, 'u' },
-        { "verbose", no_argument, 0, 'v' },
-        { "version", no_argument, 0, 'V' },
-        { 0, 0, 0, 0 }
+        { "debug", no_argument, NULL, 'd' },
+        { "entries", required_argument, NULL, 'e' },
+        { "help", no_argument, NULL, 'h' },
+        { "max-requests", required_argument, NULL, 'm' },
+        { "quiet", no_argument, NULL, 'q' },
+        { "url", required_argument, NULL, 'u' },
+        { "verbose", no_argument, NULL, 'v' },
+        { "version", no_argument, NULL, 'V' },
+        { NULL, 0, NULL, 0 }
     };
     const char *descriptions[] = {
         "Debug output",
         "Number of entries per request",
-        "Show this help",
+        "Show this help message",
         "Maximum number of requests",
         "Quiet mode",
         "Server URL",
@@ -172,7 +173,7 @@ int main(int argc, char* argv[]) {
     int option_index = 0;
 
     while((option = getopt_long(argc, argv, "de:hm:qu:vV", long_options, &option_index)) != -1) {
-        switch (option) {
+        switch(option) {
             case 'd':
                 debug_flag = 1;
                 break;
@@ -189,6 +190,7 @@ int main(int argc, char* argv[]) {
                 quiet = 1;
                 break;
             case 'u':
+                // TODO: check copy
                 url = optarg;
                 break;
             case 'v':

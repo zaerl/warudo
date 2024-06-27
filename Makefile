@@ -27,7 +27,7 @@ start: configure build
 
 test: BUILD_TYPE = Test
 test: configure build
-	build/test/warudo-test
+	build/test/warudo-test $(ARGS)
 
 clean_build:
 	@cmake --build $(BUILD_DIR) --target clean
