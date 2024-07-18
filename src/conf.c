@@ -2,6 +2,7 @@
 #include <ctype.h>
 
 #include "conf.h"
+#include "db.h"
 #include "env.h"
 
 // This file automatically generated. Do not edit it manually.
@@ -24,96 +25,53 @@ WRD_API void wrd_init_config(wrd_config *config) {
 }
 
 // Load a configuration file.
-WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path) {
+WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     wrd_init_config(config);
 
     if(file_path == NULL) {
-        return 0;
+        return -1;
     }
 
-    FILE *stream = fopen(file_path, "r");
+    int rc = sqlite3_initialize();
 
-    if(stream == NULL) {
-        return 0;
+    if(rc != SQLITE_OK) {
+        return -1;
     }
 
-    char *line = NULL;
-    size_t length = 0;
-    ssize_t nread = 0;
-    /*enum statuses {
-        INIT,
-        NAME,
-        EQUALS,
-        VALUE,
-    } status = INIT;*/
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
 
-    unsigned int loaded = 0;
+    rc = sqlite3_open(":memory", &db);
 
-    #define is_char(c) isalpha(c) || isdigit(c) || c == '.' || c == '-' || c == '_'
-
-    while((nread = getline(&line, &length, stream)) != -1) {
-        // printf(">>%s<<%zd", line, nread);
-        size_t start_name = 0;
-        size_t start_value = 0;
-
-        // Empty line
-        if(nread <= 1 || (nread == 1 && line[0] == '\n')) {
-            continue;
-        }
-
-        // Comment
-        if(line[0] == '#') {
-            continue;
-        }
-
-        for(ssize_t i = 0; i < nread; ++i) {
-            if(line[i] == '=') {
-                start_value = i + 1;
-            }
-
-            /*if(status == INIT) {
-                if(line[i] == ' ' || line[i] == '\t') {
-                    continue;
-                } else if(line[i] == '#') {
-                    break;
-                } else if(is_char(line[i])) {
-                    status = NAME;
-                    start_name = i;
-                }
-            } else if(status == NAME) {
-                if(is_char(line[i])) {
-                    continue;
-                } else if (line[i] == ' ' || line[i] == '\t') {
-                    status = EQUALS;
-                } else if (line[i] == '=') {
-                    status = VALUE;
-                } else {
-                    break;
-                }
-            } else if(status == EQUALS) {
-                if(line[i] == ' ' || line[i] == '\t') {
-                    continue;
-                } else if(line[i] == '=') {
-                    status = VALUE;
-                } else {
-                    break;
-                }
-            } else if(status == VALUE) {
-                if(line[i] == ' ' || line[i] == '\t') {
-                    continue;
-                } else {
-                    start_value = i;
-                }
-            }*/
-        }
-
-        /*if(status == VALUE && start_value > 0) {
-            ++loaded;
-        }*/
+    if(rc != SQLITE_OK) {
+        return -1;
     }
 
-    free(line);
-    fclose(stream);
+    const char *create_table = "CREATE TABLE json_data (data TEXT)";
+    rc = sqlite3_exec(db, create_table, NULL, NULL, NULL);
 
-    return loaded;
+    if(rc != SQLITE_OK) {
+        sqlite3_close(db);
+
+        return -1;
+    }
+
+    const char *load_json = "INSERT INTO json_data (data) VALUES (readfile(?1))";
+    rc = sqlite3_prepare_v2(db, load_json, -1, &stmt, NULL);
+
+    if(rc != SQLITE_OK) {
+        sqlite3_close(db);
+
+        return -1;
+    }
+
+    rc = sqlite3_bind_text(stmt, 1, file_path, -1, SQLITE_STATIC);
+
+    // Execute the statement
+    rc = sqlite3_step(stmt);
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return rc == SQLITE_DONE ? 0 : -1;
 }

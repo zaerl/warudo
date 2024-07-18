@@ -28,7 +28,13 @@ WRD_API wrd_code wrd_init(warudo **config) {
     (*config)->timing_count = 0;
     (*config)->timing_end_count = 0;
 
-    wrd_load_config(&(*config)->config, NULL);
+    res = wrd_load_config(&(*config)->config, NULL);
+
+    if(res != 0) {
+        wrd_close(*config);
+
+        return res;
+    }
 
     // Load net
     // res = wrd_net_init(*config, wrd_get_env_int("WRD_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));

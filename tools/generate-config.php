@@ -17,7 +17,7 @@ $map = [
     'Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug',
     ['log_level', 0, ['no_log', 'info', 'error', 'debug']],
     'Net',
-    ['access_origin'],
+    ['access_origin', null],
     ['listen_backlog', 1024],
     ['max_columns', 64],
     ['net_buffer_size', 1],
@@ -37,20 +37,50 @@ $structs = [];
 // C file.
 $init_configs = [];
 
+// Transform a value to a configuration file value.
+function value_to_conf($value) {
+    if(is_null($value)) {
+        return 'null';
+    }
+
+    if(is_int($value)) {
+        return $value;
+    }
+
+    return '\'' . str_replace('\'', '\\\'', $value) . '\'';
+}
+
+// Transform a value to a C file value.
+function value_to_c($value) {
+    if(is_null($value)) {
+        return 'NULL';
+    }
+
+    if(is_int($value)) {
+        return $value;
+    }
+
+    return '"' . str_replace('"', '\\"', $value) . '"';
+}
+
+function values_to_struct($values) {
+    return array_map(function($value) { return '    ' . $value; }, $values);
+}
+
 // Loop through each line
 foreach($map as $value) {
     // A section
     if(is_string($value)) {
         $comment = "// {$value}";
         // Configuration file.
-        $confs[] = "\n# " . $value;
+        $confs[] = "// " . $value;
 
         // H file.
         $defines[] = "\n" . $comment;
-        $structs[] = '    ' . $comment;
+        $structs[] = $comment;
 
         // C file.
-        $init_configs[] = '    ' . $comment;
+        $init_configs[] = $comment;
 
         continue;
     }
@@ -60,7 +90,7 @@ foreach($map as $value) {
     }
 
     $entry_name = $value[0];
-    $entry_value = $value[1] ?? '';
+    $entry_value = $value[1];
     $enum_values = $value[2] ?? [];
     $is_integer = is_int($entry_value);
     $define_name = strtoupper($entry_name);
@@ -69,7 +99,8 @@ foreach($map as $value) {
     $env_function = $is_integer ? 'wrd_get_env_int' : 'wrd_get_env_string';
 
     // Configuration file.
-    $confs[] = "{$entry_name} = {$entry_value}";
+    $conf_entry_value = value_to_conf($entry_value);
+    $confs[] = "{$entry_name}: {$conf_entry_value},";
 
     // An enum
     if(count($enum_values)) {
@@ -78,20 +109,22 @@ foreach($map as $value) {
         $enums = [];
 
         foreach($enum_values as $enum_value) {
-            $enums[] = '    WRD_' . strtoupper($entry_name) . '_' . strtoupper( $enum_value );
+            $enums[] = 'WRD_' . strtoupper($entry_name) . '_' . strtoupper( $enum_value );
         }
 
-        $defines[] = join(",\n", $enums);
+        $defines[] = join(",\n", values_to_struct($enums));
         $defines[] = "} {$type};\n";
         $type .= ' ';
     }
 
+    $c_entry_value = value_to_c($entry_value);
+
     // H file.
-    $defines[] = "#define {$define} " . ($is_integer ? $entry_value : '"' . $entry_value . '"');
-    $structs[] = "    {$type}{$entry_name};";
+    $defines[] = "#define {$define} " . $c_entry_value;
+    $structs[] = "{$type}{$entry_name};";
 
     // C file.
-    $init_configs[] = "    config->{$entry_name} = {$env_function}(\"WRD_{$define_name}\", {$define});";
+    $init_configs[] = "config->{$entry_name} = {$env_function}(\"WRD_{$define_name}\", {$define});";
 }
 
 $warning_message = '// This file automatically generated. Do not edit it manually.';
@@ -100,11 +133,11 @@ if ($argv[1] === 'h'): ?>
 #ifndef WRD_CONF_H
 #define WRD_CONF_H
 
+<?php echo $warning_message, "\n"; ?>
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-<?php echo $warning_message, "\n"; ?>
 
 #ifdef __cplusplus
 extern "C" {
@@ -116,14 +149,14 @@ extern "C" {
 <?php echo join("\n", $defines), "\n"; ?>
 
 typedef struct wrd_config {
-<?php echo join("\n", $structs), "\n"; ?>
+<?php echo join("\n", values_to_struct($structs)), "\n"; ?>
 } wrd_config;
 
 // Load a configuration file.
 WRD_API void wrd_init_config(wrd_config *config);
 
 // Load a configuration file.
-WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path);
+WRD_API int wrd_load_config(wrd_config *config, const char *file_path);
 
 #ifdef __cplusplus
 }
@@ -135,119 +168,81 @@ WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path);
 #include <ctype.h>
 
 #include "conf.h"
+#include "db.h"
 #include "env.h"
 
 <?php echo $warning_message, "\n"; ?>
 
 // Init a configuration file with environment variables.
 WRD_API void wrd_init_config(wrd_config *config) {
-<?php echo join("\n", $init_configs), "\n"; ?>
+<?php echo join("\n", values_to_struct($init_configs)), "\n"; ?>
 }
 
 // Load a configuration file.
-WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path) {
+WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     wrd_init_config(config);
 
     if(file_path == NULL) {
-        return 0;
+        return -1;
     }
 
-    FILE *stream = fopen(file_path, "r");
+    int rc = sqlite3_initialize();
 
-    if(stream == NULL) {
-        return 0;
+    if(rc != SQLITE_OK) {
+        return -1;
     }
 
-    char *line = NULL;
-    size_t length = 0;
-    ssize_t nread = 0;
-    /*enum statuses {
-        INIT,
-        NAME,
-        EQUALS,
-        VALUE,
-    } status = INIT;*/
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
 
-    unsigned int loaded = 0;
+    rc = sqlite3_open(":memory", &db);
 
-    #define is_char(c) isalpha(c) || isdigit(c) || c == '.' || c == '-' || c == '_'
-
-    while((nread = getline(&line, &length, stream)) != -1) {
-        // printf(">>%s<<%zd", line, nread);
-        size_t start_name = 0;
-        size_t start_value = 0;
-
-        // Empty line
-        if(nread <= 1 || (nread == 1 && line[0] == '\n')) {
-            continue;
-        }
-
-        // Comment
-        if(line[0] == '#') {
-            continue;
-        }
-
-        for(ssize_t i = 0; i < nread; ++i) {
-            if(line[i] == '=') {
-                start_value = i + 1;
-            }
-
-            /*if(status == INIT) {
-                if(line[i] == ' ' || line[i] == '\t') {
-                    continue;
-                } else if(line[i] == '#') {
-                    break;
-                } else if(is_char(line[i])) {
-                    status = NAME;
-                    start_name = i;
-                }
-            } else if(status == NAME) {
-                if(is_char(line[i])) {
-                    continue;
-                } else if (line[i] == ' ' || line[i] == '\t') {
-                    status = EQUALS;
-                } else if (line[i] == '=') {
-                    status = VALUE;
-                } else {
-                    break;
-                }
-            } else if(status == EQUALS) {
-                if(line[i] == ' ' || line[i] == '\t') {
-                    continue;
-                } else if(line[i] == '=') {
-                    status = VALUE;
-                } else {
-                    break;
-                }
-            } else if(status == VALUE) {
-                if(line[i] == ' ' || line[i] == '\t') {
-                    continue;
-                } else {
-                    start_value = i;
-                }
-            }*/
-        }
-
-        /*if(status == VALUE && start_value > 0) {
-            ++loaded;
-        }*/
+    if(rc != SQLITE_OK) {
+        return -1;
     }
 
-    free(line);
-    fclose(stream);
+    const char *create_table = "CREATE TABLE json_data (data TEXT)";
+    rc = sqlite3_exec(db, create_table, NULL, NULL, NULL);
 
-    return loaded;
+    if(rc != SQLITE_OK) {
+        sqlite3_close(db);
+
+        return -1;
+    }
+
+    const char *load_json = "INSERT INTO json_data (data) VALUES (readfile(?1))";
+    rc = sqlite3_prepare_v2(db, load_json, -1, &stmt, NULL);
+
+    if(rc != SQLITE_OK) {
+        sqlite3_close(db);
+
+        return -1;
+    }
+
+    rc = sqlite3_bind_text(stmt, 1, file_path, -1, SQLITE_STATIC);
+
+    // Execute the statement
+    rc = sqlite3_step(stmt);
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+
+    return rc == SQLITE_DONE ? 0 : -1;
 }
 <?php elseif ($argv[1] === 'conf'): ?>
-# This is the Warudo default configuration file.
-# Lines starting with a '#' character are ignored as well as empty lines.
+/*
+This is the Warudo default configuration file.
 
-# A configuration is in the `name = value` form. `name=value` form is ok.
-# The file must be UTF-8 encoded, line ending can be \n, \r\n. Multiple spaces
-# at the end of a line are ignored.
+The configuration file is an UTF-8 text file that contains configurations saved
+in the RFC 8259 JSON syntax and also the JSON5 estensions.
 
-# All configuration can also be passed as an environment variable to the
-# executable. Example socket_port can be passed as WRD_SOCKET_PORT variable.
-<?php echo join("\n", $confs); ?>
+All configuration can also be passed as an environment variable to the
+executable. For example `socket_port` can be passed as the `WRD_SOCKET_PORT`
+variable.
+*/
 
+{
+<?php echo join("\n", values_to_struct($confs)); ?>
+
+}
 <?php endif;

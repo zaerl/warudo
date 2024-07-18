@@ -1,11 +1,11 @@
 #ifndef WRD_CONF_H
 #define WRD_CONF_H
 
+// This file automatically generated. Do not edit it manually.
+
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-// This file automatically generated. Do not edit it manually.
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,7 +29,7 @@ typedef enum {
 #define WRD_DEFAULT_LOG_LEVEL 0
 
 // Net
-#define WRD_DEFAULT_ACCESS_ORIGIN ""
+#define WRD_DEFAULT_ACCESS_ORIGIN NULL
 #define WRD_DEFAULT_LISTEN_BACKLOG 1024
 #define WRD_DEFAULT_MAX_COLUMNS 64
 #define WRD_DEFAULT_NET_BUFFER_SIZE 1
@@ -58,7 +58,7 @@ typedef struct wrd_config {
 WRD_API void wrd_init_config(wrd_config *config);
 
 // Load a configuration file.
-WRD_API ssize_t wrd_load_config(wrd_config *config, const char *file_path);
+WRD_API int wrd_load_config(wrd_config *config, const char *file_path);
 
 #ifdef __cplusplus
 }
