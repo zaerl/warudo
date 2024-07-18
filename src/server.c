@@ -28,7 +28,7 @@ WRD_API wrd_code wrd_init(warudo **config) {
     (*config)->timing_count = 0;
     (*config)->timing_end_count = 0;
 
-    res = wrd_load_config(&(*config)->config, NULL);
+    res = wrd_load_config(*config, NULL);
 
     if(res != 0) {
         wrd_close(*config);
@@ -38,7 +38,7 @@ WRD_API wrd_code wrd_init(warudo **config) {
 
     // Load net
     // res = wrd_net_init(*config, wrd_get_env_int("WRD_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
-    res = wrd_net_init(*config, (*config)->config.listen_backlog);
+    res = wrd_net_init(*config, (*config)->listen_backlog);
 
     if(res != WRD_OK) {
         wrd_close(*config);
@@ -56,16 +56,16 @@ WRD_API wrd_code wrd_init(warudo **config) {
 
     wrd_log_info(*config, "Starting warudo %s\n", WRD_VERSION);
     // TODO: check NULL
-    wrd_log_info(*config, "Access origin: %s\n", (*config)->config.access_origin ? (*config)->config.access_origin : "disabled");
-    wrd_log_info(*config, "Log level: %u\n", (*config)->config.log_level);
+    wrd_log_info(*config, "Access origin: %s\n", (*config)->access_origin ? (*config)->access_origin : "disabled");
+    wrd_log_info(*config, "Log level: %u\n", (*config)->log_level);
 
     wrd_log_info(*config, "Net buffer size: %u bytes\n", (*config)->net_buffer.size);
     wrd_log_info(*config, "Net input buffer size: %u bytes\n", (*config)->net_buffer.size);
     wrd_log_info(*config, "Net headers size: %u bytes\n", (*config)->net_headers_buffer.size);
-    wrd_log_info(*config, "Loading DB: \"%s\"\n", (*config)->config.db_path);
+    wrd_log_info(*config, "Loading DB: \"%s\"\n", (*config)->db_path);
 
     // Load database
-    res = wrd_db_init((*config)->config.db_path, *config);
+    res = wrd_db_init((*config)->db_path, *config);
 
     if(res != WRD_OK) {
         wrd_close(*config);
@@ -88,7 +88,7 @@ WRD_API wrd_code wrd_accept_connection(warudo *config) {
         return accepted;
     }
 
-    if(config->config.timing) {
+    if(config->timing) {
         wrd_start_time(config);
     }
 
@@ -109,7 +109,7 @@ WRD_API wrd_code wrd_after_connection(warudo *config) {
     wrd_http_flush(config);
     wrd_net_finish_request(config);
 
-    if(config->config.timing) {
+    if(config->timing) {
         wrd_end_time(config, "after finish request");
     }
 

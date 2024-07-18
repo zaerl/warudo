@@ -12,7 +12,7 @@ build: configure
 rebuild: clean_build all
 
 generate_config:
-	php tools/generate-config.php h > src/conf.h
+	php tools/generate-config.php h
 	php tools/generate-config.php c > src/conf.c
 	php tools/generate-config.php conf > warudo.conf.default
 
@@ -34,6 +34,6 @@ clean_build:
 
 clean:
 	rm -rf $(BUILD_DIR)
-	rm src/conf.h src/conf.c warudo.conf.default
+	rm src/conf.c warudo.conf.default
 
 .PHONY: all configure build clean rebuild

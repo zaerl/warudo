@@ -67,6 +67,28 @@ function values_to_struct($values) {
     return array_map(function($value) { return '    ' . $value; }, $values);
 }
 
+function inject_text($file, $start_text, $end_text, $text, $start_pos = 0) {
+    $start_pos = strpos($file, $start_text, $start_pos);
+
+    if($start_pos === false) {
+        echo "Could not find the start of injection point.\n";
+        exit(1);
+    }
+
+    $start_pos += strlen($start_text) + 1;
+    $end_pos = strpos($file, $end_text, $start_pos);
+
+    if($end_pos === false) {
+        echo "Could not find the end of the injection point.\n";
+        exit(1);
+    }
+
+    return [
+        'start_pos' => $start_pos,
+        'text' => substr_replace($file, $text, $start_pos, $end_pos - $start_pos),
+    ];
+}
+
 // Loop through each line
 foreach($map as $value) {
     // A section
@@ -129,41 +151,17 @@ foreach($map as $value) {
 
 $warning_message = '// This file automatically generated. Do not edit it manually.';
 
-if ($argv[1] === 'h'): ?>
-#ifndef WRD_CONF_H
-#define WRD_CONF_H
+if ($argv[1] === 'h') {
+$warudo_h = file_get_contents('src/warudo.h');
+$start_comment = '// Configurations.';
+$injection = inject_text($warudo_h, $start_comment, "\n#include <", join("\n", $defines) . "\n");
+$injection = inject_text($injection['text'], $start_comment, "\n\n", "\n" . join("\n", values_to_struct($structs)), $injection['start_pos']);
 
-<?php echo $warning_message, "\n"; ?>
-
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifndef WRD_API
-#define WRD_API
-#endif
-<?php echo join("\n", $defines), "\n"; ?>
-
-typedef struct wrd_config {
-<?php echo join("\n", values_to_struct($structs)), "\n"; ?>
-} wrd_config;
-
-// Load a configuration file.
-WRD_API void wrd_init_config(wrd_config *config);
-
-// Load a configuration file.
-WRD_API int wrd_load_config(wrd_config *config, const char *file_path);
-
-#ifdef __cplusplus
+if(file_put_contents('src/warudo.h', $injection['text']) === false) {
+    echo "Could not write to src/warudo.h.\n";
+    exit(1);
 }
-#endif
-
-#endif // WRD_CONF_H
-<?php elseif ($argv[1] === 'c'): ?>
+} elseif ($argv[1] === 'c') { ?>
 
 #include <ctype.h>
 
@@ -174,22 +172,22 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path);
 <?php echo $warning_message, "\n"; ?>
 
 // Init a configuration file with environment variables.
-WRD_API void wrd_init_config(wrd_config *config) {
+WRD_API void wrd_init_config(warudo *config) {
 <?php echo join("\n", values_to_struct($init_configs)), "\n"; ?>
 }
 
 // Load a configuration file.
-WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
+WRD_API int wrd_load_config(warudo *config, const char *file_path) {
     wrd_init_config(config);
 
     if(file_path == NULL) {
-        return -1;
+        return WRD_ERROR;
     }
 
     int rc = sqlite3_initialize();
 
     if(rc != SQLITE_OK) {
-        return -1;
+        return WRD_DB_INIT_ERROR;
     }
 
     sqlite3 *db;
@@ -198,7 +196,7 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     rc = sqlite3_open(":memory", &db);
 
     if(rc != SQLITE_OK) {
-        return -1;
+        return WRD_DB_OPEN_ERROR;
     }
 
     const char *create_table = "CREATE TABLE json_data (data TEXT)";
@@ -207,7 +205,7 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     if(rc != SQLITE_OK) {
         sqlite3_close(db);
 
-        return -1;
+        return WRD_DB_ERROR;
     }
 
     const char *load_json = "INSERT INTO json_data (data) VALUES (readfile(?1))";
@@ -216,7 +214,7 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     if(rc != SQLITE_OK) {
         sqlite3_close(db);
 
-        return -1;
+        return WRD_DB_ERROR;
     }
 
     rc = sqlite3_bind_text(stmt, 1, file_path, -1, SQLITE_STATIC);
@@ -227,9 +225,9 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 
-    return rc == SQLITE_DONE ? 0 : -1;
+    return rc == SQLITE_DONE ? WRD_OK : WRD_DB_ERROR;
 }
-<?php elseif ($argv[1] === 'conf'): ?>
+<?php } elseif ($argv[1] === 'conf') { ?>
 /*
 This is the Warudo default configuration file.
 
@@ -245,4 +243,4 @@ variable.
 <?php echo join("\n", values_to_struct($confs)); ?>
 
 }
-<?php endif;
+<?php }

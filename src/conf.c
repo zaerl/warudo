@@ -8,7 +8,7 @@
 // This file automatically generated. Do not edit it manually.
 
 // Init a configuration file with environment variables.
-WRD_API void wrd_init_config(wrd_config *config) {
+WRD_API void wrd_init_config(warudo *config) {
     // Database
     config->db_path = wrd_get_env_string("WRD_DB_PATH", WRD_DEFAULT_DB_PATH);
     // Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
@@ -25,17 +25,17 @@ WRD_API void wrd_init_config(wrd_config *config) {
 }
 
 // Load a configuration file.
-WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
+WRD_API int wrd_load_config(warudo *config, const char *file_path) {
     wrd_init_config(config);
 
     if(file_path == NULL) {
-        return -1;
+        return WRD_ERROR;
     }
 
     int rc = sqlite3_initialize();
 
     if(rc != SQLITE_OK) {
-        return -1;
+        return WRD_DB_INIT_ERROR;
     }
 
     sqlite3 *db;
@@ -44,7 +44,7 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     rc = sqlite3_open(":memory", &db);
 
     if(rc != SQLITE_OK) {
-        return -1;
+        return WRD_DB_OPEN_ERROR;
     }
 
     const char *create_table = "CREATE TABLE json_data (data TEXT)";
@@ -53,7 +53,7 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     if(rc != SQLITE_OK) {
         sqlite3_close(db);
 
-        return -1;
+        return WRD_DB_ERROR;
     }
 
     const char *load_json = "INSERT INTO json_data (data) VALUES (readfile(?1))";
@@ -62,7 +62,7 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     if(rc != SQLITE_OK) {
         sqlite3_close(db);
 
-        return -1;
+        return WRD_DB_ERROR;
     }
 
     rc = sqlite3_bind_text(stmt, 1, file_path, -1, SQLITE_STATIC);
@@ -73,5 +73,5 @@ WRD_API int wrd_load_config(wrd_config *config, const char *file_path) {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 
-    return rc == SQLITE_DONE ? 0 : -1;
+    return rc == SQLITE_DONE ? WRD_OK : WRD_DB_ERROR;
 }
