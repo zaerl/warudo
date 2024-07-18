@@ -5,7 +5,7 @@ void *test_conf(void *arg) {
     MOCK_CONFIG
     MOCK_CONFIG_S
 
-    ATT_ASSERT(wrd_load_config(&config, NULL), WRD_ERROR, "wrd_load_config NULL")
+    ATT_ASSERT(wrd_load_config(&config, NULL), WRD_DEFAULT, "wrd_load_config NULL")
 
     MOCK_FILE_S("")
     ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_DB_ERROR, "wrd_load_config empty")

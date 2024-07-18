@@ -63,6 +63,7 @@ typedef enum {
 typedef enum {
     // Success code
     WRD_OK = 0,
+    WRD_DEFAULT = 1,
 
     // HTTP codes
     WRD_HTTP_BAD_REQUEST = 400,
@@ -139,7 +140,6 @@ typedef struct warudo {
     sqlite3 *query_db;
     sqlite3_stmt *insert_query_stmt;
 
-    // Network
     // Configurations.
 
     // Database

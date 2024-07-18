@@ -11,6 +11,7 @@ if($argc < 2 || !in_array($argv[1], ['h', 'c', 'conf'])) {
     exit(1);
 }
 
+// List of configurations.
 $map = [
     'Database',
     ['db_path', 'file:warudo.db'],
@@ -119,6 +120,7 @@ foreach($map as $value) {
     $define = 'WRD_DEFAULT_' . $define_name;
     $type = $is_integer ? 'int ' : 'char *';
     $env_function = $is_integer ? 'wrd_get_env_int' : 'wrd_get_env_string';
+    $env_cast = $is_integer ? '(int*)' : '';
 
     // Configuration file.
     $conf_entry_value = value_to_conf($entry_value);
@@ -146,7 +148,7 @@ foreach($map as $value) {
     $structs[] = "{$type}{$entry_name};";
 
     // C file.
-    $init_configs[] = "config->{$entry_name} = {$env_function}(\"WRD_{$define_name}\", {$define});";
+    $init_configs[] = "{$env_function}({$env_cast}&config->{$entry_name}, \"WRD_{$define_name}\", {$define});";
 }
 
 $warning_message = '// This file automatically generated. Do not edit it manually.';
@@ -180,11 +182,12 @@ WRD_API void wrd_init_config(warudo *config) {
 WRD_API int wrd_load_config(warudo *config, const char *file_path) {
     wrd_init_config(config);
 
-    if(file_path == NULL) {
-        return WRD_ERROR;
-    }
-
     int rc = sqlite3_initialize();
+
+    if(file_path == NULL) {
+        // Nothing to load, return.
+        return WRD_DEFAULT;
+    }
 
     if(rc != SQLITE_OK) {
         return WRD_DB_INIT_ERROR;

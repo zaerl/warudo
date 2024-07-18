@@ -6,6 +6,10 @@ WRD_API const char *wrd_error_description(wrd_code code, int extended) {
         case WRD_OK:
             return extended ? "Success" : "OK";
 
+        // Default code
+        case WRD_DEFAULT:
+            return extended ? "Default" : "DEFAULT";
+
         // HTTP codes
         case WRD_HTTP_BAD_REQUEST:
             return extended ? "404 Bad Request" : "BAD_REQUEST";

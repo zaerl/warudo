@@ -2,22 +2,30 @@
 
 #include "env.h"
 
-WRD_API int wrd_get_env_int(const char *name, int default_value) {
+WRD_API wrd_code wrd_get_env_int(int *result, const char *name, int default_value) {
     char *env = getenv(name);
 
     if(env != NULL) {
-        return atoi(env);
+        *result = atoi(env);
+    } else {
+        *result = default_value;
+
+        return WRD_DEFAULT;
     }
 
-    return default_value;
+    return WRD_OK;
 }
 
-WRD_API char* wrd_get_env_string(const char *name, char *default_value) {
+WRD_API wrd_code wrd_get_env_string(char **result, const char *name, char *default_value) {
     char *env = getenv(name);
 
     if(env != NULL) {
-        return env;
+        *result = env;
+    } else {
+        *result = default_value;
+
+        return WRD_DEFAULT;
     }
 
-    return default_value;
+    return WRD_OK;
 }
