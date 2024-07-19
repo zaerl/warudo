@@ -154,96 +154,31 @@ foreach($map as $value) {
 $warning_message = '// This file automatically generated. Do not edit it manually.';
 
 if ($argv[1] === 'h') {
-$warudo_h = file_get_contents('src/warudo.h');
-$start_comment = '// Configurations.';
-$injection = inject_text($warudo_h, $start_comment, "\n#include <", join("\n", $defines) . "\n");
-$injection = inject_text($injection['text'], $start_comment, "\n\n", "\n" . join("\n", values_to_struct($structs)), $injection['start_pos']);
+    $warudo_h = file_get_contents('src/warudo.h');
+    $start_comment = '// Configurations.';
+    $injection = inject_text($warudo_h, $start_comment, "\n#include <", join("\n", $defines) . "\n");
+    $injection = inject_text($injection['text'], $start_comment, "\n\n", "\n" . join("\n", values_to_struct($structs)), $injection['start_pos']);
 
-if(file_put_contents('src/warudo.h', $injection['text']) === false) {
-    echo "Could not write to src/warudo.h.\n";
-    exit(1);
+    if(file_put_contents('src/warudo.h', $injection['text']) === false) {
+        echo "Could not write to src/warudo.h.\n";
+        exit(1);
+    }
+} elseif ($argv[1] === 'c') {
+    $conf_c = file_get_contents('src/conf.c');
+    $start = 'WRD_API void wrd_init_config(warudo *config) {';
+    $injection = inject_text($conf_c, $start, "\n}", join("\n", values_to_struct($init_configs)));
+
+    if(file_put_contents('src/conf.c', $injection['text']) === false) {
+        echo "Could not write to src/conf.c.\n";
+        exit(1);
+    }
+} elseif ($argv[1] === 'conf') {
+    $conf = file_get_contents('warudo.conf.default');
+    $start = '{';
+    $injection = inject_text($conf, $start, "}", join("\n", values_to_struct($confs)) . "\n");
+
+    if(file_put_contents('warudo.conf.default', $injection['text']) === false) {
+        echo "Could not write to warudo.conf.default.\n";
+        exit(1);
+    }
 }
-} elseif ($argv[1] === 'c') { ?>
-
-#include <ctype.h>
-
-#include "conf.h"
-#include "db.h"
-#include "env.h"
-
-<?php echo $warning_message, "\n"; ?>
-
-// Init a configuration file with environment variables.
-WRD_API void wrd_init_config(warudo *config) {
-<?php echo join("\n", values_to_struct($init_configs)), "\n"; ?>
-}
-
-// Load a configuration file.
-WRD_API int wrd_load_config(warudo *config, const char *file_path) {
-    wrd_init_config(config);
-
-    int rc = sqlite3_initialize();
-
-    if(file_path == NULL) {
-        // Nothing to load, return.
-        return WRD_DEFAULT;
-    }
-
-    if(rc != SQLITE_OK) {
-        return WRD_DB_INIT_ERROR;
-    }
-
-    sqlite3 *db;
-    sqlite3_stmt *stmt;
-
-    rc = sqlite3_open(":memory:", &db);
-
-    if(rc != SQLITE_OK) {
-        return WRD_DB_OPEN_ERROR;
-    }
-
-    const char *create_table = "CREATE TABLE json_data (data TEXT);";
-    rc = sqlite3_exec(db, create_table, NULL, NULL, NULL);
-
-    if(rc != SQLITE_OK) {
-        sqlite3_close(db);
-
-        return WRD_DB_ERROR;
-    }
-
-    const char *load_json = "INSERT INTO json_data (data) VALUES (?1);";
-    rc = sqlite3_prepare_v2(db, load_json, -1, &stmt, NULL);
-
-    if(rc != SQLITE_OK) {
-        sqlite3_close(db);
-
-        return WRD_DB_ERROR;
-    }
-
-    rc = sqlite3_bind_text(stmt, 1, file_path, -1, SQLITE_STATIC);
-
-    // Execute the statement
-    rc = sqlite3_step(stmt);
-
-    sqlite3_finalize(stmt);
-    sqlite3_close(db);
-
-    return rc == SQLITE_DONE ? WRD_OK : WRD_DB_ERROR;
-}
-<?php } elseif ($argv[1] === 'conf') { ?>
-/*
-This is the Warudo default configuration file.
-
-The configuration file is an UTF-8 text file that contains configurations saved
-in the RFC 8259 JSON syntax and also the JSON5 estensions.
-
-All configuration can also be passed as an environment variable to the
-executable. For example `socket_port` can be passed as the `WRD_SOCKET_PORT`
-variable.
-*/
-
-{
-<?php echo join("\n", values_to_struct($confs)); ?>
-
-}
-<?php }

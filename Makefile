@@ -13,8 +13,8 @@ rebuild: clean_build all
 
 generate_config:
 	php tools/generate-config.php h
-	php tools/generate-config.php c > src/conf.c
-	php tools/generate-config.php conf > warudo.conf.default
+	php tools/generate-config.php c
+	php tools/generate-config.php conf
 
 generate_tests:
 	php tools/generate-tests.php
