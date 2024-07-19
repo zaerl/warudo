@@ -158,7 +158,6 @@ foreach($map as $value) {
     $init_configs[] = "{$env_function}({$env_cast}&config->{$entry_name}, \"WRD_{$define_name}\", {$define});";
 }
 
-$warning_message = '// This file automatically generated. Do not edit it manually.';
 $files = [
     'h' => [
         'file' => 'src/warudo.h',
@@ -199,47 +198,3 @@ for($i = 1; $i < $argc; ++$i) {
 
     echo "Generated {$file['file']}.\n";
 }
-
-/*for($i = 1; $i < $argc; ++$i) {
-    $type = $argv[$i];
-
-    if ($type === 'h') {
-        $file = 'src/warudo.h';
-        $warudo_h = file_get_contents($file);
-        $start_comment = '// Configurations.';
-        $injection = inject_text($warudo_h, $start_comment, "\n#include <", join("\n", $defines) . "\n");
-        $injection = inject_text($injection['text'], $start_comment, "\n\n", "\n" . join("\n", values_to_struct($structs)), $injection['start_pos']);
-
-        if(file_put_contents($file, $injection['text']) === false) {
-            echo "Could not write to {$file}.\n";
-            exit(1);
-        }
-
-        echo "Generated {$file}.\n";
-    } elseif ($type === 'c') {
-        $file = 'src/conf.c';
-        $conf_c = file_get_contents($file);
-        $start = 'WRD_API void wrd_init_config(warudo *config) {';
-        $injection = inject_text($conf_c, $start, "\n}", join("\n", values_to_struct($init_configs)));
-
-        if(file_put_contents($file, $injection['text']) === false) {
-            echo "Could not write to {$file}.\n";
-            exit(1);
-        }
-
-        echo "Generated {$file}.\n";
-    } elseif ($type === 'conf') {
-        $file = 'warudo.conf.default';
-        $conf = file_get_contents($file);
-        $start = '{';
-        $injection = inject_text($conf, $start, "}", join("\n", values_to_struct($confs)) . "\n");
-
-        if(file_put_contents($file, $injection['text']) === false) {
-            echo "Could not write to {$file}.\n";
-            exit(1);
-        }
-
-        echo "Generated {$file}.\n";
-    }
-}
-*/
