@@ -76,6 +76,5 @@ WRD_API int wrd_load_config(warudo *config, const char *file_path) {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 
-    puts("Configuration file loaded.");
     return rc == SQLITE_DONE ? WRD_OK : WRD_DB_ERROR;
 }

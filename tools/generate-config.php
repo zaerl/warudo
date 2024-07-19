@@ -153,32 +153,39 @@ foreach($map as $value) {
 
 $warning_message = '// This file automatically generated. Do not edit it manually.';
 
-if ($argv[1] === 'h') {
-    $warudo_h = file_get_contents('src/warudo.h');
-    $start_comment = '// Configurations.';
-    $injection = inject_text($warudo_h, $start_comment, "\n#include <", join("\n", $defines) . "\n");
-    $injection = inject_text($injection['text'], $start_comment, "\n\n", "\n" . join("\n", values_to_struct($structs)), $injection['start_pos']);
+for($i = 1; $i < $argc; ++$i) {
+    $type = $argv[$i];
 
-    if(file_put_contents('src/warudo.h', $injection['text']) === false) {
-        echo "Could not write to src/warudo.h.\n";
-        exit(1);
-    }
-} elseif ($argv[1] === 'c') {
-    $conf_c = file_get_contents('src/conf.c');
-    $start = 'WRD_API void wrd_init_config(warudo *config) {';
-    $injection = inject_text($conf_c, $start, "\n}", join("\n", values_to_struct($init_configs)));
+    if ($type === 'h') {
+        $file = 'src/warudo.h';
+        $warudo_h = file_get_contents($file);
+        $start_comment = '// Configurations.';
+        $injection = inject_text($warudo_h, $start_comment, "\n#include <", join("\n", $defines) . "\n");
+        $injection = inject_text($injection['text'], $start_comment, "\n\n", "\n" . join("\n", values_to_struct($structs)), $injection['start_pos']);
 
-    if(file_put_contents('src/conf.c', $injection['text']) === false) {
-        echo "Could not write to src/conf.c.\n";
-        exit(1);
-    }
-} elseif ($argv[1] === 'conf') {
-    $conf = file_get_contents('warudo.conf.default');
-    $start = '{';
-    $injection = inject_text($conf, $start, "}", join("\n", values_to_struct($confs)) . "\n");
+        if(file_put_contents($file, $injection['text']) === false) {
+            echo "Could not write to {$file}.\n";
+            exit(1);
+        }
+    } elseif ($type === 'c') {
+        $file = 'src/conf.c';
+        $conf_c = file_get_contents($file);
+        $start = 'WRD_API void wrd_init_config(warudo *config) {';
+        $injection = inject_text($conf_c, $start, "\n}", join("\n", values_to_struct($init_configs)));
 
-    if(file_put_contents('warudo.conf.default', $injection['text']) === false) {
-        echo "Could not write to warudo.conf.default.\n";
-        exit(1);
+        if(file_put_contents($file, $injection['text']) === false) {
+            echo "Could not write to {$file}.\n";
+            exit(1);
+        }
+    } elseif ($type === 'conf') {
+        $file = 'warudo.conf.default';
+        $conf = file_get_contents($file);
+        $start = '{';
+        $injection = inject_text($conf, $start, "}", join("\n", values_to_struct($confs)) . "\n");
+
+        if(file_put_contents($file, $injection['text']) === false) {
+            echo "Could not write to {$file}.\n";
+            exit(1);
+        }
     }
 }

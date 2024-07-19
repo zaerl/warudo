@@ -34,6 +34,5 @@ clean_build:
 
 clean:
 	rm -rf $(BUILD_DIR)
-	rm src/conf.c warudo.conf.default
 
 .PHONY: all configure build clean rebuild
