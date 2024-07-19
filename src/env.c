@@ -23,7 +23,11 @@ WRD_API wrd_code wrd_get_env_string(char **result, const char *name, char *defau
     if(env != NULL) {
         *result = strdup(env);
     } else {
-        *result = strdup(default_value);
+        if(default_value) {
+            *result = strdup(default_value);
+        } else {
+            *result = NULL;
+        }
 
         return WRD_DEFAULT;
     }
