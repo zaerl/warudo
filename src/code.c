@@ -2,11 +2,9 @@
 
 WRD_API const char *wrd_error_description(wrd_code code, int extended) {
     switch(code) {
-        // Success code
+        // Success codes
         case WRD_OK:
             return extended ? "Success" : "OK";
-
-        // Default code
         case WRD_DEFAULT:
             return extended ? "Default" : "DEFAULT";
 
@@ -41,6 +39,10 @@ WRD_API const char *wrd_error_description(wrd_code code, int extended) {
             return extended ? "Error while initializing the request" : "INIT_REQUEST_ERROR";
         case WRD_READ_ERROR:
             return extended ? "Error while reading from the socket" : "READ_ERROR";
+        case WRD_FILE_ERROR:
+            return extended ? "Error while opening the file" : "FILE_ERROR";
+        case WRD_MEMORY_ERROR:
+            return extended ? "Memory allocation error" : "MEMORY_ERROR";
 
         // Parser error codes
         case WRD_PARSER_EMPTY:

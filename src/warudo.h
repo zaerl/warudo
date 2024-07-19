@@ -61,7 +61,7 @@ typedef enum {
 #include "sqlite3/sqlite3.h"
 
 typedef enum {
-    // Success code
+    // Success codes
     WRD_OK = 0,
     WRD_DEFAULT = 1,
 
@@ -82,25 +82,27 @@ typedef enum {
     WRD_EMPTY_QUERY_STRING_ERROR = -8,
     WRD_INIT_REQUEST_ERROR = -9,
     WRD_READ_ERROR = -10,
+    WRD_FILE_ERROR = -11,
+    WRD_MEMORY_ERROR = -12,
 
     // Parser error codes
-    WRD_PARSER_EMPTY = -11,
-    WRD_PARSER_EMPTY_BOUNDARY = -12,
-    WRD_PARSER_VOID = -13,
-    WRD_PARSER_NO_BOUNDARY = -14,
-    WRD_PARSER_MISSING_END = -15,
-    WRD_PARSER_MISSING_CONTENT = -16,
-    WRD_PARSER_MISSING_BODY = -17,
+    WRD_PARSER_EMPTY = -32,
+    WRD_PARSER_EMPTY_BOUNDARY = -33,
+    WRD_PARSER_VOID = -34,
+    WRD_PARSER_NO_BOUNDARY = -35,
+    WRD_PARSER_MISSING_END = -36,
+    WRD_PARSER_MISSING_CONTENT = -37,
+    WRD_PARSER_MISSING_BODY = -38,
 
     // Network error codes
-    WRD_SOCKET_ERROR = -18,
-    WRD_BIND_ERROR = -19,
-    WRD_LISTEN_ERROR = -20,
-    WRD_ACCEPT_ERROR = -21,
-    WRD_CLOSE_ERROR = -22,
+    WRD_SOCKET_ERROR = -64,
+    WRD_BIND_ERROR = -65,
+    WRD_LISTEN_ERROR = -66,
+    WRD_ACCEPT_ERROR = -67,
+    WRD_CLOSE_ERROR = -68,
 
     // Unknown error codes
-    WRD_UNKNOWN_ERROR = -23
+    WRD_UNKNOWN_ERROR = -80
 } wrd_code;
 
 #define CHECK_CONFIG if(!config) return WRD_ERROR;

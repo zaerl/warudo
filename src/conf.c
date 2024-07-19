@@ -28,53 +28,99 @@ WRD_API void wrd_init_config(warudo *config) {
 WRD_API int wrd_load_config(warudo *config, const char *file_path) {
     wrd_init_config(config);
 
-    int rc = sqlite3_initialize();
+    sqlite3 *db = NULL;
+    sqlite3_stmt *stmt = NULL;
+    void *file_buffer = NULL;
+    wrd_code ret = WRD_DB_ERROR;
 
     if(file_path == NULL) {
         // Nothing to load, return.
         return WRD_DEFAULT;
     }
 
+    FILE *file = fopen(file_path, "r");
+
+    if(!file) {
+        return WRD_FILE_ERROR;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long file_size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    if(file_size == 0) {
+        // Empty file, return.
+        return WRD_DEFAULT;
+    }
+
+    file_buffer = malloc(file_size);
+
+    if(!file_buffer) {
+        fclose(file);
+
+        return WRD_MEMORY_ERROR;
+    }
+
+    fread(file_buffer, 1, file_size, file);
+    fclose(file);
+
+    int rc = sqlite3_initialize();
+
     if(rc != SQLITE_OK) {
         return WRD_DB_INIT_ERROR;
     }
 
-    sqlite3 *db;
-    sqlite3_stmt *stmt;
-
+    // Open in-memory database.
     rc = sqlite3_open(":memory:", &db);
 
     if(rc != SQLITE_OK) {
         return WRD_DB_OPEN_ERROR;
     }
 
-    const char *create_table = "CREATE TABLE json_data (data TEXT);";
+    // Create a table to store the JSON data.
+    const char *create_table = "CREATE TABLE json_data (data BLOB);";
     rc = sqlite3_exec(db, create_table, NULL, NULL, NULL);
 
     if(rc != SQLITE_OK) {
-        puts(sqlite3_errmsg(db));
-        sqlite3_close(db);
-
-        return WRD_DB_ERROR;
+        goto error;
     }
 
-    const char *load_json = "INSERT INTO json_data (data) VALUES (?1);";
+    const char *load_json = "INSERT INTO json_data (data) VALUES (jsonb(?1));";
     rc = sqlite3_prepare_v2(db, load_json, -1, &stmt, NULL);
 
     if(rc != SQLITE_OK) {
-        puts(sqlite3_errmsg(db));
-        sqlite3_close(db);
-
-        return WRD_DB_ERROR;
+        goto error;
     }
 
-    rc = sqlite3_bind_text(stmt, 1, file_path, -1, SQLITE_STATIC);
+    // Bind the JSON data to the statement.
+    rc = sqlite3_bind_blob(stmt, 1, file_buffer, file_size, SQLITE_STATIC);
+
+    if(rc != SQLITE_OK) {
+        goto error;
+    }
 
     // Execute the statement
     rc = sqlite3_step(stmt);
 
-    sqlite3_finalize(stmt);
-    sqlite3_close(db);
+    if(rc != SQLITE_DONE) {
+        goto error;
+    }
 
-    return rc == SQLITE_DONE ? WRD_OK : WRD_DB_ERROR;
+    ret = WRD_OK;
+
+error:
+
+    if(stmt) {
+        sqlite3_finalize(stmt);
+    }
+
+    if(db) {
+        sqlite3_close(db);
+    }
+
+    if(file_buffer) {
+        free(file_buffer);
+    }
+
+    return ret;
 }
