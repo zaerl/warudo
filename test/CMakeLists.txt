@@ -6,6 +6,7 @@ set(TEST_SOURCES
     data.c
     db.c
     env.c
+    fs.c
     hpack.c
     http.c
     log.c

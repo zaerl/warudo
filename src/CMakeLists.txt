@@ -4,6 +4,7 @@ set(SOURCES
     conf.c
     db.c
     env.c
+    fs.c
     hpack.c
     http.c
     log.c

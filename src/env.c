@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 
 #include "env.h"
 
@@ -20,9 +21,9 @@ WRD_API wrd_code wrd_get_env_string(char **result, const char *name, char *defau
     char *env = getenv(name);
 
     if(env != NULL) {
-        *result = env;
+        *result = strdup(env);
     } else {
-        *result = default_value;
+        *result = strdup(default_value);
 
         return WRD_DEFAULT;
     }

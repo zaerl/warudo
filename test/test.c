@@ -97,6 +97,7 @@ int main(int argc, char * const argv[]) {
     RUN_TEST(data)
     RUN_TEST(db)
     RUN_TEST(env)
+    RUN_TEST(fs)
     RUN_TEST(hpack)
     RUN_TEST(http)
     RUN_TEST(log)

@@ -25,6 +25,10 @@ void *test_conf(void *arg) {
     MOCK_FILE_S("{ // Test\ntest: 1, }")
     ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config valid JSON5")
 
+    MOCK_FILE_S("{ access_origin: 'a test' }")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config add access_origin")
+    ATT_ASSERT(config.access_origin, "a test", "wrd_load_config valid access_origin")
+
     // MOCK_FILE_S("test=test")
     // ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), 1, "wrd_load_config test 4")
 

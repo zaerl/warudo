@@ -44,6 +44,7 @@ $structs = [];
 
 // C file.
 $init_configs = [];
+$free_configs = [];
 
 // Transform a value to a configuration file value.
 function value_to_conf($value) {
@@ -156,6 +157,10 @@ foreach($map as $value) {
 
     // C file.
     $init_configs[] = "{$env_function}({$env_cast}&config->{$entry_name}, \"WRD_{$define_name}\", {$define});";
+
+    if(!$is_integer) {
+        $free_configs[] = "if(config->{$entry_name}) {\n    free(config->{$entry_name});\n}\n";
+    }
 }
 
 $files = [
@@ -169,9 +174,11 @@ $files = [
     ],
     'c' => [
         'file' => 'src/conf.c',
-        'start' => 'WRD_API void wrd_init_config(warudo *config) {',
-        'end' => "\n}",
-        'text' => join("\n", values_to_struct($init_configs)),
+        'start' => 'WRD_API wrd_code wrd_init_config(warudo *config) {',
+        'end' => "\n    return WRD_OK;",
+        'text' => join("\n", values_to_struct($init_configs)) . "\n",
+        // 'double_end' => "WRD_API wrd_code wrd_config_close(warudo *config) {",
+        'double_text' => "\n" . join("\n", values_to_struct($free_configs)),
     ],
     'conf' => [
         'file' => 'warudo.conf.default',

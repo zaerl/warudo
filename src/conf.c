@@ -1,14 +1,16 @@
 
 #include <ctype.h>
+#include <string.h>
 
 #include "conf.h"
 #include "db.h"
 #include "env.h"
+#include "fs.h"
 
 // This file automatically generated. Do not edit it manually.
 
 // Init a configuration file with environment variables.
-WRD_API void wrd_init_config(warudo *config) {
+WRD_API wrd_code wrd_init_config(warudo *config) {
     // Database
     wrd_get_env_string(&config->db_path, "WRD_DB_PATH", WRD_DEFAULT_DB_PATH);
     // Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
@@ -22,48 +24,50 @@ WRD_API void wrd_init_config(warudo *config) {
     wrd_get_env_int((int*)&config->net_input_buffer_size, "WRD_NET_INPUT_BUFFER_SIZE", WRD_DEFAULT_NET_INPUT_BUFFER_SIZE);
     wrd_get_env_int((int*)&config->socket_port, "WRD_SOCKET_PORT", WRD_DEFAULT_SOCKET_PORT);
     wrd_get_env_int((int*)&config->timing, "WRD_TIMING", WRD_DEFAULT_TIMING);
+
+    return WRD_OK;
+}
+
+// Close loaded configurations.
+WRD_API wrd_code wrd_config_close(warudo *config) {
+    if(config->access_origin) {
+        free(config->access_origin);
+        config->access_origin = NULL;
+    }
+
+    return WRD_OK;
 }
 
 // Load a configuration file.
-WRD_API int wrd_load_config(warudo *config, const char *file_path) {
+WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
+    wrd_config_close(config);
     wrd_init_config(config);
 
     sqlite3 *db = NULL;
     sqlite3_stmt *stmt = NULL;
     void *file_buffer = NULL;
-    wrd_code ret = WRD_DB_ERROR;
+    wrd_code ret;
+    long file_size;
 
     if(file_path == NULL) {
         // Nothing to load, return.
         return WRD_DEFAULT;
     }
 
-    FILE *file = fopen(file_path, "r");
+    ret = wrd_read_file(file_path, &file_buffer, &file_size);
 
-    if(!file) {
-        return WRD_FILE_ERROR;
+    if(ret != WRD_OK) {
+        return ret;
     }
-
-    fseek(file, 0, SEEK_END);
-    long file_size = ftell(file);
-    fseek(file, 0, SEEK_SET);
 
     if(file_size == 0) {
         // Empty file, return.
         return WRD_DEFAULT;
     }
 
-    file_buffer = malloc(file_size);
-
-    if(!file_buffer) {
-        fclose(file);
-
-        return WRD_MEMORY_ERROR;
-    }
-
-    fread(file_buffer, 1, file_size, file);
-    fclose(file);
-
+    // Set an error by default.
+    ret = WRD_DB_ERROR;
+    // Initialize SQLite.
     int rc = sqlite3_initialize();
 
     if(rc != SQLITE_OK) {
@@ -105,6 +109,33 @@ WRD_API int wrd_load_config(warudo *config, const char *file_path) {
     if(rc != SQLITE_DONE) {
         goto error;
     }
+
+    sqlite3_finalize(stmt);
+    stmt = NULL;
+
+    const char *select_json = "SELECT data ->> '$.access_origin' FROM json_data;";
+    rc = sqlite3_prepare_v2(db, select_json, -1, &stmt, 0);
+
+    if(rc != SQLITE_OK) {
+        goto error;
+    }
+
+    rc = sqlite3_step(stmt);
+
+    if(rc != SQLITE_ROW) {
+        goto error;
+    }
+
+    const char *access_origin = (const char*)sqlite3_column_text(stmt, 0);
+
+    if(access_origin) {
+        int length = sqlite3_column_bytes(stmt, 0);
+
+        if(length) {
+            config->access_origin = strndup(access_origin, length);
+        }
+    }
+    puts(access_origin);
 
     ret = WRD_OK;
 

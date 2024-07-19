@@ -119,6 +119,7 @@ WRD_API wrd_code wrd_after_connection(warudo *config) {
 WRD_API wrd_code wrd_close(warudo *config) {
     CHECK_CONFIG
 
+    wrd_config_close(config);
     wrd_net_close(config);
     wrd_db_close(config);
 

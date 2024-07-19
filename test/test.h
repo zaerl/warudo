@@ -45,6 +45,7 @@ void *test_conf(void *arg);
 void *test_data(void *arg);
 void *test_db(void *arg);
 void *test_env(void *arg);
+void *test_fs(void *arg);
 void *test_hpack(void *arg);
 void *test_http(void *arg);
 void *test_log(void *arg);
