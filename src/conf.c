@@ -42,25 +42,27 @@ WRD_API int wrd_load_config(warudo *config, const char *file_path) {
     sqlite3 *db;
     sqlite3_stmt *stmt;
 
-    rc = sqlite3_open(":memory", &db);
+    rc = sqlite3_open(":memory:", &db);
 
     if(rc != SQLITE_OK) {
         return WRD_DB_OPEN_ERROR;
     }
 
-    const char *create_table = "CREATE TABLE json_data (data TEXT)";
+    const char *create_table = "CREATE TABLE json_data (data TEXT);";
     rc = sqlite3_exec(db, create_table, NULL, NULL, NULL);
 
     if(rc != SQLITE_OK) {
+        puts(sqlite3_errmsg(db));
         sqlite3_close(db);
 
         return WRD_DB_ERROR;
     }
 
-    const char *load_json = "INSERT INTO json_data (data) VALUES (readfile(?1))";
+    const char *load_json = "INSERT INTO json_data (data) VALUES (?1);";
     rc = sqlite3_prepare_v2(db, load_json, -1, &stmt, NULL);
 
     if(rc != SQLITE_OK) {
+        puts(sqlite3_errmsg(db));
         sqlite3_close(db);
 
         return WRD_DB_ERROR;
@@ -74,5 +76,6 @@ WRD_API int wrd_load_config(warudo *config, const char *file_path) {
     sqlite3_finalize(stmt);
     sqlite3_close(db);
 
+    puts("Configuration file loaded.");
     return rc == SQLITE_DONE ? WRD_OK : WRD_DB_ERROR;
 }

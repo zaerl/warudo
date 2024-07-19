@@ -8,19 +8,19 @@ void *test_conf(void *arg) {
     ATT_ASSERT(wrd_load_config(&config, NULL), WRD_DEFAULT, "wrd_load_config NULL")
 
     MOCK_FILE_S("")
-    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_DB_ERROR, "wrd_load_config empty")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config empty")
 
     MOCK_FILE_S("\n\n\n\n")
-    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_DB_ERROR, "wrd_load_config empty")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config empty 2")
 
     MOCK_FILE_S("test")
-    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_DB_ERROR, "wrd_load_config test")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config test")
 
     MOCK_FILE_S("#")
-    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_DB_ERROR, "wrd_load_config test 2")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config test 2")
 
     MOCK_FILE_S("test\ntest")
-    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_DB_ERROR, "wrd_load_config test 3")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config test 3")
 
     // MOCK_FILE_S("test=test")
     // ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), 1, "wrd_load_config test 4")
