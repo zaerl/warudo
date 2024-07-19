@@ -6,9 +6,16 @@ if(php_sapi_name() !== 'cli') {
     exit(1);
 }
 
-if($argc < 2 || !in_array($argv[1], ['h', 'c', 'conf'])) {
+if($argc < 2) {
     echo "Usage: php generate-config.php h|c|conf\n";
     exit(1);
+}
+
+for($i = 1; $i < $argc; ++$i) {
+    if(!in_array($argv[1], ['h', 'c', 'conf'])) {
+        echo "Wrong file type. Accepted files: h|c|conf\n";
+        exit(1);
+    }
 }
 
 // List of configurations.
@@ -152,8 +159,48 @@ foreach($map as $value) {
 }
 
 $warning_message = '// This file automatically generated. Do not edit it manually.';
+$files = [
+    'h' => [
+        'file' => 'src/warudo.h',
+        'start' => '// Configurations.',
+        'end' => "\n#include <",
+        'text' => join("\n", $defines) . "\n",
+        'double_end' => "\n\n",
+        'double_text' => "\n" . join("\n", values_to_struct($structs)),
+    ],
+    'c' => [
+        'file' => 'src/conf.c',
+        'start' => 'WRD_API void wrd_init_config(warudo *config) {',
+        'end' => "\n}",
+        'text' => join("\n", values_to_struct($init_configs)),
+    ],
+    'conf' => [
+        'file' => 'warudo.conf.default',
+        'start' => '{',
+        'end' => '}',
+        'text' => join("\n", values_to_struct($confs)) . "\n",
+    ],
+];
 
 for($i = 1; $i < $argc; ++$i) {
+    $type = $argv[$i];
+    $file = $files[$type];
+    $content = file_get_contents($file['file']);
+    $injection = inject_text($content, $file['start'], $file['end'], $file['text']);
+
+    if(array_key_exists('double_end', $file)) {
+        $injection = inject_text($injection['text'], $file['start'], $file['double_end'], $file['double_text'], $injection['start_pos']);
+    }
+
+    if(file_put_contents($file['file'], $injection['text']) === false) {
+        echo "Could not write to {$file['file']}.\n";
+        exit(1);
+    }
+
+    echo "Generated {$file['file']}.\n";
+}
+
+/*for($i = 1; $i < $argc; ++$i) {
     $type = $argv[$i];
 
     if ($type === 'h') {
@@ -167,6 +214,8 @@ for($i = 1; $i < $argc; ++$i) {
             echo "Could not write to {$file}.\n";
             exit(1);
         }
+
+        echo "Generated {$file}.\n";
     } elseif ($type === 'c') {
         $file = 'src/conf.c';
         $conf_c = file_get_contents($file);
@@ -177,6 +226,8 @@ for($i = 1; $i < $argc; ++$i) {
             echo "Could not write to {$file}.\n";
             exit(1);
         }
+
+        echo "Generated {$file}.\n";
     } elseif ($type === 'conf') {
         $file = 'warudo.conf.default';
         $conf = file_get_contents($file);
@@ -187,5 +238,8 @@ for($i = 1; $i < $argc; ++$i) {
             echo "Could not write to {$file}.\n";
             exit(1);
         }
+
+        echo "Generated {$file}.\n";
     }
 }
+*/
