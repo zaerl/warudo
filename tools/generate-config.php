@@ -22,8 +22,7 @@ for($i = 1; $i < $argc; ++$i) {
 $map = [
     'Database',
     ['db_path', 'file:warudo.db'],
-    'Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug',
-    ['log_level', 0, ['no_log', 'info', 'error', 'debug']],
+    ['log_level', 0, ['no_log', 'info', 'error', 'debug'], 'Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug'],
     'Net',
     ['access_origin', null],
     ['listen_backlog', 1024],
@@ -100,11 +99,17 @@ function inject_text($file, $start_text, $end_text, $text, $start_pos = 0) {
 
 // Loop through each line
 foreach($map as $value) {
+    $comment = null;
+
+    if(is_string($value)) {
+        $comment = $value;
+    }
+
     // A section
     if(is_string($value)) {
         $comment = "// {$value}";
         // Configuration file.
-        $confs[] = "// " . $value;
+        $confs[] = $comment;
 
         // H file.
         $defines[] = "\n" . $comment;
@@ -112,12 +117,17 @@ foreach($map as $value) {
 
         // C file.
         $init_configs[] = $comment;
+        $free_configs[] = $comment;
 
         continue;
     }
 
     if(!is_array($value) || !count($value)) {
         continue;
+    }
+
+    if(count($value) === 4) {
+        $confs[] = '// ' . $value[3];
     }
 
     $entry_name = $value[0];
@@ -159,7 +169,7 @@ foreach($map as $value) {
     $init_configs[] = "{$env_function}({$env_cast}&config->{$entry_name}, \"WRD_{$define_name}\", {$define});";
 
     if(!$is_integer) {
-        $free_configs[] = "if(config->{$entry_name}) {\n    free(config->{$entry_name});\n}\n";
+        $free_configs[] = "if(config->{$entry_name}) {\n        free(config->{$entry_name});\n        config->{$entry_name} = NULL;\n    }\n";
     }
 }
 
@@ -174,10 +184,10 @@ $files = [
     ],
     'c' => [
         'file' => 'src/conf.c',
-        'start' => 'WRD_API wrd_code wrd_init_config(warudo *config) {',
+        'start' => '// Configurations.',
         'end' => "\n    return WRD_OK;",
-        'text' => join("\n", values_to_struct($init_configs)) . "\n",
-        // 'double_end' => "WRD_API wrd_code wrd_config_close(warudo *config) {",
+        'text' => "\n" . join("\n", values_to_struct($init_configs)) . "\n",
+        'double_end' => "\n    return WRD_OK;",
         'double_text' => "\n" . join("\n", values_to_struct($free_configs)),
     ],
     'conf' => [

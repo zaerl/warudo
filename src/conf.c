@@ -11,9 +11,10 @@
 
 // Init a configuration file with environment variables.
 WRD_API wrd_code wrd_init_config(warudo *config) {
+    // Configurations.
+
     // Database
     wrd_get_env_string(&config->db_path, "WRD_DB_PATH", WRD_DEFAULT_DB_PATH);
-    // Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
     wrd_get_env_int((int*)&config->log_level, "WRD_LOG_LEVEL", WRD_DEFAULT_LOG_LEVEL);
     // Net
     wrd_get_env_string(&config->access_origin, "WRD_ACCESS_ORIGIN", WRD_DEFAULT_ACCESS_ORIGIN);
@@ -30,6 +31,15 @@ WRD_API wrd_code wrd_init_config(warudo *config) {
 
 // Close loaded configurations.
 WRD_API wrd_code wrd_config_close(warudo *config) {
+    // Configurations.
+
+    // Database
+    if(config->db_path) {
+        free(config->db_path);
+        config->db_path = NULL;
+    }
+
+    // Net
     if(config->access_origin) {
         free(config->access_origin);
         config->access_origin = NULL;

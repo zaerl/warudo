@@ -33,8 +33,6 @@ extern "C" {
 
 // Database
 #define WRD_DEFAULT_DB_PATH "file:warudo.db"
-
-// Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
 typedef enum {
     WRD_LOG_LEVEL_NO_LOG,
     WRD_LOG_LEVEL_INFO,
@@ -146,7 +144,6 @@ typedef struct warudo {
 
     // Database
     char *db_path;
-    // Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
     wrd_log_level log_level;
     // Net
     char *access_origin;
