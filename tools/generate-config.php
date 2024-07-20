@@ -194,30 +194,41 @@ $files = [
         'start' => '// Configurations.',
         'end' => "\n#include <",
         'text' => join("\n", $defines) . "\n",
-        'double_end' => "\n\n",
-        'double_text' => "\n" . join("\n", values_to_struct($structs)),
+        'additionals' => [
+            [
+                'end' => "\n\n",
+                'text' => "\n" . join("\n", values_to_struct($structs)),
+            ],
+        ]
     ],
     'c' => [
         'file' => 'src/conf.c',
         'start' => '// Configurations.',
         'end' => "\n    return WRD_OK;",
         'text' => "\n" . join("\n", values_to_struct($init_configs)) . "\n",
-        'double_end' => "\n    return WRD_OK;",
-        'double_text' => "\n" . join("\n", values_to_struct($free_configs)),
-        'triple_end' => "ret = WRD_OK;",
-        'triple_text' => "\n" . join("\n", values_to_struct($db_loads)) . "\n\n",
+        'additionals' => [
+            [
+                'end' => "\n    return WRD_OK;",
+                'text' => "\n" . join("\n", values_to_struct($free_configs)),
+            ], [
+                'end' => "ret = WRD_OK;",
+                'text' => "\n" . join("\n", values_to_struct($db_loads)) . "\n\n",
+            ]
+        ]
     ],
     'conf' => [
         'file' => 'warudo.conf.default',
         'start' => '{',
         'end' => '}',
         'text' => join("\n", values_to_struct($confs)) . "\n",
+        'additionals' => [],
     ],
     'server' => [
         'file' => 'src/server.c',
         'start' => '// Configurations.',
         'end' => "res = wrd_db_init((*config)->db_path, *config);",
         'text' => join("\n", values_to_struct($logs)) . "\n\n    ",
+        'additionals' => [],
     ],
 ];
 
@@ -227,12 +238,8 @@ for($i = 1; $i < $argc; ++$i) {
     $content = file_get_contents($file['file']);
     $injection = inject_text($content, $file['start'], $file['end'], $file['text']);
 
-    if(array_key_exists('double_end', $file)) {
-        $injection = inject_text($injection['text'], $file['start'], $file['double_end'], $file['double_text'], $injection['start_pos']);
-    }
-
-    if(array_key_exists('triple_end', $file)) {
-        $injection = inject_text($injection['text'], $file['start'], $file['triple_end'], $file['triple_text'], $injection['start_pos']);
+    foreach($file['additionals'] as $additional) {
+        $injection = inject_text($injection['text'], $file['start'], $additional['end'], $additional['text'], $injection['start_pos']);
     }
 
     if(file_put_contents($file['file'], $injection['text']) === false) {
