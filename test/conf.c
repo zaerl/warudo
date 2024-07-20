@@ -29,6 +29,15 @@ void *test_conf(void *arg) {
     ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config add access_origin")
     ATT_ASSERT(config.access_origin, "a test", "wrd_load_config valid access_origin")
 
+    MOCK_FILE_S("{ net_buffer_size: 100 }")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config add net_buffer_size")
+    ATT_ASSERT(config.access_origin, NULL, "wrd_load_config access_origin NULL")
+    ATT_ASSERT(config.net_buffer_size, 100, "wrd_load_config valid net_buffer_size")
+
+    MOCK_FILE_S("{ net_buffer_size: '30' }")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config add net_buffer_size")
+    ATT_ASSERT(config.net_buffer_size, WRD_DEFAULT_NET_BUFFER_SIZE, "wrd_load_config default net_buffer_size")
+
     // MOCK_FILE_S("test=test")
     // ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), 1, "wrd_load_config test 4")
 

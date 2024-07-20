@@ -12,7 +12,7 @@ build: configure
 rebuild: clean_build all
 
 generate_config:
-	php tools/generate-config.php h c conf
+	php tools/generate-config.php h c conf server
 
 generate_tests:
 	php tools/generate-tests.php
@@ -21,7 +21,7 @@ code_coverage:
 	php tools/code-coverage.php > TESTS.md
 
 start: configure build
-	WRD_CORS="*" WRD_LOG_LEVEL=3 build/src/warudo
+	WRD_CORS="*" WRD_LOG_LEVEL=3 WRD_CONF_PATH=warudo.conf build/src/warudo
 
 test: BUILD_TYPE = Test
 test: configure build

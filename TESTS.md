@@ -8,11 +8,9 @@
 | wrd_debug_dump               | 5        |
 | wrd_error_description        | 5        |
 | wrd_escape_html              | 4        |
-| wrd_get_env_int              | 2        |
-| wrd_get_env_string           | 1        |
 | wrd_get_formdata_boundary    | 9        |
 | wrd_is_valid_boundary        | 5        |
-| wrd_load_config              | 5        |
+| wrd_load_config              | 10       |
 | wrd_url_decode               | 13       |
 | wrd_version                  | 1        |
 | wrd_accept_connection        | 0        |
@@ -22,6 +20,7 @@
 | wrd_after_connection         | 0        |
 | wrd_close                    | 0        |
 | wrd_compress_header          | 0        |
+| wrd_config_close             | 0        |
 | wrd_content_length           | 0        |
 | wrd_db_add_header            | 0        |
 | wrd_db_close                 | 0        |
@@ -30,6 +29,8 @@
 | wrd_end_time                 | 0        |
 | wrd_formdata_callback        | 0        |
 | wrd_get_entries              | 0        |
+| wrd_get_env_int              | 0        |
+| wrd_get_env_string           | 0        |
 | wrd_get_keys                 | 0        |
 | wrd_http_bad_request         | 0        |
 | wrd_http_content_type        | 0        |
@@ -61,8 +62,9 @@
 | wrd_parse_json               | 0        |
 | wrd_parse_query_string       | 0        |
 | wrd_read_content             | 0        |
+| wrd_read_file                | 0        |
 | wrd_route_app                | 0        |
 | wrd_route_app_keys           | 0        |
 | wrd_route_home               | 0        |
 | wrd_start_time               | 0        |
-| Total                        | 64       |
+| Total                        | 66       |

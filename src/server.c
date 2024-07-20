@@ -28,9 +28,16 @@ WRD_API wrd_code wrd_init(warudo **config) {
     (*config)->timing_count = 0;
     (*config)->timing_end_count = 0;
 
-    res = wrd_load_config(*config, NULL);
+    char *conf_file = NULL;
+    wrd_get_env_string(&conf_file, "WRD_CONF_PATH", "warudo.conf");
 
-    if(res != 0) {
+    res = wrd_load_config(*config, conf_file);
+
+    if(conf_file) {
+        free(conf_file);
+    }
+
+    if(!(res == WRD_OK || res == WRD_DEFAULT)) {
         wrd_close(*config);
 
         return res;
@@ -54,17 +61,20 @@ WRD_API wrd_code wrd_init(warudo **config) {
     // Query string
     wrd_parse_query_string(*config, NULL);
 
-    wrd_log_info(*config, "Starting warudo %s\n", WRD_VERSION);
-    // TODO: check NULL
-    wrd_log_info(*config, "Access origin: %s\n", (*config)->access_origin ? (*config)->access_origin : "disabled");
-    wrd_log_info(*config, "Log level: %u\n", (*config)->log_level);
+    wrd_log_info(*config, "Starting Warudo %s\n", WRD_VERSION);
 
-    wrd_log_info(*config, "Net buffer size: %u bytes\n", (*config)->net_buffer.size);
-    wrd_log_info(*config, "Net input buffer size: %u bytes\n", (*config)->net_buffer.size);
-    wrd_log_info(*config, "Net headers size: %u bytes\n", (*config)->net_headers_buffer.size);
-    wrd_log_info(*config, "Loading DB: \"%s\"\n", (*config)->db_path);
+    // Configurations.
+    wrd_log_info(*config, "Db Path: %s\n", (*config)->db_path);
+    wrd_log_info(*config, "Log Level: %d\n", (*config)->log_level);
+    wrd_log_info(*config, "Access Origin: %s\n", (*config)->access_origin);
+    wrd_log_info(*config, "Listen Backlog: %d\n", (*config)->listen_backlog);
+    wrd_log_info(*config, "Max Columns: %d\n", (*config)->max_columns);
+    wrd_log_info(*config, "Net Buffer Size: %d\n", (*config)->net_buffer_size);
+    wrd_log_info(*config, "Net Headers Buffer Size: %d\n", (*config)->net_headers_buffer_size);
+    wrd_log_info(*config, "Net Input Buffer Size: %d\n", (*config)->net_input_buffer_size);
+    wrd_log_info(*config, "Socket Port: %d\n", (*config)->socket_port);
+    wrd_log_info(*config, "Timing: %d\n", (*config)->timing);
 
-    // Load database
     res = wrd_db_init((*config)->db_path, *config);
 
     if(res != WRD_OK) {

@@ -12,8 +12,8 @@ if($argc < 2) {
 }
 
 for($i = 1; $i < $argc; ++$i) {
-    if(!in_array($argv[1], ['h', 'c', 'conf'])) {
-        echo "Wrong file type. Accepted files: h|c|conf\n";
+    if(!in_array($argv[1], ['h', 'c', 'conf', 'server'])) {
+        echo "Wrong file type. Accepted files: h|c|conf|server\n";
         exit(1);
     }
 }
@@ -44,6 +44,10 @@ $structs = [];
 // C file.
 $init_configs = [];
 $free_configs = [];
+$db_loads = [];
+
+// Server file.
+$logs = [];
 
 // Transform a value to a configuration file value.
 function value_to_conf($value) {
@@ -79,7 +83,7 @@ function inject_text($file, $start_text, $end_text, $text, $start_pos = 0) {
     $start_pos = strpos($file, $start_text, $start_pos);
 
     if($start_pos === false) {
-        echo "Could not find the start of injection point.\n";
+        echo "Could not find the start of injection point ('{$start_text}').\n";
         exit(1);
     }
 
@@ -87,7 +91,7 @@ function inject_text($file, $start_text, $end_text, $text, $start_pos = 0) {
     $end_pos = strpos($file, $end_text, $start_pos);
 
     if($end_pos === false) {
-        echo "Could not find the end of the injection point.\n";
+        echo "Could not find the end of the injection point ('{$end_text}').\n";
         exit(1);
     }
 
@@ -167,6 +171,17 @@ foreach($map as $value) {
 
     // C file.
     $init_configs[] = "{$env_function}({$env_cast}&config->{$entry_name}, \"WRD_{$define_name}\", {$define});";
+    $config_name = explode('_', $entry_name);
+    $config_name = array_map('ucfirst', $config_name);
+    $config_name = join(' ', $config_name);
+
+    if($is_integer) {
+        $db_loads[] = "rc = wrd_load_integer(stmt, \"{$entry_name}\", (int*)&config->{$entry_name});";
+        $logs[] = "wrd_log_info(*config, \"{$config_name}: %d\\n\", (*config)->{$entry_name});";
+    } else {
+        $db_loads[] = "rc = wrd_load_string(stmt, \"{$entry_name}\", &config->{$entry_name});";
+        $logs[] = "wrd_log_info(*config, \"{$config_name}: %s\\n\", (*config)->{$entry_name});";
+    }
 
     if(!$is_integer) {
         $free_configs[] = "if(config->{$entry_name}) {\n        free(config->{$entry_name});\n        config->{$entry_name} = NULL;\n    }\n";
@@ -189,12 +204,20 @@ $files = [
         'text' => "\n" . join("\n", values_to_struct($init_configs)) . "\n",
         'double_end' => "\n    return WRD_OK;",
         'double_text' => "\n" . join("\n", values_to_struct($free_configs)),
+        'triple_end' => "ret = WRD_OK;",
+        'triple_text' => "\n" . join("\n", values_to_struct($db_loads)) . "\n\n",
     ],
     'conf' => [
         'file' => 'warudo.conf.default',
         'start' => '{',
         'end' => '}',
         'text' => join("\n", values_to_struct($confs)) . "\n",
+    ],
+    'server' => [
+        'file' => 'src/server.c',
+        'start' => '// Configurations.',
+        'end' => "res = wrd_db_init((*config)->db_path, *config);",
+        'text' => join("\n", values_to_struct($logs)) . "\n\n    ",
     ],
 ];
 
@@ -206,6 +229,10 @@ for($i = 1; $i < $argc; ++$i) {
 
     if(array_key_exists('double_end', $file)) {
         $injection = inject_text($injection['text'], $file['start'], $file['double_end'], $file['double_text'], $injection['start_pos']);
+    }
+
+    if(array_key_exists('triple_end', $file)) {
+        $injection = inject_text($injection['text'], $file['start'], $file['triple_end'], $file['triple_text'], $injection['start_pos']);
     }
 
     if(file_put_contents($file['file'], $injection['text']) === false) {

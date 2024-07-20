@@ -48,6 +48,62 @@ WRD_API wrd_code wrd_config_close(warudo *config) {
     return WRD_OK;
 }
 
+WRD_API wrd_code wrd_load_string(sqlite3_stmt *stmt, const char *name, char **output) {
+    wrd_code ret = WRD_DB_ERROR;
+
+    if(sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC) != SQLITE_OK) {
+        goto error;
+    }
+
+    if(sqlite3_step(stmt) != SQLITE_ROW) {
+        goto error;
+    }
+
+    if(sqlite3_column_type(stmt, 0) == SQLITE_TEXT) {
+        const char *res = (const char*)sqlite3_column_text(stmt, 0);
+
+        if(!res) {
+            goto error;
+        }
+
+        int length = sqlite3_column_bytes(stmt, 0);
+
+        if(length) {
+            *output = strndup(res, length);
+            ret = WRD_OK;
+        }
+    }
+
+error:
+
+    sqlite3_reset(stmt);
+
+    return ret;
+}
+
+WRD_API wrd_code wrd_load_integer(sqlite3_stmt *stmt, const char *name, int *output) {
+    wrd_code ret = WRD_DB_ERROR;
+
+    if(sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC) != SQLITE_OK) {
+        goto error;
+    }
+
+    if(sqlite3_step(stmt) != SQLITE_ROW) {
+        goto error;
+    }
+
+    if(sqlite3_column_type(stmt, 0) == SQLITE_INTEGER) {
+        *output = sqlite3_column_int(stmt, 0);
+        ret = WRD_OK;
+    }
+
+error:
+
+    sqlite3_reset(stmt);
+
+    return ret;
+}
+
 // Load a configuration file.
 WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
     wrd_config_close(config);
@@ -123,31 +179,27 @@ WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
     sqlite3_finalize(stmt);
     stmt = NULL;
 
-    const char *select_json = "SELECT data ->> '$.access_origin' FROM json_data;";
+    const char *select_json = "SELECT data ->> ('$.' || ?1) FROM json_data;";
     rc = sqlite3_prepare_v2(db, select_json, -1, &stmt, 0);
 
     if(rc != SQLITE_OK) {
         goto error;
     }
 
-    rc = sqlite3_step(stmt);
+    // Configurations.
 
-    if(rc != SQLITE_ROW) {
-        goto error;
-    }
+    rc = wrd_load_string(stmt, "db_path", &config->db_path);
+    rc = wrd_load_integer(stmt, "log_level", (int*)&config->log_level);
+    rc = wrd_load_string(stmt, "access_origin", &config->access_origin);
+    rc = wrd_load_integer(stmt, "listen_backlog", (int*)&config->listen_backlog);
+    rc = wrd_load_integer(stmt, "max_columns", (int*)&config->max_columns);
+    rc = wrd_load_integer(stmt, "net_buffer_size", (int*)&config->net_buffer_size);
+    rc = wrd_load_integer(stmt, "net_headers_buffer_size", (int*)&config->net_headers_buffer_size);
+    rc = wrd_load_integer(stmt, "net_input_buffer_size", (int*)&config->net_input_buffer_size);
+    rc = wrd_load_integer(stmt, "socket_port", (int*)&config->socket_port);
+    rc = wrd_load_integer(stmt, "timing", (int*)&config->timing);
 
-    const char *access_origin = (const char*)sqlite3_column_text(stmt, 0);
-
-    if(access_origin) {
-        int length = sqlite3_column_bytes(stmt, 0);
-
-        if(length) {
-            config->access_origin = strndup(access_origin, length);
-        }
-    }
-    puts(access_origin);
-
-    ret = WRD_OK;
+ret = WRD_OK;
 
 error:
 
