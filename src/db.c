@@ -10,10 +10,10 @@
 #define WRD_DB_RET_CALL(STMT, CALL, RET) \
     rc = CALL; \
     if(rc != RET) { \
-        wrd_log_error(config, "Failed to execute db query: %d/%d %s (%s, %d)\n", rc, RET, sqlite3_errmsg(config->db), __FUNCTION__, __LINE__); \
+        wrd_log_error(config, u8"Failed to execute db query: %d/%d %s (%s, %d)\n", rc, RET, sqlite3_errmsg(config->db), __FUNCTION__, __LINE__); \
         if(must_finalize) sqlite3_finalize(STMT); \
         if(must_free) sqlite3_free((void*)query); \
-        if(must_output_error) wrd_http_bad_request(config, "Failed to get data."); \
+        if(must_output_error) wrd_http_bad_request(config, u8"Failed to get data."); \
         return WRD_DB_ERROR; \
     } \
 
@@ -36,7 +36,7 @@ WRD_API wrd_code wrd_db_init(const char *filename, warudo *config) {
     rc = sqlite3_initialize();
 
     if(rc != SQLITE_OK) {
-        wrd_log(config, WRD_LOG_LEVEL_ERROR, "Can't initialize DB\n");
+        wrd_log(config, WRD_LOG_LEVEL_ERROR, u8"Can't initialize DB\n");
 
         return WRD_DB_INIT_ERROR;
     }
@@ -44,7 +44,7 @@ WRD_API wrd_code wrd_db_init(const char *filename, warudo *config) {
     rc = sqlite3_open(filename, &config->db);
 
     if(rc != SQLITE_OK) {
-        wrd_log_error(config, "Can't open database: %s\n", sqlite3_errmsg(config->db));
+        wrd_log_error(config, u8"Can't open database: %s\n", sqlite3_errmsg(config->db));
 
         return WRD_DB_OPEN_ERROR;
     }
@@ -84,7 +84,7 @@ WRD_API wrd_code wrd_db_init(const char *filename, warudo *config) {
     rc = sqlite3_exec(config->db, sql, 0, 0, &error_msg);
 
     if(rc != SQLITE_OK) {
-        wrd_log_error(config, "SQL error: %s\n", error_msg);
+        wrd_log_error(config, u8"SQL error: %s\n", error_msg);
 
         return WRD_DB_OPEN_ERROR;
     }
@@ -107,7 +107,7 @@ WRD_API wrd_code wrd_db_query_init(warudo *config) {
     char *error_msg = 0;
 
     if(rc != SQLITE_OK) {
-        wrd_log_error(config, "Can't open query database: %s\n", sqlite3_errmsg(config->query_db));
+        wrd_log_error(config, u8"Can't open query database: %s\n", sqlite3_errmsg(config->query_db));
 
         return WRD_DB_OPEN_ERROR;
     }
@@ -117,7 +117,7 @@ WRD_API wrd_code wrd_db_query_init(warudo *config) {
     rc = sqlite3_exec(config->query_db, sql, 0, 0, &error_msg);
 
     if(rc != SQLITE_OK) {
-        wrd_log_error(config, "SQL error: %s\n", error_msg);
+        wrd_log_error(config, u8"SQL error: %s\n", error_msg);
 
         return WRD_DB_OPEN_ERROR;
     }
@@ -125,7 +125,7 @@ WRD_API wrd_code wrd_db_query_init(warudo *config) {
     rc = sqlite3_prepare_v2(config->query_db, "INSERT INTO http_query(name, value) VALUES(?1, ?2);", -1, &config->insert_query_stmt, NULL);
 
     if(rc != SQLITE_OK) {
-        wrd_log_error(config, "SQL error: %s\n", sqlite3_errmsg(config->query_db));
+        wrd_log_error(config, u8"SQL error: %s\n", sqlite3_errmsg(config->query_db));
 
         return WRD_DB_OPEN_ERROR;
     }
@@ -202,7 +202,7 @@ WRD_API wrd_code wrd_db_add_header(warudo *config, const char *name, const char 
 
     WRD_DB_CALL(stmt, sqlite3_prepare_v2(config->db, query, -1, &stmt, NULL));
 
-    wrd_log_info(config, "Column names for table '%s':\n", WRD_ENTRIES_TABLE);
+    wrd_log_info(config, u8"Column names for table '%s':\n", WRD_ENTRIES_TABLE);
 
     while(sqlite3_step(stmt) == SQLITE_ROW) {
         const char *name = (const char*)sqlite3_column_text(stmt, 1);
@@ -214,7 +214,7 @@ WRD_API wrd_code wrd_db_add_header(warudo *config, const char *name, const char 
     }
 
     for(unsigned int i = 0; i < config->columns_count; ++i) {
-        wrd_log_info(config, "%s: %s\n", config->columns[i].name, config->columns[i].type);
+        wrd_log_info(config, u8"%s: %s\n", config->columns[i].name, config->columns[i].type);
     }
 
     sqlite3_finalize(stmt);
@@ -376,14 +376,14 @@ WRD_API wrd_code wrd_add_entries(int entry_type, warudo *config) {
     char **value = NULL;
 
     if(wrd_http_get_header(config, "content-length", value) != WRD_OK) {
-        wrd_http_bad_request(config, "Failed to get content length.");
+        wrd_http_bad_request(config, u8"Failed to get content length.");
     }
 
     const char *boundary = wrd_get_formdata_boundary(*value);
     count = wrd_parse_formdata(input, length, boundary, &wrd_formdata_callback, config);
 
     if(count <= 0) {
-        wrd_http_bad_request(config, "No entries created.");
+        wrd_http_bad_request(config, u8"No entries created.");
     } else {
         // wrd_http_ok(config);
         // wrd_http_puts(input, config);
@@ -467,7 +467,7 @@ WRD_API wrd_code wrd_get_entries(int entry_type, warudo *config) {
             wrd_http_puts(config, ",");
         }
 
-        wrd_http_printf(config, "{\"id\":%lld,\"created\":%lld,\"modified\":%lld,\"data\":%s}",
+        wrd_http_printf(config, u8"{\"id\":%lld,\"created\":%lld,\"modified\":%lld,\"data\":%s}",
             id, created, modified, data ? data : "{}");
         ++count;
     }
@@ -511,7 +511,7 @@ WRD_API wrd_code wrd_get_keys(warudo *config) {
             wrd_http_puts(config, ",");
         }
 
-        wrd_http_printf(config, "{\"name\":\"%s\",\"value\":%lld}", key_name, key_count);
+        wrd_http_printf(config, u8"{\"name\":\"%s\",\"value\":%lld}", key_name, key_count);
         ++count;
     }
 

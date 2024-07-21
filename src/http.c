@@ -22,7 +22,7 @@ WRD_API wrd_code wrd_http_buffer_printf(warudo *config, wrd_buffer *buffer, cons
 WRD_API wrd_code wrd_http_status(warudo *config, const char *status) {
     WRD_CHECK_CONNECTION(config)
 
-    wrd_http_buffer_printf(config, &config->net_headers_buffer, "HTTP/1.1 %s\r\n", status);
+    wrd_http_buffer_printf(config, &config->net_headers_buffer, u8"HTTP/1.1 %s\r\n", status);
 
     return WRD_OK;
 }
@@ -37,10 +37,10 @@ WRD_API wrd_code wrd_http_additional(warudo *config) {
     time(&current_time);
     timeinfo = gmtime(&current_time); // UTC time
 
-    strftime(date_string, sizeof(date_string), "Date: %a, %d %b %Y %H:%M:%S GMT\r\n", timeinfo);
-    wrd_http_buffer_puts(config, &config->net_headers_buffer, "Cache-Control: no-cache\r\n");
+    strftime(date_string, sizeof(date_string), u8"Date: %a, %d %b %Y %H:%M:%S GMT\r\n", timeinfo);
+    wrd_http_buffer_puts(config, &config->net_headers_buffer, u8"Cache-Control: no-cache\r\n");
     wrd_http_buffer_puts(config, &config->net_headers_buffer, date_string);
-    wrd_http_buffer_printf(config, &config->net_headers_buffer, "Server: %s %s\r\n", WRD_NAME, WRD_VERSION);
+    wrd_http_buffer_printf(config, &config->net_headers_buffer, u8"Server: %s %s\r\n", WRD_NAME, WRD_VERSION);
 
     return WRD_OK;
 }
@@ -49,11 +49,11 @@ WRD_API wrd_code wrd_http_content_type(warudo *config, const char *content_type)
      WRD_CHECK_CONNECTION(config)
 
     if(config->access_origin != NULL) {
-        wrd_http_buffer_printf(config, &config->net_headers_buffer, "Access-Control-Allow-Origin: %s\r\n",
+        wrd_http_buffer_printf(config, &config->net_headers_buffer, u8"Access-Control-Allow-Origin: %s\r\n",
             config->access_origin);
     }
 
-    wrd_http_buffer_printf(config, &config->net_headers_buffer, "Content-type: %s;charset=utf-8\r\n", content_type);
+    wrd_http_buffer_printf(config, &config->net_headers_buffer, u8"Content-type: %s;charset=utf-8\r\n", content_type);
 
     return WRD_OK;
 }
@@ -78,7 +78,7 @@ WRD_API wrd_code wrd_http_created(warudo *config, unsigned long long int id) {
     WRD_CHECK_CONNECTION(config)
 
     wrd_http_header(config, "201 Created", "application/json");
-    wrd_http_printf(config, "{\"status\":\"success\",\"id\":%lld}", id);
+    wrd_http_printf(config, u8"{\"status\":\"success\",\"id\":%lld}", id);
 
     return WRD_OK;
 }
@@ -87,7 +87,7 @@ WRD_API wrd_code wrd_http_multi_created(warudo *config, unsigned long int count)
     WRD_CHECK_CONNECTION(config)
 
     wrd_http_header(config, "201 Created", "application/json");
-    wrd_http_printf(config, "{\"status\":\"success\",\"count\":%lld}", count);
+    wrd_http_printf(config, u8"{\"status\":\"success\",\"count\":%lld}", count);
 
     return WRD_OK;
 }
@@ -96,8 +96,8 @@ WRD_API wrd_code wrd_http_not_allowed(warudo *config, const char *allowed) {
     WRD_CHECK_CONNECTION(config)
 
     wrd_http_header(config, "405 Method Not Allowed", "text/type");
-    wrd_http_buffer_printf(config, &config->net_headers_buffer, "Allow: %s\r\n", allowed);
-    wrd_http_puts(config, "Not allowed.");
+    wrd_http_buffer_printf(config, &config->net_headers_buffer, u8"Allow: %s\r\n", allowed);
+    wrd_http_puts(config, u8"Not allowed.");
 
     return WRD_HTTP_NOT_ALLOWED;
 }
@@ -115,7 +115,7 @@ WRD_API wrd_code wrd_http_bad_request(warudo *config, const char *description) {
     WRD_CHECK_CONNECTION(config)
 
     wrd_http_header(config, "400 Bad Request", "application/json");
-    wrd_http_printf(config, "{\"status\":\"failure\",\"error\":\"%s\"}", description);
+    wrd_http_printf(config, u8"{\"status\":\"failure\",\"error\":\"%s\"}", description);
 
     return WRD_HTTP_BAD_REQUEST;
 }
@@ -124,7 +124,7 @@ WRD_API wrd_code wrd_http_not_found(warudo *config) {
     WRD_CHECK_CONNECTION(config)
 
     wrd_http_header(config, "404 Not Found", "text/plain");
-    wrd_http_puts(config, "Unknown.");
+    wrd_http_puts(config, u8"Unknown.");
 
     return WRD_HTTP_NOT_FOUND;
 }

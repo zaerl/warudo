@@ -32,17 +32,17 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
     // Configurations.
 
     // Database
-    wrd_get_env_string(&config->db_path, "WRD_DB_PATH");
-    wrd_get_env_int((int*)&config->log_level, "WRD_LOG_LEVEL");
+    wrd_get_env_string(&config->db_path, u8"WRD_DB_PATH");
+    wrd_get_env_int((int*)&config->log_level, u8"WRD_LOG_LEVEL");
     // Net
-    wrd_get_env_string(&config->access_origin, "WRD_ACCESS_ORIGIN");
-    wrd_get_env_int((int*)&config->listen_backlog, "WRD_LISTEN_BACKLOG");
-    wrd_get_env_int((int*)&config->max_columns, "WRD_MAX_COLUMNS");
-    wrd_get_env_int((int*)&config->net_buffer_size, "WRD_NET_BUFFER_SIZE");
-    wrd_get_env_int((int*)&config->net_headers_buffer_size, "WRD_NET_HEADERS_BUFFER_SIZE");
-    wrd_get_env_int((int*)&config->net_input_buffer_size, "WRD_NET_INPUT_BUFFER_SIZE");
-    wrd_get_env_int((int*)&config->socket_port, "WRD_SOCKET_PORT");
-    wrd_get_env_int((int*)&config->timing, "WRD_TIMING");
+    wrd_get_env_string(&config->access_origin, u8"WRD_ACCESS_ORIGIN");
+    wrd_get_env_int((int*)&config->listen_backlog, u8"WRD_LISTEN_BACKLOG");
+    wrd_get_env_int((int*)&config->max_columns, u8"WRD_MAX_COLUMNS");
+    wrd_get_env_int((int*)&config->net_buffer_size, u8"WRD_NET_BUFFER_SIZE");
+    wrd_get_env_int((int*)&config->net_headers_buffer_size, u8"WRD_NET_HEADERS_BUFFER_SIZE");
+    wrd_get_env_int((int*)&config->net_input_buffer_size, u8"WRD_NET_INPUT_BUFFER_SIZE");
+    wrd_get_env_int((int*)&config->socket_port, u8"WRD_SOCKET_PORT");
+    wrd_get_env_int((int*)&config->timing, u8"WRD_TIMING");
 
     return WRD_OK;
 }
@@ -167,14 +167,14 @@ WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
     }
 
     // Create a table to store the JSON data.
-    const char *create_table = "CREATE TABLE json_data (data BLOB);";
+    const char *create_table = u8"CREATE TABLE json_data (data BLOB);";
     rc = sqlite3_exec(db, create_table, NULL, NULL, NULL);
 
     if(rc != SQLITE_OK) {
         goto error;
     }
 
-    const char *load_json = "INSERT INTO json_data (data) VALUES (jsonb(?1));";
+    const char *load_json = u8"INSERT INTO json_data (data) VALUES (jsonb(?1));";
     rc = sqlite3_prepare_v2(db, load_json, -1, &stmt, NULL);
 
     if(rc != SQLITE_OK) {
@@ -198,7 +198,7 @@ WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
     sqlite3_finalize(stmt);
     stmt = NULL;
 
-    const char *select_json = "SELECT data ->> ('$.' || ?1) FROM json_data;";
+    const char *select_json = u8"SELECT data ->> ('$.' || ?1) FROM json_data;";
     rc = sqlite3_prepare_v2(db, select_json, -1, &stmt, 0);
 
     if(rc != SQLITE_OK) {

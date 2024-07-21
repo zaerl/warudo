@@ -30,10 +30,10 @@ int main(void) {
         //fputs("gatto", stdout);
         // fputs("<---------", stdout);
         wrd_http_parse_query_headers(config);
-        wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
+        wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
 
         wrd_http_ok(config);
-        wrd_http_puts(config, "{\"Hello\": \"World\"}");
+        wrd_http_puts(config, u8"{\"Hello\": \"World\"}");
 
         wrd_after_connection(config);
     }
@@ -43,7 +43,7 @@ int main(void) {
         char **envp = config->request.envp;
 
         while(*envp) {
-            wrd_log_debug(config, "%s\n", *envp);
+            wrd_log_debug(config, u8"%s\n", *envp);
             ++envp;
         }
         if(config->page == WRD_PAGE_APP) {
@@ -61,9 +61,9 @@ int main(void) {
         wrd_after_connection(config);
 
         if(ret == 0) {
-            wrd_log_info(config, "Accepted request %llu\n", config->requests_count);
+            wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
         } else {
-            wrd_log_error(config, "Failed to accept request %llu. Code %s\n",
+            wrd_log_error(config, u8"Failed to accept request %llu. Code %s\n",
                 config->requests_count, wrd_error_description(ret, 0));
         }
     }*/
@@ -123,7 +123,7 @@ int main(void) {
     config->script_name = script_name;
     config->query_string = query_string;*/
 
-    wrd_log_info(config, "Bye %s!\n", WRD_VERSION);
+    wrd_log_info(config, u8"Bye %s!\n", WRD_VERSION);
     wrd_close(config);
 
     return WRD_OK;

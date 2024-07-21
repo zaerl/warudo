@@ -134,13 +134,11 @@ foreach($map as $value) {
     $config_name = join(' ', $config_name);
 
     if($is_integer) {
-        // $db_loads[] = "status = wrd_load_integer(stmt, \"{$entry_name}\", (int*)&config->{$entry_name});";
         $db_loads[] = "LOAD_DB_CONFIG_INT(WRD_{$define_name}, {$entry_name})";
-        $logs[] = "wrd_log_info(*config, \"{$config_name}: %d\\n\", (*config)->{$entry_name});";
+        $logs[] = "wrd_log_info(*config, u8\"{$config_name}: %d\\n\", (*config)->{$entry_name});";
     } else {
-        // $db_loads[] = "status = wrd_load_string(stmt, \"{$entry_name}\", &config->{$entry_name});";
         $db_loads[] = "LOAD_DB_CONFIG_STR(WRD_{$define_name}, {$entry_name})";
-        $logs[] = "wrd_log_info(*config, \"{$config_name}: %s\\n\", (*config)->{$entry_name});";
+        $logs[] = "wrd_log_info(*config, u8\"{$config_name}: %s\\n\", (*config)->{$entry_name});";
     }
 
     if(!$is_integer) {
@@ -148,7 +146,7 @@ foreach($map as $value) {
         $free_configs[] = "FREE_CONFIG_STRING(WRD_{$define_name}, $entry_name)\n";
     }
 
-    $env_loads[] = "{$env_function}({$env_cast}&config->{$entry_name}, \"WRD_{$define_name}\");";
+    $env_loads[] = "{$env_function}({$env_cast}&config->{$entry_name}, u8\"WRD_{$define_name}\");";
 }
 
 $defines = array_merge(

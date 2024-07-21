@@ -61,19 +61,19 @@ WRD_API wrd_code wrd_init(warudo **config) {
     // Query string
     wrd_parse_query_string(*config, NULL);
 
-    wrd_log_info(*config, "Starting Warudo %s\n", WRD_VERSION);
+    wrd_log_info(*config, u8"Starting Warudo %s\n", WRD_VERSION);
 
     // Configurations.
-    wrd_log_info(*config, "Db Path: %s\n", (*config)->db_path);
-    wrd_log_info(*config, "Log Level: %d\n", (*config)->log_level);
-    wrd_log_info(*config, "Access Origin: %s\n", (*config)->access_origin);
-    wrd_log_info(*config, "Listen Backlog: %d\n", (*config)->listen_backlog);
-    wrd_log_info(*config, "Max Columns: %d\n", (*config)->max_columns);
-    wrd_log_info(*config, "Net Buffer Size: %d\n", (*config)->net_buffer_size);
-    wrd_log_info(*config, "Net Headers Buffer Size: %d\n", (*config)->net_headers_buffer_size);
-    wrd_log_info(*config, "Net Input Buffer Size: %d\n", (*config)->net_input_buffer_size);
-    wrd_log_info(*config, "Socket Port: %d\n", (*config)->socket_port);
-    wrd_log_info(*config, "Timing: %d\n", (*config)->timing);
+    wrd_log_info(*config, u8"Db Path: %s\n", (*config)->db_path);
+    wrd_log_info(*config, u8"Log Level: %d\n", (*config)->log_level);
+    wrd_log_info(*config, u8"Access Origin: %s\n", (*config)->access_origin);
+    wrd_log_info(*config, u8"Listen Backlog: %d\n", (*config)->listen_backlog);
+    wrd_log_info(*config, u8"Max Columns: %d\n", (*config)->max_columns);
+    wrd_log_info(*config, u8"Net Buffer Size: %d\n", (*config)->net_buffer_size);
+    wrd_log_info(*config, u8"Net Headers Buffer Size: %d\n", (*config)->net_headers_buffer_size);
+    wrd_log_info(*config, u8"Net Input Buffer Size: %d\n", (*config)->net_input_buffer_size);
+    wrd_log_info(*config, u8"Socket Port: %d\n", (*config)->socket_port);
+    wrd_log_info(*config, u8"Timing: %d\n", (*config)->timing);
 
     res = wrd_db_init((*config)->db_path, *config);
 
@@ -92,7 +92,7 @@ WRD_API wrd_code wrd_accept_connection(warudo *config) {
     wrd_code accepted = wrd_net_accept(config);
 
     if(accepted != WRD_OK) {
-        wrd_log_error(config, "Failed to accept request %llu. Code %s\n",
+        wrd_log_error(config, u8"Failed to accept request %llu. Code %s\n",
                 config->requests_count, wrd_error_description(accepted, 0));
 
         return accepted;
@@ -120,7 +120,7 @@ WRD_API wrd_code wrd_after_connection(warudo *config) {
     wrd_net_finish_request(config);
 
     if(config->timing) {
-        wrd_end_time(config, "after finish request");
+        wrd_end_time(config, u8"after finish request");
     }
 
     return WRD_OK;

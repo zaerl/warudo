@@ -19,4 +19,5 @@ target_compile_options(warudo_sqlite
     -DSQLITE_OMIT_AUTOINIT
     -DSQLITE_STRICT_SUBTYPE=1
     -DSQLITE_USE_URI=1
+    -Wno-constant-logical-operand # C23 warning.
 )
