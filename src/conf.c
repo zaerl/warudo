@@ -7,49 +7,68 @@
 #include "env.h"
 #include "fs.h"
 
-// This file automatically generated. Do not edit it manually.
-
-// Init a configuration file with environment variables.
+// Init configurations with default values.
 WRD_API wrd_code wrd_init_config(warudo *config) {
     // Configurations.
 
     // Database
-    wrd_get_env_string(&config->db_path, "WRD_DB_PATH", WRD_DEFAULT_DB_PATH);
-    wrd_get_env_int((int*)&config->log_level, "WRD_LOG_LEVEL", WRD_DEFAULT_LOG_LEVEL);
+    config->db_path = WRD_DEFAULT_DB_PATH;
+    config->log_level = WRD_DEFAULT_LOG_LEVEL;
     // Net
-    wrd_get_env_string(&config->access_origin, "WRD_ACCESS_ORIGIN", WRD_DEFAULT_ACCESS_ORIGIN);
-    wrd_get_env_int((int*)&config->listen_backlog, "WRD_LISTEN_BACKLOG", WRD_DEFAULT_LISTEN_BACKLOG);
-    wrd_get_env_int((int*)&config->max_columns, "WRD_MAX_COLUMNS", WRD_DEFAULT_MAX_COLUMNS);
-    wrd_get_env_int((int*)&config->net_buffer_size, "WRD_NET_BUFFER_SIZE", WRD_DEFAULT_NET_BUFFER_SIZE);
-    wrd_get_env_int((int*)&config->net_headers_buffer_size, "WRD_NET_HEADERS_BUFFER_SIZE", WRD_DEFAULT_NET_HEADERS_BUFFER_SIZE);
-    wrd_get_env_int((int*)&config->net_input_buffer_size, "WRD_NET_INPUT_BUFFER_SIZE", WRD_DEFAULT_NET_INPUT_BUFFER_SIZE);
-    wrd_get_env_int((int*)&config->socket_port, "WRD_SOCKET_PORT", WRD_DEFAULT_SOCKET_PORT);
-    wrd_get_env_int((int*)&config->timing, "WRD_TIMING", WRD_DEFAULT_TIMING);
+    config->access_origin = WRD_DEFAULT_ACCESS_ORIGIN;
+    config->listen_backlog = WRD_DEFAULT_LISTEN_BACKLOG;
+    config->max_columns = WRD_DEFAULT_MAX_COLUMNS;
+    config->net_buffer_size = WRD_DEFAULT_NET_BUFFER_SIZE;
+    config->net_headers_buffer_size = WRD_DEFAULT_NET_HEADERS_BUFFER_SIZE;
+    config->net_input_buffer_size = WRD_DEFAULT_NET_INPUT_BUFFER_SIZE;
+    config->socket_port = WRD_DEFAULT_SOCKET_PORT;
+    config->timing = WRD_DEFAULT_TIMING;
+
+    return WRD_OK;
+}
+
+// Set configurations to environment variable values, if they exist.
+WRD_API wrd_code wrd_load_config_env(warudo *config) {
+    // Configurations.
+
+    // Database
+    wrd_get_env_string(&config->db_path, "WRD_DB_PATH");
+    wrd_get_env_int((int*)&config->log_level, "WRD_LOG_LEVEL");
+    // Net
+    wrd_get_env_string(&config->access_origin, "WRD_ACCESS_ORIGIN");
+    wrd_get_env_int((int*)&config->listen_backlog, "WRD_LISTEN_BACKLOG");
+    wrd_get_env_int((int*)&config->max_columns, "WRD_MAX_COLUMNS");
+    wrd_get_env_int((int*)&config->net_buffer_size, "WRD_NET_BUFFER_SIZE");
+    wrd_get_env_int((int*)&config->net_headers_buffer_size, "WRD_NET_HEADERS_BUFFER_SIZE");
+    wrd_get_env_int((int*)&config->net_input_buffer_size, "WRD_NET_INPUT_BUFFER_SIZE");
+    wrd_get_env_int((int*)&config->socket_port, "WRD_SOCKET_PORT");
+    wrd_get_env_int((int*)&config->timing, "WRD_TIMING");
 
     return WRD_OK;
 }
 
 // Close loaded configurations.
 WRD_API wrd_code wrd_config_close(warudo *config) {
+    // Used to shorten the declarations.
+    #define FREE_CONFIG_STRING(NAME, FIELD) \
+        if(config->FIELD && wrd_get_config_status(config, NAME) != WRD_DEFAULT_CONFIG) { \
+            free(config->FIELD); \
+            config->FIELD = NULL; \
+        }
+
     // Configurations.
 
     // Database
-    if(config->db_path) {
-        free(config->db_path);
-        config->db_path = NULL;
-    }
+    FREE_CONFIG_STRING(WRD_DB_PATH, db_path)
 
     // Net
-    if(config->access_origin) {
-        free(config->access_origin);
-        config->access_origin = NULL;
-    }
+    FREE_CONFIG_STRING(WRD_ACCESS_ORIGIN, access_origin)
 
     return WRD_OK;
 }
 
-WRD_API wrd_code wrd_load_string(sqlite3_stmt *stmt, const char *name, char **output) {
-    wrd_code ret = WRD_DB_ERROR;
+WRD_API wrd_config_status wrd_load_string(sqlite3_stmt *stmt, const char *name, char **output) {
+    wrd_config_status ret = WRD_DEFAULT_CONFIG;
 
     if(sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC) != SQLITE_OK) {
         goto error;
@@ -70,7 +89,7 @@ WRD_API wrd_code wrd_load_string(sqlite3_stmt *stmt, const char *name, char **ou
 
         if(length) {
             *output = strndup(res, length);
-            ret = WRD_OK;
+            ret = WRD_LOADED_CONFIG;
         }
     }
 
@@ -81,8 +100,8 @@ error:
     return ret;
 }
 
-WRD_API wrd_code wrd_load_integer(sqlite3_stmt *stmt, const char *name, int *output) {
-    wrd_code ret = WRD_DB_ERROR;
+WRD_API wrd_config_status wrd_load_integer(sqlite3_stmt *stmt, const char *name, int *output) {
+    wrd_config_status ret = WRD_DEFAULT_CONFIG;
 
     if(sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC) != SQLITE_OK) {
         goto error;
@@ -94,7 +113,7 @@ WRD_API wrd_code wrd_load_integer(sqlite3_stmt *stmt, const char *name, int *out
 
     if(sqlite3_column_type(stmt, 0) == SQLITE_INTEGER) {
         *output = sqlite3_column_int(stmt, 0);
-        ret = WRD_OK;
+        ret = WRD_LOADED_CONFIG;
     }
 
 error:
@@ -186,20 +205,34 @@ WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
         goto error;
     }
 
+    // Status of the new configurations.
+    wrd_config_status status;
+
+    // Used to shorten the declarations.
+    #define LOAD_DB_CONFIG_INT(NAME, FIELD) \
+        status = wrd_load_integer(stmt, #FIELD, (int*)&config->FIELD); \
+        wrd_set_config_status(config, NAME, status);
+
+    #define LOAD_DB_CONFIG_STR(NAME, FIELD) \
+        status = wrd_load_string(stmt, #FIELD, &config->FIELD); \
+        wrd_set_config_status(config, NAME, status);
+
     // Configurations.
 
-    rc = wrd_load_string(stmt, "db_path", &config->db_path);
-    rc = wrd_load_integer(stmt, "log_level", (int*)&config->log_level);
-    rc = wrd_load_string(stmt, "access_origin", &config->access_origin);
-    rc = wrd_load_integer(stmt, "listen_backlog", (int*)&config->listen_backlog);
-    rc = wrd_load_integer(stmt, "max_columns", (int*)&config->max_columns);
-    rc = wrd_load_integer(stmt, "net_buffer_size", (int*)&config->net_buffer_size);
-    rc = wrd_load_integer(stmt, "net_headers_buffer_size", (int*)&config->net_headers_buffer_size);
-    rc = wrd_load_integer(stmt, "net_input_buffer_size", (int*)&config->net_input_buffer_size);
-    rc = wrd_load_integer(stmt, "socket_port", (int*)&config->socket_port);
-    rc = wrd_load_integer(stmt, "timing", (int*)&config->timing);
+    LOAD_DB_CONFIG_STR(WRD_DB_PATH, db_path)
+    LOAD_DB_CONFIG_INT(WRD_LOG_LEVEL, log_level)
+    LOAD_DB_CONFIG_STR(WRD_ACCESS_ORIGIN, access_origin)
+    LOAD_DB_CONFIG_INT(WRD_LISTEN_BACKLOG, listen_backlog)
+    LOAD_DB_CONFIG_INT(WRD_MAX_COLUMNS, max_columns)
+    LOAD_DB_CONFIG_INT(WRD_NET_BUFFER_SIZE, net_buffer_size)
+    LOAD_DB_CONFIG_INT(WRD_NET_HEADERS_BUFFER_SIZE, net_headers_buffer_size)
+    LOAD_DB_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
+    LOAD_DB_CONFIG_INT(WRD_SOCKET_PORT, socket_port)
+    LOAD_DB_CONFIG_INT(WRD_TIMING, timing)
 
-ret = WRD_OK;
+    wrd_load_config_env(config);
+
+    ret = WRD_OK;
 
 error:
 
@@ -216,4 +249,22 @@ error:
     }
 
     return ret;
+}
+
+// Get the status of a configuration.
+WRD_API wrd_config_status wrd_get_config_status(warudo *config, wrd_config_name name) {
+    if(!config) {
+        return WRD_NOT_VALID_CONFIG;
+    }
+
+    return config->config_status[name];
+}
+
+// Set the status of a configuration.
+WRD_API wrd_code wrd_set_config_status(warudo *config, wrd_config_name name, wrd_config_status status) {
+    CHECK_CONFIG
+
+    config->config_status[name] = status;
+
+    return WRD_OK;
 }

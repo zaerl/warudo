@@ -29,7 +29,22 @@ extern "C" {
 #define WRD_AUTH_DEFAULT_PASS "admin"
 #define WRD_AUTH_DEFAULT_ROLE "admin"
 
+#define WRD_DEFAULT_CONF_PATH "warudo.conf"
+
 // Configurations.
+// Configuration names.
+typedef enum {
+    WRD_DB_PATH,
+    WRD_LOG_LEVEL,
+    WRD_ACCESS_ORIGIN,
+    WRD_LISTEN_BACKLOG,
+    WRD_MAX_COLUMNS,
+    WRD_NET_BUFFER_SIZE,
+    WRD_NET_HEADERS_BUFFER_SIZE,
+    WRD_NET_INPUT_BUFFER_SIZE,
+    WRD_SOCKET_PORT,
+    WRD_TIMING,
+} wrd_config_name;
 
 // Database
 #define WRD_DEFAULT_DB_PATH "file:warudo.db"
@@ -142,6 +157,8 @@ typedef struct warudo {
 
     // Configurations.
 
+    char config_status[10];
+    
     // Database
     char *db_path;
     wrd_log_level log_level;

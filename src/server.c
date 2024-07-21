@@ -29,9 +29,9 @@ WRD_API wrd_code wrd_init(warudo **config) {
     (*config)->timing_end_count = 0;
 
     char *conf_file = NULL;
-    wrd_get_env_string(&conf_file, "WRD_CONF_PATH", "warudo.conf");
+    wrd_get_env_string(&conf_file, "WRD_CONF_PATH");
 
-    res = wrd_load_config(*config, conf_file);
+    res = wrd_load_config(*config, conf_file ? conf_file : WRD_DEFAULT_CONF_PATH);
 
     if(conf_file) {
         free(conf_file);

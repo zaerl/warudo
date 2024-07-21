@@ -39,67 +39,23 @@ $confs = [];
 
 // H header file.
 $defines = [];
+$names = [];
+$statuses = [];
 $structs = [];
 
 // C file.
 $init_configs = [];
 $free_configs = [];
 $db_loads = [];
+$env_loads = [];
 
 // Server file.
 $logs = [];
 
-// Transform a value to a configuration file value.
-function value_to_conf($value) {
-    if(is_null($value)) {
-        return 'null';
-    }
-
-    if(is_int($value)) {
-        return $value;
-    }
-
-    return '\'' . str_replace('\'', '\\\'', $value) . '\'';
-}
-
-// Transform a value to a C file value.
-function value_to_c($value) {
-    if(is_null($value)) {
-        return 'NULL';
-    }
-
-    if(is_int($value)) {
-        return $value;
-    }
-
-    return '"' . str_replace('"', '\\"', $value) . '"';
-}
-
-function values_to_struct($values) {
-    return array_map(function($value) { return '    ' . $value; }, $values);
-}
-
-function inject_text($file, $start_text, $end_text, $text, $start_pos = 0) {
-    $start_pos = strpos($file, $start_text, $start_pos);
-
-    if($start_pos === false) {
-        echo "Could not find the start of injection point ('{$start_text}').\n";
-        exit(1);
-    }
-
-    $start_pos += strlen($start_text) + 1;
-    $end_pos = strpos($file, $end_text, $start_pos);
-
-    if($end_pos === false) {
-        echo "Could not find the end of the injection point ('{$end_text}').\n";
-        exit(1);
-    }
-
-    return [
-        'start_pos' => $start_pos,
-        'text' => substr_replace($file, $text, $start_pos, $end_pos - $start_pos),
-    ];
-}
+$struct_count = count(array_filter($map, 'is_array'));
+$statuses[] = "// Configuration statuses.";
+$structs[] = "char config_status[{$struct_count}];";
+$structs[] = '';
 
 // Loop through each line
 foreach($map as $value) {
@@ -122,6 +78,7 @@ foreach($map as $value) {
         // C file.
         $init_configs[] = $comment;
         $free_configs[] = $comment;
+        $env_loads[] = $comment;
 
         continue;
     }
@@ -158,7 +115,7 @@ foreach($map as $value) {
             $enums[] = 'WRD_' . strtoupper($entry_name) . '_' . strtoupper( $enum_value );
         }
 
-        $defines[] = join(",\n", values_to_struct($enums));
+        $defines[] = join(",\n", add_indentation($enums));
         $defines[] = "} {$type};\n";
         $type .= ' ';
     }
@@ -168,25 +125,41 @@ foreach($map as $value) {
     // H file.
     $defines[] = "#define {$define} " . $c_entry_value;
     $structs[] = "{$type}{$entry_name};";
+    $names[] = "WRD_{$define_name},";
 
     // C file.
-    $init_configs[] = "{$env_function}({$env_cast}&config->{$entry_name}, \"WRD_{$define_name}\", {$define});";
+    $init_configs[] = "config->{$entry_name} = {$define};";
     $config_name = explode('_', $entry_name);
     $config_name = array_map('ucfirst', $config_name);
     $config_name = join(' ', $config_name);
 
     if($is_integer) {
-        $db_loads[] = "rc = wrd_load_integer(stmt, \"{$entry_name}\", (int*)&config->{$entry_name});";
+        // $db_loads[] = "status = wrd_load_integer(stmt, \"{$entry_name}\", (int*)&config->{$entry_name});";
+        $db_loads[] = "LOAD_DB_CONFIG_INT(WRD_{$define_name}, {$entry_name})";
         $logs[] = "wrd_log_info(*config, \"{$config_name}: %d\\n\", (*config)->{$entry_name});";
     } else {
-        $db_loads[] = "rc = wrd_load_string(stmt, \"{$entry_name}\", &config->{$entry_name});";
+        // $db_loads[] = "status = wrd_load_string(stmt, \"{$entry_name}\", &config->{$entry_name});";
+        $db_loads[] = "LOAD_DB_CONFIG_STR(WRD_{$define_name}, {$entry_name})";
         $logs[] = "wrd_log_info(*config, \"{$config_name}: %s\\n\", (*config)->{$entry_name});";
     }
 
     if(!$is_integer) {
-        $free_configs[] = "if(config->{$entry_name}) {\n        free(config->{$entry_name});\n        config->{$entry_name} = NULL;\n    }\n";
+        // $free_configs[] = "if(config->{$entry_name}) {\n        free(config->{$entry_name});\n        config->{$entry_name} = NULL;\n    }\n";
+        $free_configs[] = "FREE_CONFIG_STRING(WRD_{$define_name}, $entry_name)\n";
     }
+
+    $env_loads[] = "{$env_function}({$env_cast}&config->{$entry_name}, \"WRD_{$define_name}\");";
 }
+
+$defines = array_merge(
+    [
+        '// Configuration names.',
+        'typedef enum {'
+    ],
+    add_indentation($names),
+    ['} wrd_config_name;'],
+    $defines
+);
 
 $files = [
     'h' => [
@@ -197,7 +170,7 @@ $files = [
         'additionals' => [
             [
                 'end' => "\n\n",
-                'text' => "\n" . join("\n", values_to_struct($structs)),
+                'text' => "\n" . join("\n", add_indentation($structs)),
             ],
         ]
     ],
@@ -205,14 +178,17 @@ $files = [
         'file' => 'src/conf.c',
         'start' => '// Configurations.',
         'end' => "\n    return WRD_OK;",
-        'text' => "\n" . join("\n", values_to_struct($init_configs)) . "\n",
+        'text' => "\n" . join("\n", add_indentation($init_configs)) . "\n",
         'additionals' => [
             [
                 'end' => "\n    return WRD_OK;",
-                'text' => "\n" . join("\n", values_to_struct($free_configs)),
+                'text' => "\n" . join("\n", add_indentation($env_loads)) . "\n",
             ], [
-                'end' => "ret = WRD_OK;",
-                'text' => "\n" . join("\n", values_to_struct($db_loads)) . "\n\n",
+                'end' => "\n    return WRD_OK;",
+                'text' => "\n" . join("\n", add_indentation($free_configs)),
+            ], [
+                'end' => "\n    wrd_load_config_env",
+                'text' => "\n" . join("\n", add_indentation($db_loads)) . "\n",
             ]
         ]
     ],
@@ -220,14 +196,14 @@ $files = [
         'file' => 'warudo.conf.default',
         'start' => '{',
         'end' => '}',
-        'text' => join("\n", values_to_struct($confs)) . "\n",
+        'text' => join("\n", add_indentation($confs)) . "\n",
         'additionals' => [],
     ],
     'server' => [
         'file' => 'src/server.c',
         'start' => '// Configurations.',
         'end' => "res = wrd_db_init((*config)->db_path, *config);",
-        'text' => join("\n", values_to_struct($logs)) . "\n\n    ",
+        'text' => join("\n", add_indentation($logs)) . "\n\n    ",
         'additionals' => [],
     ],
 ];
@@ -248,4 +224,64 @@ for($i = 1; $i < $argc; ++$i) {
     }
 
     echo "Generated {$file['file']}.\n";
+}
+
+// Transform a value to a configuration file value.
+function value_to_conf($value) {
+    if(is_null($value)) {
+        return 'null';
+    }
+
+    if(is_int($value)) {
+        return $value;
+    }
+
+    return '\'' . str_replace('\'', '\\\'', $value) . '\'';
+}
+
+// Transform a value to a C file value.
+function value_to_c($value) {
+    if(is_null($value)) {
+        return 'NULL';
+    }
+
+    if(is_int($value)) {
+        return $value;
+    }
+
+    return '"' . str_replace('"', '\\"', $value) . '"';
+}
+
+// Add indentation to an array of values.
+function add_indentation($values, $indentation = 1) {
+    $indentation = str_repeat(' ', $indentation * 4);
+
+    return array_map(
+        function($value) use ($indentation) {
+            return $indentation . $value;
+        },
+        $values
+    );
+}
+
+function inject_text($file, $start_text, $end_text, $text, $start_pos = 0) {
+    $start_pos = strpos($file, $start_text, $start_pos);
+
+    if($start_pos === false) {
+        echo "Could not find the start of injection point ('{$start_text}').\n";
+        exit(1);
+    }
+
+    $start_pos += strlen($start_text) + 1;
+    $end_pos = strpos($file, $end_text, $start_pos);
+
+    if($end_pos === false) {
+        echo "Could not find the end of the injection point ('{$end_text}').\n";
+        exit(1);
+    }
+
+    return [
+        'start_pos' => $start_pos,
+        'text' => substr_replace($file, $text, $start_pos, $end_pos - $start_pos),
+    ];
 }
