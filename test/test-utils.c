@@ -17,10 +17,12 @@ char *wrd_mock_file(const char *content) {
         return NULL;
     }
 
-    if(write(fd, content, strlen(content)) == -1) {
-        ATT_ASSERT(0, 1, "fputs() failed")
+    if(content) {
+        if(write(fd, content, strlen(content)) == -1) {
+            ATT_ASSERT(0, 1, "fputs() failed")
 
-        return NULL;
+            return NULL;
+        }
     }
 
     close(fd);
