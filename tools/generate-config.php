@@ -56,6 +56,8 @@ $struct_count = count(array_filter($map, 'is_array'));
 $statuses[] = "// Configuration statuses.";
 $structs[] = "char config_status[{$struct_count}];";
 $structs[] = '';
+$init_configs[] = '// Initialize to defaults.';
+$init_configs[] = "memset(config->config_status, WRD_DEFAULT_CONFIG, {$struct_count});\n";
 
 // Loop through each line
 foreach($map as $value) {
@@ -98,7 +100,7 @@ foreach($map as $value) {
     $define_name = strtoupper($entry_name);
     $define = 'WRD_DEFAULT_' . $define_name;
     $type = $is_integer ? 'int ' : 'char *';
-    $env_function = $is_integer ? 'wrd_get_env_int' : 'wrd_get_env_string';
+    $env_function = $is_integer ? 'LOAD_ENV_CONFIG_INT' : 'LOAD_ENV_CONFIG_STRING';
     $env_cast = $is_integer ? '(int*)' : '';
 
     // Configuration file.
@@ -135,10 +137,10 @@ foreach($map as $value) {
 
     if($is_integer) {
         $db_loads[] = "LOAD_DB_CONFIG_INT(WRD_{$define_name}, {$entry_name})";
-        $logs[] = "wrd_log_info(*config, u8\"{$config_name}: %d\\n\", (*config)->{$entry_name});";
+        $logs[] = "wrd_log_info(*config, u8\"{$config_name}: %d [%c]\\n\", (*config)->{$entry_name}, wrd_get_config_status(*config, WRD_{$define_name}));";
     } else {
         $db_loads[] = "LOAD_DB_CONFIG_STR(WRD_{$define_name}, {$entry_name})";
-        $logs[] = "wrd_log_info(*config, u8\"{$config_name}: %s\\n\", (*config)->{$entry_name});";
+        $logs[] = "wrd_log_info(*config, u8\"{$config_name}: %s [%c]\\n\", (*config)->{$entry_name}, wrd_get_config_status(*config, WRD_{$define_name}));";
     }
 
     if(!$is_integer) {
@@ -146,7 +148,7 @@ foreach($map as $value) {
         $free_configs[] = "FREE_CONFIG_STRING(WRD_{$define_name}, $entry_name)\n";
     }
 
-    $env_loads[] = "{$env_function}({$env_cast}&config->{$entry_name}, u8\"WRD_{$define_name}\");";
+    $env_loads[] = "{$env_function}(WRD_{$define_name}, {$entry_name})";
 }
 
 $defines = array_merge(

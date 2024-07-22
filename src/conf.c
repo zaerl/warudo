@@ -11,6 +11,9 @@
 WRD_API wrd_code wrd_init_config(warudo *config) {
     // Configurations.
 
+    // Initialize to defaults.
+    memset(config->config_status, WRD_DEFAULT_CONFIG, 10);
+
     // Database
     config->db_path = WRD_DEFAULT_DB_PATH;
     config->log_level = WRD_DEFAULT_LOG_LEVEL;
@@ -29,20 +32,32 @@ WRD_API wrd_code wrd_init_config(warudo *config) {
 
 // Set configurations to environment variable values, if they exist.
 WRD_API wrd_code wrd_load_config_env(warudo *config) {
+    // Status of the loaded configuration.
+    wrd_code ret;
+
+    // Used to shorten the declarations.
+    #define LOAD_ENV_CONFIG_INT(NAME, FIELD) \
+        ret = wrd_get_env_int((int*)&config->FIELD, #NAME); \
+        if(ret == WRD_OK) wrd_set_config_status(config, NAME, WRD_ENV_CONFIG);
+
+    #define LOAD_ENV_CONFIG_STRING(NAME, FIELD) \
+        ret = wrd_get_env_string(&config->FIELD, #NAME); \
+        if(ret == WRD_OK) wrd_set_config_status(config, NAME, WRD_ENV_CONFIG);
+
     // Configurations.
 
     // Database
-    wrd_get_env_string(&config->db_path, u8"WRD_DB_PATH");
-    wrd_get_env_int((int*)&config->log_level, u8"WRD_LOG_LEVEL");
+    LOAD_ENV_CONFIG_STRING(WRD_DB_PATH, db_path)
+    LOAD_ENV_CONFIG_INT(WRD_LOG_LEVEL, log_level)
     // Net
-    wrd_get_env_string(&config->access_origin, u8"WRD_ACCESS_ORIGIN");
-    wrd_get_env_int((int*)&config->listen_backlog, u8"WRD_LISTEN_BACKLOG");
-    wrd_get_env_int((int*)&config->max_columns, u8"WRD_MAX_COLUMNS");
-    wrd_get_env_int((int*)&config->net_buffer_size, u8"WRD_NET_BUFFER_SIZE");
-    wrd_get_env_int((int*)&config->net_headers_buffer_size, u8"WRD_NET_HEADERS_BUFFER_SIZE");
-    wrd_get_env_int((int*)&config->net_input_buffer_size, u8"WRD_NET_INPUT_BUFFER_SIZE");
-    wrd_get_env_int((int*)&config->socket_port, u8"WRD_SOCKET_PORT");
-    wrd_get_env_int((int*)&config->timing, u8"WRD_TIMING");
+    LOAD_ENV_CONFIG_STRING(WRD_ACCESS_ORIGIN, access_origin)
+    LOAD_ENV_CONFIG_INT(WRD_LISTEN_BACKLOG, listen_backlog)
+    LOAD_ENV_CONFIG_INT(WRD_MAX_COLUMNS, max_columns)
+    LOAD_ENV_CONFIG_INT(WRD_NET_BUFFER_SIZE, net_buffer_size)
+    LOAD_ENV_CONFIG_INT(WRD_NET_HEADERS_BUFFER_SIZE, net_headers_buffer_size)
+    LOAD_ENV_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
+    LOAD_ENV_CONFIG_INT(WRD_SOCKET_PORT, socket_port)
+    LOAD_ENV_CONFIG_INT(WRD_TIMING, timing)
 
     return WRD_OK;
 }
@@ -254,7 +269,11 @@ error:
 // Get the status of a configuration.
 WRD_API wrd_config_status wrd_get_config_status(warudo *config, wrd_config_name name) {
     if(!config) {
-        return WRD_NOT_VALID_CONFIG;
+        return WRD_NOT_LOADED_CONFIG;
+    }
+
+    if(!config->config_status[name]) {
+        return WRD_NOT_LOADED_CONFIG;
     }
 
     return config->config_status[name];

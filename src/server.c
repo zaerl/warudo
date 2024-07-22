@@ -64,16 +64,16 @@ WRD_API wrd_code wrd_init(warudo **config) {
     wrd_log_info(*config, u8"Starting Warudo %s\n", WRD_VERSION);
 
     // Configurations.
-    wrd_log_info(*config, u8"Db Path: %s\n", (*config)->db_path);
-    wrd_log_info(*config, u8"Log Level: %d\n", (*config)->log_level);
-    wrd_log_info(*config, u8"Access Origin: %s\n", (*config)->access_origin);
-    wrd_log_info(*config, u8"Listen Backlog: %d\n", (*config)->listen_backlog);
-    wrd_log_info(*config, u8"Max Columns: %d\n", (*config)->max_columns);
-    wrd_log_info(*config, u8"Net Buffer Size: %d\n", (*config)->net_buffer_size);
-    wrd_log_info(*config, u8"Net Headers Buffer Size: %d\n", (*config)->net_headers_buffer_size);
-    wrd_log_info(*config, u8"Net Input Buffer Size: %d\n", (*config)->net_input_buffer_size);
-    wrd_log_info(*config, u8"Socket Port: %d\n", (*config)->socket_port);
-    wrd_log_info(*config, u8"Timing: %d\n", (*config)->timing);
+    wrd_log_info(*config, u8"Db Path: %s [%c]\n", (*config)->db_path, wrd_get_config_status(*config, WRD_DB_PATH));
+    wrd_log_info(*config, u8"Log Level: %d [%c]\n", (*config)->log_level, wrd_get_config_status(*config, WRD_LOG_LEVEL));
+    wrd_log_info(*config, u8"Access Origin: %s [%c]\n", (*config)->access_origin, wrd_get_config_status(*config, WRD_ACCESS_ORIGIN));
+    wrd_log_info(*config, u8"Listen Backlog: %d [%c]\n", (*config)->listen_backlog, wrd_get_config_status(*config, WRD_LISTEN_BACKLOG));
+    wrd_log_info(*config, u8"Max Columns: %d [%c]\n", (*config)->max_columns, wrd_get_config_status(*config, WRD_MAX_COLUMNS));
+    wrd_log_info(*config, u8"Net Buffer Size: %d [%c]\n", (*config)->net_buffer_size, wrd_get_config_status(*config, WRD_NET_BUFFER_SIZE));
+    wrd_log_info(*config, u8"Net Headers Buffer Size: %d [%c]\n", (*config)->net_headers_buffer_size, wrd_get_config_status(*config, WRD_NET_HEADERS_BUFFER_SIZE));
+    wrd_log_info(*config, u8"Net Input Buffer Size: %d [%c]\n", (*config)->net_input_buffer_size, wrd_get_config_status(*config, WRD_NET_INPUT_BUFFER_SIZE));
+    wrd_log_info(*config, u8"Socket Port: %d [%c]\n", (*config)->socket_port, wrd_get_config_status(*config, WRD_SOCKET_PORT));
+    wrd_log_info(*config, u8"Timing: %d [%c]\n", (*config)->timing, wrd_get_config_status(*config, WRD_TIMING));
 
     res = wrd_db_init((*config)->db_path, *config);
 

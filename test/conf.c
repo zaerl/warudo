@@ -5,6 +5,7 @@ void *test_conf(void *arg) {
     MOCK_CONFIG
     MOCK_CONFIG_S
 
+    ATT_ASSERT(wrd_get_config_status(&config, WRD_DB_PATH), WRD_NOT_LOADED_CONFIG, "wrd_get_config_status not loaded")
     ATT_ASSERT(wrd_load_config(&config, NULL), WRD_DEFAULT, "wrd_load_config NULL")
 
     WRD_MOCK_FILE("")
@@ -38,8 +39,21 @@ void *test_conf(void *arg) {
     ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config add net_buffer_size")
     ATT_ASSERT(config.net_buffer_size, WRD_DEFAULT_NET_BUFFER_SIZE, "wrd_load_config default net_buffer_size")
 
-    // WRD_MOCK_FILE("test=test")
-    // ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), 1, "wrd_load_config test 4")
+    // Default
+    ATT_ASSERT(wrd_get_config_status(&config, WRD_DB_PATH), WRD_DEFAULT_CONFIG, "wrd_get_config_status default")
+
+    // Loaded from config file.
+    WRD_MOCK_FILE("{ db_path: \"Test\" }")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config add access_origin")
+    ATT_ASSERT(wrd_get_config_status(&config, WRD_DB_PATH), WRD_LOADED_CONFIG, "wrd_get_config_status loaded")
+
+    // Loaded from environment variable.
+    setenv("WRD_DB_PATH", "Test 2", 1);
+    WRD_MOCK_FILE("{}")
+    ATT_ASSERT(wrd_load_config(&config, tmp_mock_file), WRD_OK, "wrd_load_config load empty file")
+    ATT_ASSERT(wrd_get_config_status(&config, WRD_DB_PATH), WRD_ENV_CONFIG, "wrd_get_config_status env")
+    ATT_ASSERT(config.db_path, "Test 2", "wrd_get_config_status env value")
+    unsetenv("WRD_DB_PATH");
 
     FREE_MOCK_FILE
 
