@@ -16,7 +16,7 @@ int main(void) {
     warudo *config = NULL;
     wrd_code ret;
 
-    ret = wrd_init(&config);
+    ret = wrd_init_server(&config);
 
     if(ret != WRD_OK) {
         wrd_log_error(config, "Failed to Initialize. Code %s\n", wrd_error_description(ret, 0));
@@ -25,10 +25,6 @@ int main(void) {
     }
 
     while(wrd_accept_connection(config) == WRD_OK) {
-        // fputs("--------->", stdout);
-        // fputs(config->net_input_buffer.buffer, stdout);
-        //fputs("gatto", stdout);
-        // fputs("<---------", stdout);
         wrd_http_parse_query_headers(config);
         wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
 

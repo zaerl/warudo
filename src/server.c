@@ -17,7 +17,7 @@
 // TODO: remove
 #include <unistd.h>
 
-WRD_API wrd_code wrd_init(warudo **config) {
+WRD_API wrd_code wrd_init_server(warudo **config) {
     CHECK_CONFIG
 
     *config = malloc(sizeof(warudo));
