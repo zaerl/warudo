@@ -9,6 +9,7 @@ extern "C" {
 
 // Start the event queue.
 WRD_API wrd_code wrd_start_queue(warudo *config);
+WRD_API wrd_code wrd_get_workers(warudo *config, long *workers);
 
 #ifdef __cplusplus
 }

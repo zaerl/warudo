@@ -17,7 +17,7 @@ WRD_API wrd_code wrd_init_config(warudo *config) {
     // Configurations.
 
     // Initialize to defaults.
-    memset(config->config_status, WRD_DEFAULT_CONFIG, 10);
+    memset(config->config_status, WRD_DEFAULT_CONFIG, 11);
 
     // Database
     config->db_path = WRD_DEFAULT_DB_PATH;
@@ -31,6 +31,8 @@ WRD_API wrd_code wrd_init_config(warudo *config) {
     config->net_input_buffer_size = WRD_DEFAULT_NET_INPUT_BUFFER_SIZE;
     config->socket_port = WRD_DEFAULT_SOCKET_PORT;
     config->timing = WRD_DEFAULT_TIMING;
+    // Server
+    config->workers = WRD_DEFAULT_WORKERS;
 
     return WRD_OK;
 }
@@ -63,6 +65,8 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
     LOAD_ENV_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
     LOAD_ENV_CONFIG_INT(WRD_SOCKET_PORT, socket_port)
     LOAD_ENV_CONFIG_INT(WRD_TIMING, timing)
+    // Server
+    LOAD_ENV_CONFIG_STRING(WRD_WORKERS, workers)
 
     return WRD_OK;
 }
@@ -83,6 +87,9 @@ WRD_API wrd_code wrd_config_close(warudo *config) {
 
     // Net
     FREE_CONFIG_STRING(WRD_ACCESS_ORIGIN, access_origin)
+
+    // Server
+    FREE_CONFIG_STRING(WRD_WORKERS, workers)
 
     return WRD_OK;
 }
@@ -249,6 +256,7 @@ WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
     LOAD_DB_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
     LOAD_DB_CONFIG_INT(WRD_SOCKET_PORT, socket_port)
     LOAD_DB_CONFIG_INT(WRD_TIMING, timing)
+    LOAD_DB_CONFIG_STR(WRD_WORKERS, workers)
 
     wrd_load_config_env(config);
 

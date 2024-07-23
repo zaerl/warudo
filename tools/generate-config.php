@@ -32,6 +32,8 @@ $map = [
     ['net_input_buffer_size', 1],
     ['socket_port', 6251],
     ['timing', 1],
+    'Server',
+    ['workers', 'auto'],
 ];
 
 // Configuration file.
@@ -202,7 +204,7 @@ $files = [
     'server' => [
         'file' => 'src/server.c',
         'start' => '// Configurations.',
-        'end' => "res = wrd_db_init(config->db_path, config);",
+        'end' => "ret = wrd_db_init(config->db_path, config);",
         'text' => join("\n", add_indentation($logs)) . "\n\n    ",
         'additionals' => [],
     ],

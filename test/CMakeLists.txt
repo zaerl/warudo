@@ -13,6 +13,7 @@ set(TEST_SOURCES
     net.c
     output.c
     query.c
+    queue.c
     route-app.c
     route-home.c
     server.c

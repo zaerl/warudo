@@ -45,6 +45,8 @@ WRD_API const char *wrd_error_description(wrd_code code, int extended) {
             return extended ? u8"Memory allocation error" : u8"MEMORY_ERROR";
         case WRD_MISSING_CRYPTO_ERROR:
             return extended ? u8"Missing crypto error" : u8"MISSING_CRYPTO_ERROR";
+        case WRD_INVALID_CONFIG:
+            return extended ? u8"Invalid configuration" : u8"INVALID_CONFIG";
 
         // Parser error codes
         case WRD_PARSER_EMPTY:

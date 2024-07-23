@@ -44,6 +44,7 @@ typedef enum {
     WRD_NET_INPUT_BUFFER_SIZE,
     WRD_SOCKET_PORT,
     WRD_TIMING,
+    WRD_WORKERS,
 } wrd_config_name;
 
 // Database
@@ -66,6 +67,9 @@ typedef enum {
 #define WRD_DEFAULT_NET_INPUT_BUFFER_SIZE 1
 #define WRD_DEFAULT_SOCKET_PORT 6251
 #define WRD_DEFAULT_TIMING 1
+
+// Server
+#define WRD_DEFAULT_WORKERS "auto"
 
 #include <time.h>
 #include <netinet/in.h>
@@ -98,6 +102,7 @@ typedef enum {
     WRD_FILE_ERROR = -11,
     WRD_MEMORY_ERROR = -12,
     WRD_MISSING_CRYPTO_ERROR = -13,
+    WRD_INVALID_CONFIG = -14,
 
     // Parser error codes
     WRD_PARSER_EMPTY = -32,
@@ -158,7 +163,7 @@ typedef struct warudo {
 
     // Configurations.
 
-    char config_status[10];
+    char config_status[11];
     
     // Database
     char *db_path;
@@ -172,6 +177,8 @@ typedef struct warudo {
     int net_input_buffer_size;
     int socket_port;
     int timing;
+    // Server
+    char *workers;
 
     // Network
     int server_fd;

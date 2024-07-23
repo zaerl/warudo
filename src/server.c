@@ -8,6 +8,7 @@
 #include "log.h"
 #include "net.h"
 #include "query.h"
+#include "queue.h"
 #include "server.h"
 #include "timing.h"
 
@@ -20,32 +21,32 @@
 WRD_API wrd_code wrd_init_server(warudo *config) {
     CHECK_CONFIG
 
-    int res;
+    wrd_code ret;
 
     char *conf_file = NULL;
     wrd_get_env_string(&conf_file, "WRD_CONF_PATH");
 
-    res = wrd_load_config(config, conf_file ? conf_file : WRD_DEFAULT_CONF_PATH);
+    ret = wrd_load_config(config, conf_file ? conf_file : WRD_DEFAULT_CONF_PATH);
 
     if(conf_file) {
         free(conf_file);
     }
 
-    if(!(res == WRD_OK || res == WRD_DEFAULT)) {
+    if(!(ret == WRD_OK || ret == WRD_DEFAULT)) {
         wrd_close(config);
 
-        return res;
+        return ret;
     }
 
     // Load net
     // res = wrd_net_init(config, wrd_get_env_int("WRD_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
-    res = wrd_net_init(config, config->listen_backlog);
+    /*res = wrd_net_init(config, config->listen_backlog);
 
     if(res != WRD_OK) {
         wrd_close(config);
 
         return res;
-    }
+    }*/
 
     config->page = -1;
     config->request_method = WRD_REQUEST_UNKNOWN;
@@ -56,6 +57,13 @@ WRD_API wrd_code wrd_init_server(warudo *config) {
     wrd_parse_query_string(config, NULL);
 
     wrd_log_info(config, u8"Starting Warudo %s\n", WRD_VERSION);
+    ret = wrd_start_queue(config);
+
+    if(ret != WRD_OK) {
+        wrd_close(config);
+
+        return ret;
+    }
 
     // Configurations.
     wrd_log_info(config, u8"Db Path: %s [%c]\n", config->db_path, wrd_get_config_status(config, WRD_DB_PATH));
@@ -68,10 +76,11 @@ WRD_API wrd_code wrd_init_server(warudo *config) {
     wrd_log_info(config, u8"Net Input Buffer Size: %d [%c]\n", config->net_input_buffer_size, wrd_get_config_status(config, WRD_NET_INPUT_BUFFER_SIZE));
     wrd_log_info(config, u8"Socket Port: %d [%c]\n", config->socket_port, wrd_get_config_status(config, WRD_SOCKET_PORT));
     wrd_log_info(config, u8"Timing: %d [%c]\n", config->timing, wrd_get_config_status(config, WRD_TIMING));
+    wrd_log_info(config, u8"Workers: %s [%c]\n", config->workers, wrd_get_config_status(config, WRD_WORKERS));
 
-    res = wrd_db_init(config->db_path, config);
+    ret = wrd_db_init(config->db_path, config);
 
-    if(res != WRD_OK) {
+    if(ret != WRD_OK) {
         wrd_close(config);
 
         return WRD_DB_INIT_ERROR;

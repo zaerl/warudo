@@ -85,7 +85,7 @@ int main(int argc, char * const argv[]) {
 
     #define RUN_TEST(NAME) \
         if(!filter || strcasestr(filter, #NAME)) { \
-            printf("\nTest: \x1B[32m%s\033[0m\n", #NAME); \
+            printf("\nTest: \x1b[1;32m%s\x1b[0m\n", #NAME); \
             pthread_t thread_##NAME; \
             pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
             pthread_join(thread_##NAME, NULL); \
