@@ -85,6 +85,7 @@ int main(int argc, char * const argv[]) {
 
     #define RUN_TEST(NAME) \
         if(!filter || strcasestr(filter, #NAME)) { \
+            printf("\nTest: \x1B[32m%s\033[0m\n", #NAME); \
             pthread_t thread_##NAME; \
             pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
             pthread_join(thread_##NAME, NULL); \
@@ -104,6 +105,7 @@ int main(int argc, char * const argv[]) {
     RUN_TEST(net)
     RUN_TEST(output)
     RUN_TEST(query)
+    RUN_TEST(queue)
     RUN_TEST(route_app)
     RUN_TEST(route_home)
     RUN_TEST(server)
