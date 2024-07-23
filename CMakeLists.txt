@@ -7,6 +7,11 @@ project(
     LANGUAGES C
 )
 
+if(APPLE)
+    link_directories("/opt/homebrew/lib")
+    include_directories("/opt/homebrew/include")
+endif()
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()

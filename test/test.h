@@ -57,6 +57,7 @@ void *test_route_app(void *arg);
 void *test_route_home(void *arg);
 void *test_server(void *arg);
 void *test_timing(void *arg);
+void *test_tls(void *arg);
 void *test_version(void *arg);
 
 #ifdef __cplusplus

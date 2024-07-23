@@ -8,9 +8,10 @@
 | wrd_debug_dump               | 5        |
 | wrd_error_description        | 5        |
 | wrd_escape_html              | 4        |
+| wrd_get_config_status        | 4        |
 | wrd_get_formdata_boundary    | 9        |
 | wrd_is_valid_boundary        | 5        |
-| wrd_load_config              | 10       |
+| wrd_load_config              | 12       |
 | wrd_url_decode               | 13       |
 | wrd_version                  | 1        |
 | wrd_accept_connection        | 0        |
@@ -28,7 +29,6 @@
 | wrd_decompress_header        | 0        |
 | wrd_end_time                 | 0        |
 | wrd_formdata_callback        | 0        |
-| wrd_get_config_status        | 0        |
 | wrd_get_entries              | 0        |
 | wrd_get_env_int              | 0        |
 | wrd_get_env_string           | 0        |
@@ -48,8 +48,9 @@
 | wrd_http_puts                | 0        |
 | wrd_http_server_error        | 0        |
 | wrd_http_status              | 0        |
-| wrd_init                     | 0        |
 | wrd_init_config              | 0        |
+| wrd_init_server              | 0        |
+| wrd_init_tls                 | 0        |
 | wrd_last_insert_rowid        | 0        |
 | wrd_load_config_env          | 0        |
 | wrd_log                      | 0        |
@@ -70,4 +71,4 @@
 | wrd_route_home               | 0        |
 | wrd_set_config_status        | 0        |
 | wrd_start_time               | 0        |
-| Total                        | 66       |
+| Total                        | 72       |

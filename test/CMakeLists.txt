@@ -19,6 +19,7 @@ set(TEST_SOURCES
     test.c
     test-utils.c
     timing.c
+    tls.c
     version.c
 )
 
