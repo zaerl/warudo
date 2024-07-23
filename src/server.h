@@ -27,7 +27,7 @@ extern "C" {
 // #define WRD_QUERY_VALUES(TYPE, NAME, COUNT) short query_valid_##NAME = 0; TYPE query_##NAME[COUNT];
 
 // Init the system
-WRD_API wrd_code wrd_init_server(warudo **config);
+WRD_API wrd_code wrd_init_server(warudo *config);
 
 // Accept an HTTP connection
 WRD_API wrd_code wrd_accept_connection(warudo *config);

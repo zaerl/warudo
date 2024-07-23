@@ -9,6 +9,11 @@
 
 // Init configurations with default values.
 WRD_API wrd_code wrd_init_config(warudo *config) {
+    config->columns_count = 0;
+    config->requests_count = 0;
+    config->timing_count = 0;
+    config->timing_end_count = 0;
+
     // Configurations.
 
     // Initialize to defaults.

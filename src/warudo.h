@@ -97,6 +97,7 @@ typedef enum {
     WRD_READ_ERROR = -10,
     WRD_FILE_ERROR = -11,
     WRD_MEMORY_ERROR = -12,
+    WRD_MISSING_CRYPTO_ERROR = -13,
 
     // Parser error codes
     WRD_PARSER_EMPTY = -32,

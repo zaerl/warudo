@@ -16,7 +16,9 @@ int main(void) {
     warudo *config = NULL;
     wrd_code ret;
 
-    ret = wrd_init_server(&config);
+    config = malloc(sizeof(warudo));
+
+    ret = wrd_init_server(config);
 
     if(ret != WRD_OK) {
         wrd_log_error(config, "Failed to Initialize. Code %s\n", wrd_error_description(ret, 0));

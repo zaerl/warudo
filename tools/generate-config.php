@@ -137,10 +137,10 @@ foreach($map as $value) {
 
     if($is_integer) {
         $db_loads[] = "LOAD_DB_CONFIG_INT(WRD_{$define_name}, {$entry_name})";
-        $logs[] = "wrd_log_info(*config, u8\"{$config_name}: %d [%c]\\n\", (*config)->{$entry_name}, wrd_get_config_status(*config, WRD_{$define_name}));";
+        $logs[] = "wrd_log_info(config, u8\"{$config_name}: %d [%c]\\n\", config->{$entry_name}, wrd_get_config_status(config, WRD_{$define_name}));";
     } else {
         $db_loads[] = "LOAD_DB_CONFIG_STR(WRD_{$define_name}, {$entry_name})";
-        $logs[] = "wrd_log_info(*config, u8\"{$config_name}: %s [%c]\\n\", (*config)->{$entry_name}, wrd_get_config_status(*config, WRD_{$define_name}));";
+        $logs[] = "wrd_log_info(config, u8\"{$config_name}: %s [%c]\\n\", config->{$entry_name}, wrd_get_config_status(config, WRD_{$define_name}));";
     }
 
     if(!$is_integer) {
@@ -169,8 +169,8 @@ $files = [
         'text' => join("\n", $defines) . "\n",
         'additionals' => [
             [
-                'end' => "\n\n",
-                'text' => "\n" . join("\n", add_indentation($structs)),
+                'end' => "\n    // Network",
+                'text' => "\n" . join("\n", add_indentation($structs)) . "\n",
             ],
         ]
     ],
@@ -202,7 +202,7 @@ $files = [
     'server' => [
         'file' => 'src/server.c',
         'start' => '// Configurations.',
-        'end' => "res = wrd_db_init((*config)->db_path, *config);",
+        'end' => "res = wrd_db_init(config->db_path, config);",
         'text' => join("\n", add_indentation($logs)) . "\n\n    ",
         'additionals' => [],
     ],
