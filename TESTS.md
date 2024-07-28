@@ -10,6 +10,7 @@
 | wrd_escape_html              | 4        |
 | wrd_get_config_status        | 4        |
 | wrd_get_formdata_boundary    | 9        |
+| wrd_get_workers              | 3        |
 | wrd_is_valid_boundary        | 5        |
 | wrd_load_config              | 12       |
 | wrd_url_decode               | 13       |
@@ -19,7 +20,6 @@
 | wrd_add_entry                | 0        |
 | wrd_add_index                | 0        |
 | wrd_after_connection         | 0        |
-| wrd_close                    | 0        |
 | wrd_compress_header          | 0        |
 | wrd_config_close             | 0        |
 | wrd_content_length           | 0        |
@@ -49,7 +49,6 @@
 | wrd_http_server_error        | 0        |
 | wrd_http_status              | 0        |
 | wrd_init_config              | 0        |
-| wrd_init_server              | 0        |
 | wrd_init_tls                 | 0        |
 | wrd_last_insert_rowid        | 0        |
 | wrd_load_config_env          | 0        |
@@ -64,11 +63,15 @@
 | wrd_parse_formdata           | 0        |
 | wrd_parse_json               | 0        |
 | wrd_parse_query_string       | 0        |
+| wrd_queue_close              | 0        |
+| wrd_queue_init               | 0        |
 | wrd_read_content             | 0        |
 | wrd_read_file                | 0        |
 | wrd_route_app                | 0        |
 | wrd_route_app_keys           | 0        |
 | wrd_route_home               | 0        |
+| wrd_server_close             | 0        |
+| wrd_server_init              | 0        |
 | wrd_set_config_status        | 0        |
 | wrd_start_time               | 0        |
-| Total                        | 72       |
+| Total                        | 75       |

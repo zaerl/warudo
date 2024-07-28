@@ -18,7 +18,7 @@
 // TODO: remove
 #include <unistd.h>
 
-WRD_API wrd_code wrd_init_server(warudo *config) {
+WRD_API wrd_code wrd_server_init(warudo *config) {
     CHECK_CONFIG
 
     wrd_code ret;
@@ -26,6 +26,7 @@ WRD_API wrd_code wrd_init_server(warudo *config) {
     char *conf_file = NULL;
     wrd_get_env_string(&conf_file, "WRD_CONF_PATH");
 
+    // load warudo.conf file.
     ret = wrd_load_config(config, conf_file ? conf_file : WRD_DEFAULT_CONF_PATH);
 
     if(conf_file) {
@@ -33,34 +34,15 @@ WRD_API wrd_code wrd_init_server(warudo *config) {
     }
 
     if(!(ret == WRD_OK || ret == WRD_DEFAULT)) {
-        wrd_close(config);
+        wrd_server_close(config);
 
         return ret;
     }
 
-    // Load net
-    // res = wrd_net_init(config, wrd_get_env_int("WRD_LISTEN_BACKLOG", WRD_LISTEN_BACKLOG));
-    /*res = wrd_net_init(config, config->listen_backlog);
-
-    if(res != WRD_OK) {
-        wrd_close(config);
-
-        return res;
-    }*/
-
-    config->page = -1;
-    config->request_method = WRD_REQUEST_UNKNOWN;
-    config->script_name = NULL;
-    config->query_string = NULL;
-
-    // Query string
-    wrd_parse_query_string(config, NULL);
-
     wrd_log_info(config, u8"Starting Warudo %s\n", WRD_VERSION);
-    ret = wrd_start_queue(config);
 
     if(ret != WRD_OK) {
-        wrd_close(config);
+        wrd_server_close(config);
 
         return ret;
     }
@@ -76,15 +58,89 @@ WRD_API wrd_code wrd_init_server(warudo *config) {
     wrd_log_info(config, u8"Net Input Buffer Size: %d [%c]\n", config->net_input_buffer_size, wrd_get_config_status(config, WRD_NET_INPUT_BUFFER_SIZE));
     wrd_log_info(config, u8"Socket Port: %d [%c]\n", config->socket_port, wrd_get_config_status(config, WRD_SOCKET_PORT));
     wrd_log_info(config, u8"Timing: %d [%c]\n", config->timing, wrd_get_config_status(config, WRD_TIMING));
-    wrd_log_info(config, u8"Workers: %s [%c]\n", config->workers, wrd_get_config_status(config, WRD_WORKERS));
+    wrd_log_info(config, u8"Worker Processes: %s [%c]\n", config->worker_processes, wrd_get_config_status(config, WRD_WORKER_PROCESSES));
 
     ret = wrd_db_init(config->db_path, config);
 
     if(ret != WRD_OK) {
-        wrd_close(config);
+        wrd_server_close(config);
 
         return WRD_DB_INIT_ERROR;
     }
+
+    // Start all the workers.
+    ret = wrd_queue_init(config);
+
+    if(ret != WRD_OK) {
+        wrd_server_close(config);
+
+        return ret;
+    }
+
+    // Current process is a worker.
+    if(config->is_worker) {
+        wrd_log_info(config, u8"Start worker\n", NULL);
+
+        // Load net
+        ret = wrd_net_init(config, config->listen_backlog);
+
+        if(ret != WRD_OK) {
+            wrd_server_close(config);
+
+            return ret;
+        }
+
+        config->page = -1;
+        config->request_method = WRD_REQUEST_UNKNOWN;
+        config->script_name = NULL;
+        config->query_string = NULL;
+
+        // Query string
+        wrd_parse_query_string(config, NULL);
+
+        while(wrd_accept_connection(config) == WRD_OK) {
+            wrd_http_parse_query_headers(config);
+            wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
+
+            wrd_http_ok(config);
+            wrd_http_puts(config, u8"{\"Hello\": \"World\"}");
+
+            wrd_after_connection(config);
+        }
+
+        return WRD_OK;
+    } else {
+        wrd_log_info(config, u8"Master process\n", NULL);
+    }
+
+    // Master process.
+    /*while(true) {
+        int status;
+
+        pid_i exit_pid = wait(&status);
+
+        if(exit_pid < 0) {
+            wrd_log_error(config, u8"Failed to wait for worker process. Code %s\n", strerror(errno));
+
+            return WRD_ERROR;
+        }
+
+        wrd_log_info(config, u8"Worker process %d exited with status %d\n", exit_pid, status);
+
+        pid_t pid = fork();
+
+        if(pid < 0) {
+            wrd_log_error(config, u8"Failed to fork worker process. Code %s\n", strerror(errno));
+
+            return WRD_ERROR;
+        } else if(pid == 0) {
+            // Child process.
+            // config->is_worker = true;
+
+            // return WRD_OK;
+        }
+    }*/
+
 
     return WRD_OK;
 }
@@ -129,10 +185,11 @@ WRD_API wrd_code wrd_after_connection(warudo *config) {
     return WRD_OK;
 }
 
-WRD_API wrd_code wrd_close(warudo *config) {
+WRD_API wrd_code wrd_server_close(warudo *config) {
     CHECK_CONFIG
 
     wrd_config_close(config);
+    wrd_queue_close(config);
     wrd_net_close(config);
     wrd_db_close(config);
 

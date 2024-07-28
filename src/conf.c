@@ -8,7 +8,7 @@
 #include "fs.h"
 
 // Init configurations with default values.
-WRD_API wrd_code wrd_init_config(warudo *config) {
+WRD_API wrd_code wrd_config_init(warudo *config) {
     config->columns_count = 0;
     config->requests_count = 0;
     config->timing_count = 0;
@@ -32,7 +32,7 @@ WRD_API wrd_code wrd_init_config(warudo *config) {
     config->socket_port = WRD_DEFAULT_SOCKET_PORT;
     config->timing = WRD_DEFAULT_TIMING;
     // Server
-    config->workers = WRD_DEFAULT_WORKERS;
+    config->worker_processes = WRD_DEFAULT_WORKER_PROCESSES;
 
     return WRD_OK;
 }
@@ -66,7 +66,7 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
     LOAD_ENV_CONFIG_INT(WRD_SOCKET_PORT, socket_port)
     LOAD_ENV_CONFIG_INT(WRD_TIMING, timing)
     // Server
-    LOAD_ENV_CONFIG_STRING(WRD_WORKERS, workers)
+    LOAD_ENV_CONFIG_STRING(WRD_WORKER_PROCESSES, worker_processes)
 
     return WRD_OK;
 }
@@ -89,7 +89,7 @@ WRD_API wrd_code wrd_config_close(warudo *config) {
     FREE_CONFIG_STRING(WRD_ACCESS_ORIGIN, access_origin)
 
     // Server
-    FREE_CONFIG_STRING(WRD_WORKERS, workers)
+    FREE_CONFIG_STRING(WRD_WORKER_PROCESSES, worker_processes)
 
     return WRD_OK;
 }
@@ -153,7 +153,7 @@ error:
 // Load a configuration file.
 WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
     wrd_config_close(config);
-    wrd_init_config(config);
+    wrd_config_init(config);
 
     sqlite3 *db = NULL;
     sqlite3_stmt *stmt = NULL;
@@ -256,7 +256,7 @@ WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
     LOAD_DB_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
     LOAD_DB_CONFIG_INT(WRD_SOCKET_PORT, socket_port)
     LOAD_DB_CONFIG_INT(WRD_TIMING, timing)
-    LOAD_DB_CONFIG_STR(WRD_WORKERS, workers)
+    LOAD_DB_CONFIG_STR(WRD_WORKER_PROCESSES, worker_processes)
 
     wrd_load_config_env(config);
 

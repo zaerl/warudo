@@ -33,7 +33,7 @@ $map = [
     ['socket_port', 6251],
     ['timing', 1],
     'Server',
-    ['workers', 'auto'],
+    ['worker_processes', 'auto'],
 ];
 
 // Configuration file.

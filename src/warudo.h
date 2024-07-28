@@ -44,7 +44,7 @@ typedef enum {
     WRD_NET_INPUT_BUFFER_SIZE,
     WRD_SOCKET_PORT,
     WRD_TIMING,
-    WRD_WORKERS,
+    WRD_WORKER_PROCESSES,
 } wrd_config_name;
 
 // Database
@@ -69,11 +69,12 @@ typedef enum {
 #define WRD_DEFAULT_TIMING 1
 
 // Server
-#define WRD_DEFAULT_WORKERS "auto"
+#define WRD_DEFAULT_WORKER_PROCESSES "auto"
 
-#include <time.h>
 #include <netinet/in.h>
 #include <stddef.h>
+#include <sys/types.h>
+#include <time.h>
 
 #include "sqlite3/sqlite3.h"
 
@@ -149,6 +150,11 @@ typedef struct wrd_query {
     const char *sort;
 } wrd_query;
 
+typedef struct wrd_worker {
+    pid_t pid;
+    int status;
+} wrd_worker;
+
 // Main Warudo confuguration.
 typedef struct warudo {
     // Main database.
@@ -179,15 +185,16 @@ typedef struct warudo {
     int socket_port;
     int timing;
     // Server
-    char *workers;
+    char *worker_processes;
 
     // Network
     int server_fd;
     int client_fd;
     struct sockaddr_in address;
 
-    // Queue
+    // Worker
     bool is_worker;
+    wrd_worker *workers;
 
     // Buffers
     wrd_buffer net_headers_buffer;
