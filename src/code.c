@@ -75,6 +75,8 @@ WRD_API const char *wrd_error_description(wrd_code code, int extended) {
             return extended ? u8"Error while accepting connection" : u8"ACCEPT_ERROR";
         case WRD_CLOSE_ERROR:
             return extended ? u8"Error while closing socket" : u8"CLOSE_ERROR";
+        case WRD_SETSOCKOPT_ERROR:
+            return extended ? u8"Error while setting socket options" : u8"SETSOCKOPT_ERROR";
 
         case WRD_UNKNOWN_ERROR:
             return extended ? u8"Unknown error" : u8"UNKNOWN_ERROR";

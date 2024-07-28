@@ -119,6 +119,7 @@ typedef enum {
     WRD_LISTEN_ERROR = -66,
     WRD_ACCEPT_ERROR = -67,
     WRD_CLOSE_ERROR = -68,
+    WRD_SETSOCKOPT_ERROR = -69,
 
     // Unknown error codes
     WRD_UNKNOWN_ERROR = -80
@@ -184,6 +185,9 @@ typedef struct warudo {
     int server_fd;
     int client_fd;
     struct sockaddr_in address;
+
+    // Queue
+    bool is_worker;
 
     // Buffers
     wrd_buffer net_headers_buffer;
