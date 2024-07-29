@@ -5,14 +5,14 @@
 | test_file_size               | 3        |
 | wrd_base64_decode            | 8        |
 | wrd_base64_encode            | 3        |
+| wrd_config_init              | 12       |
 | wrd_debug_dump               | 5        |
-| wrd_error_description        | 5        |
+| wrd_error_description        | 4        |
 | wrd_escape_html              | 4        |
 | wrd_get_config_status        | 4        |
 | wrd_get_formdata_boundary    | 9        |
 | wrd_get_workers              | 3        |
 | wrd_is_valid_boundary        | 5        |
-| wrd_load_config              | 12       |
 | wrd_url_decode               | 13       |
 | wrd_version                  | 1        |
 | wrd_accept_connection        | 0        |
@@ -48,7 +48,6 @@
 | wrd_http_puts                | 0        |
 | wrd_http_server_error        | 0        |
 | wrd_http_status              | 0        |
-| wrd_init_config              | 0        |
 | wrd_init_tls                 | 0        |
 | wrd_last_insert_rowid        | 0        |
 | wrd_load_config_env          | 0        |
@@ -74,4 +73,4 @@
 | wrd_server_init              | 0        |
 | wrd_set_config_status        | 0        |
 | wrd_start_time               | 0        |
-| Total                        | 75       |
+| Total                        | 74       |

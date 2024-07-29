@@ -10,8 +10,8 @@ long test_file_size(FILE *file) {
 void *test_data(void *arg) {
     WRD_TMP_FILE(temp_file)
 
-    ATT_ASSERT(wrd_debug_dump(NULL, NULL, NULL, 0), 0, "wrd_debug_dump NULL")
-    ATT_ASSERT(wrd_debug_dump("test", NULL, NULL, 0), 0, "wrd_debug_dump NULL ptr")
+    ATT_ASSERT(wrd_debug_dump(NULL, NULL, NULL, 0), 0, "NULL")
+    ATT_ASSERT(wrd_debug_dump("test", NULL, NULL, 0), 0, "NULL ptr")
 
     // test, 0000000000 bytes (0x00000000)
     ATT_ASSERT(wrd_debug_dump("test", temp_file, (unsigned char*)"test", 0), 0, "0 written")
