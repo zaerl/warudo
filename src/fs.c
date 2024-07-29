@@ -3,6 +3,7 @@
 
 #include "fs.h"
 
+// Read a file into a buffer.
 WRD_API wrd_code wrd_read_file(const char *file_path, void **file_buffer, long *file_size) {
     if(file_path == NULL) {
         // Nothing to load, return.

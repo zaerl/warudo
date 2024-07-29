@@ -3,6 +3,7 @@
 
 #include "env.h"
 
+// Get an integer from an environment variable.
 WRD_API wrd_code wrd_get_env_int(int *result, const char *name) {
     char *env = getenv(name);
 
@@ -15,6 +16,7 @@ WRD_API wrd_code wrd_get_env_int(int *result, const char *name) {
     return WRD_DEFAULT;
 }
 
+// Get a string from an environment variable.
 WRD_API wrd_code wrd_get_env_string(char **result, const char *name) {
     char *env = getenv(name);
 

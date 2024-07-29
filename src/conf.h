@@ -21,14 +21,14 @@ typedef enum {
 // Init configurations with default values.
 WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path);
 
+// Init configurations with default values.
+WRD_API wrd_code wrd_config_init_defaults(warudo *config);
+
 // Set configurations to environment variable values, if they exist.
 WRD_API wrd_code wrd_load_config_env(warudo *config);
 
 // Close loaded configurations.
 WRD_API wrd_code wrd_config_close(warudo *config);
-
-// Get the status of a configuration.
-WRD_API wrd_config_status wrd_get_config_status(warudo *config, wrd_config_name name);
 
 // Get the status of a configuration.
 WRD_API wrd_config_status wrd_get_config_status(warudo *config, wrd_config_name name);
