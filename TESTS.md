@@ -22,6 +22,7 @@
 | wrd_after_connection         | 0        |
 | wrd_compress_header          | 0        |
 | wrd_config_close             | 0        |
+| wrd_config_init_defaults     | 0        |
 | wrd_content_length           | 0        |
 | wrd_db_add_header            | 0        |
 | wrd_db_close                 | 0        |

@@ -1,13 +1,9 @@
-#include <stdio.h>
+#include <stdlib.h>
 
 #include "code.h"
-#include "db.h"
-#include "http.h"
 #include "log.h"
-#include "output.h"
-#include "query.h"
 #include "server.h"
-#include "sqlite3/sqlite3.h"
+#include "warudo.h"
 
 // /opt/homebrew/opt/nginx/bin/nginx -g "daemon off;"
 // /opt/homebrew/opt/lighttpd/bin/lighttpd -D -f /opt/homebrew/etc/lighttpd/lighttpd.conf
@@ -26,7 +22,7 @@ int main(void) {
         return ret;
     }
 
-    while(wrd_accept_connection(config) == WRD_OK) {
+    /*while(wrd_accept_connection(config) == WRD_OK) {
         wrd_http_parse_query_headers(config);
         wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
 
@@ -34,7 +30,7 @@ int main(void) {
         wrd_http_puts(config, u8"{\"Hello\": \"World\"}");
 
         wrd_after_connection(config);
-    }
+    }*/
 
     /*
     while(wrd_accept_connection(config) >= 0) {

@@ -1,6 +1,5 @@
 #include "http.h"
-#include "output.h"
-#include "warudo.h"
+#include "routes.h"
 
 WRD_API wrd_code wrd_route_home(warudo *config) {
     CHECK_CONFIG

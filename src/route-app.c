@@ -1,12 +1,7 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
 #include "db.h"
 #include "http.h"
-#include "output.h"
 #include "server.h"
-#include "warudo.h"
+#include "routes.h"
 
 WRD_API wrd_code wrd_route_app(int entry_type, warudo *config) {
     CHECK_CONFIG

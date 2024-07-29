@@ -1,9 +1,7 @@
-
-#include <ctype.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "conf.h"
-#include "db.h"
 #include "env.h"
 #include "fs.h"
 

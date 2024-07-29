@@ -1,10 +1,7 @@
-#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <unistd.h>
 
-#include "env.h"
-#include "log.h"
 #include "net.h"
 
 WRD_API wrd_code wrd_net_init(warudo *config, int backlog) {

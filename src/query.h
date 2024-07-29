@@ -1,8 +1,6 @@
 #ifndef WRD_QUERY_H
 #define WRD_QUERY_H
 
-#include <string.h>
-#include <stdlib.h>
 #include "warudo.h"
 
 #ifdef __cplusplus

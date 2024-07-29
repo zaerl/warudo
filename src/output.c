@@ -1,8 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 
-#include "http.h"
 #include "output.h"
 
 // Function to escape special characters in a string for HTML

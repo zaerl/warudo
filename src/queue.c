@@ -1,16 +1,18 @@
-#include <sys/errno.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
+#include <sys/errno.h>
 #include <unistd.h>
 
+#include "log.h"
+#include "queue.h"
+
+/*
 #ifdef __linux__
 #include <sys/epoll.h>
 #else
 #include <sys/event.h>
 #endif
-
-#include "log.h"
-#include "queue.h"
+*/
 
 WRD_API wrd_code wrd_queue_init(warudo *config) {
     // Start the event queue.

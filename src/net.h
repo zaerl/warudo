@@ -1,8 +1,6 @@
 #ifndef WRD_NET_H
 #define WRD_NET_H
 
-#include <sys/socket.h>
-
 #include "warudo.h"
 
 #ifdef __cplusplus

@@ -72,8 +72,6 @@ typedef enum {
 #define WRD_DEFAULT_WORKER_PROCESSES "auto"
 
 #include <netinet/in.h>
-#include <stddef.h>
-#include <sys/types.h>
 #include <time.h>
 
 #include "sqlite3/sqlite3.h"

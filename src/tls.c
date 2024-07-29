@@ -1,5 +1,3 @@
-#include "tls.h"
-
 #include <string.h>
 
 #include <mbedtls/error.h>
@@ -10,6 +8,8 @@
 #include <mbedtls/ssl.h>
 #include <mbedtls/net_sockets.h>
 #include <mbedtls/timing.h>
+
+#include "tls.h"
 
 // Init TLS with default values.
 WRD_API wrd_code wrd_init_tls(warudo *config) {

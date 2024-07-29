@@ -1,5 +1,3 @@
-#include <time.h>
-
 #include "log.h"
 #include "timing.h"
 

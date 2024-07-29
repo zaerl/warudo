@@ -1,10 +1,6 @@
 #ifndef WRD_CONF_H
 #define WRD_CONF_H
 
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "warudo.h"
 
 #ifdef __cplusplus

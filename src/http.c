@@ -2,9 +2,7 @@
 #include <string.h>
 
 #include "http.h"
-#include "log.h"
 #include "net.h"
-#include "timing.h"
 
 /*#define WRD_CHECK_CONNECTION(request) \
     if(request.in == NULL || \

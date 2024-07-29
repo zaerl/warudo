@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 
 #include "code.h"
 #include "conf.h"
@@ -11,12 +10,6 @@
 #include "queue.h"
 #include "server.h"
 #include "timing.h"
-
-// TODO: remove
-#include "http.h"
-
-// TODO: remove
-#include <unistd.h>
 
 WRD_API wrd_code wrd_server_init(warudo *config) {
     CHECK_CONFIG
@@ -96,7 +89,7 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
         config->query_string = NULL;
 
         // Query string
-        wrd_parse_query_string(config, NULL);
+        /*wrd_parse_query_string(config, NULL);
 
         while(wrd_accept_connection(config) == WRD_OK) {
             wrd_http_parse_query_headers(config);
@@ -106,7 +99,7 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
             wrd_http_puts(config, u8"{\"Hello\": \"World\"}");
 
             wrd_after_connection(config);
-        }
+        }*/
 
         return WRD_OK;
     } else {
@@ -175,7 +168,7 @@ WRD_API wrd_code wrd_accept_connection(warudo *config) {
 WRD_API wrd_code wrd_after_connection(warudo *config) {
     CHECK_CONFIG
 
-    wrd_http_flush(config);
+    // wrd_http_flush(config);
     wrd_net_finish_request(config);
 
     if(config->timing) {
