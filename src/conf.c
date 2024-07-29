@@ -8,7 +8,7 @@
 #include "fs.h"
 
 // Init configurations with default values.
-WRD_API wrd_code wrd_config_init(warudo *config) {
+WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     config->columns_count = 0;
     config->requests_count = 0;
     config->timing_count = 0;
@@ -150,48 +150,55 @@ error:
     return ret;
 }
 
-// Load a configuration file.
-WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
+// Init config from a configuration file.
+WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
     wrd_config_close(config);
-    wrd_config_init(config);
+    wrd_config_init_defaults(config);
 
     sqlite3 *db = NULL;
-    sqlite3_stmt *stmt = NULL;
     void *file_buffer = NULL;
-    wrd_code ret;
     long file_size;
+    int rc = 0;
+    wrd_code ret;
+    sqlite3_stmt *stmt = NULL;
 
     if(file_path == NULL) {
-        // Nothing to load, return.
         return WRD_DEFAULT;
     }
 
     ret = wrd_read_file(file_path, &file_buffer, &file_size);
 
     if(ret != WRD_OK) {
-        return ret;
+        goto error;
     }
 
     if(file_size == 0) {
         // Empty file, return.
-        return WRD_DEFAULT;
+        ret = WRD_DEFAULT;
+        goto error;
     }
 
-    // Set an error by default.
-    ret = WRD_DB_ERROR;
     // Initialize SQLite.
-    int rc = sqlite3_initialize();
+    rc = sqlite3_initialize();
 
     if(rc != SQLITE_OK) {
-        return WRD_DB_INIT_ERROR;
+        ret = WRD_DB_INIT_ERROR;
+        goto error;
     }
+
+    // Set default error.
+    ret = WRD_DB_OPEN_ERROR;
 
     // Open in-memory database.
     rc = sqlite3_open(":memory:", &db);
 
     if(rc != SQLITE_OK) {
-        return WRD_DB_OPEN_ERROR;
+        ret = WRD_DB_OPEN_ERROR;
+        goto error;
     }
+
+    // Set an error by default.
+    ret = WRD_DB_ERROR;
 
     // Create a table to store the JSON data.
     const char *create_table = u8"CREATE TABLE json_data (data BLOB);";
@@ -263,7 +270,6 @@ WRD_API wrd_code wrd_load_config(warudo *config, const char *file_path) {
     ret = WRD_OK;
 
 error:
-
     if(stmt) {
         sqlite3_finalize(stmt);
     }
