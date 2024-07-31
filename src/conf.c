@@ -82,10 +82,8 @@ WRD_API wrd_code wrd_config_close(warudo *config) {
 
     // Database
     FREE_CONFIG_STRING(WRD_DB_PATH, db_path)
-
     // Net
     FREE_CONFIG_STRING(WRD_ACCESS_ORIGIN, access_origin)
-
     // Server
     FREE_CONFIG_STRING(WRD_WORKER_PROCESSES, worker_processes)
 

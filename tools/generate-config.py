@@ -145,7 +145,7 @@ for value in map:
         )
 
     if not is_int:
-        free_statement = f"FREE_CONFIG_STRING({define_name}, {entry_name})\n"
+        free_statement = f"FREE_CONFIG_STRING({define_name}, {entry_name})"
         free_configs.append(free_statement)
 
     env_loads.append(f"{env_function}({define_name}, {entry_name})")
@@ -182,7 +182,7 @@ files = {
             },
             {
                 "end": "\n    return WRD_OK;",
-                "text": "\n" + "\n".join(ut.add_indentation(free_configs)),
+                "text": "\n" + "\n".join(ut.add_indentation(free_configs)) + "\n",
             },
             {
                 "end": "\n    wrd_load_config_env",
