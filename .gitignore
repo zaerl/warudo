@@ -97,3 +97,5 @@ hctree-src/
 hctree-build/
 
 warudo.conf
+
+__pycache__/

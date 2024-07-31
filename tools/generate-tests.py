@@ -23,7 +23,7 @@ for file in c_files:
     c_name = name.replace("-", "_")
     func = f"void *test_{c_name}(void *arg)"
 
-    # Code to generate the test function
+    # Code to generate the test function.
     functs.append(func)
     names.append(name)
     run_macro.append(f"    RUN_TEST({c_name})")
