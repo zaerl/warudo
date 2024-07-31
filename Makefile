@@ -12,7 +12,7 @@ build: configure
 rebuild: clean_build all
 
 generate_config:
-	php tools/generate-config.php h c conf server
+	python3 tools/generate-config.py h c conf server
 
 generate_tests:
 	python3 tools/generate-tests.py

@@ -1,6 +1,6 @@
 import glob
 import os
-from utils import wrd_generate_file
+from utils import generate_file
 
 # Use glob to find all .c files.
 c_files = glob.glob("src/*.c")
@@ -46,9 +46,9 @@ names.sort()
 run_macro.sort()
 
 start_line = "// Start tests declarations."
-wrd_generate_file("test/test.h", start_line, "\n\n", ";\n".join(functs) + ";")
-wrd_generate_file("test/test.c", start_line, "\n\n", "\n".join(run_macro))
+generate_file("test/test.h", start_line, "\n\n", ";\n".join(functs) + ";")
+generate_file("test/test.c", start_line, "\n\n", "\n".join(run_macro))
 
 start_line = "attractor/attractor.c\n   "
 replacement = ".c\n    ".join(names) + ".c\n"
-wrd_generate_file("test/CMakeLists.txt", start_line, ")\n", replacement)
+generate_file("test/CMakeLists.txt", start_line, ")\n", replacement)
