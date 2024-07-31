@@ -191,7 +191,7 @@ typedef struct warudo {
     struct sockaddr_in address;
 
     // Worker
-    bool is_worker;
+    int is_worker;
     wrd_worker *workers;
 
     // Buffers

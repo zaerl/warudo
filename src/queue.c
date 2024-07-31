@@ -40,7 +40,7 @@ WRD_API wrd_code wrd_queue_init(warudo *config) {
             return WRD_ERROR;
         } else if(pid == 0) {
             // Child process.
-            config->is_worker = true;
+            config->is_worker = 1;
 
             return WRD_OK;
         }

@@ -1,0 +1,127 @@
+import functools
+import re
+import subprocess
+
+
+def run_process(cmd):
+    output = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+
+    if output.returncode != 0:
+        print(f"Error running: {cmd}")
+
+    return output.stdout
+
+
+def comparator(a, b):
+    if coverage[a] and coverage[b] or not coverage[a] and not coverage[b]:
+        if a < b:
+            return -1
+        elif a > b:
+            return 1
+        else:
+            return 0
+
+    if coverage[a] and not coverage[b]:
+        return -1
+
+    if not coverage[a] and coverage[b]:
+        return 1
+
+
+def analyze_output(output, verbose=False):
+    lines = output.split("\n")
+    pattern = r"\b(\w+)\s+\*?\b(\w+)\s*\("
+    coverage = {}
+
+    for i, line in enumerate(lines):
+        if (
+            line == ""
+            or line.startswith("Match #")
+            or line.startswith("Binding for")
+            or i == len(lines) - 2
+        ):
+            continue
+        else:
+            match = re.search(pattern, line)
+
+            if match:
+                if verbose:
+                    print(f"{line}\n    > {match.group(2)}")
+
+                coverage[match.group(2)] = 0
+            else:
+                if verbose:
+                    print(line)
+
+    return coverage
+
+
+def analyze_test(output, coverage, verbose=False):
+    lines = output.split("\n")
+    pattern = r"\_Generic\(\(0\s,\s(.+)\),\schar: att_assert_c"
+
+    for i, line in enumerate(lines):
+        if (
+            line == ""
+            or line.startswith("Match #")
+            or line.startswith("Binding for")
+            or i == len(lines) - 2
+        ):
+            continue
+        else:
+            match = re.search(pattern, line)
+
+            if match:
+                if verbose:
+                    print(match.group(1))
+
+                match_2 = re.search(r"([a-z0-9_]+)\(.*\)", match.group(1))
+
+                if match_2:
+                    if verbose:
+                        print(f"    > {match_2.group(1)}")
+
+                    if match_2.group(1) not in coverage:
+                        coverage[match_2.group(1)] = 0
+
+                    coverage[match_2.group(1)] += 1
+
+    return coverage
+
+
+output = run_process("clang-query -f tools/src-query.txt ./src/*.h")
+coverage = analyze_output(output)
+
+output = run_process("clang-query -f tools/test-query.txt ./test/*.c")
+coverage = analyze_test(output, coverage)
+
+total = 0
+max_name_length = 0
+
+for key, value in coverage.items():
+    total += value
+    max_name_length = max(max_name_length, len(key))
+
+
+sorted_keys = sorted(coverage.keys(), key=functools.cmp_to_key(comparator))
+coverage = {key: coverage[key] for key in sorted_keys}
+bar = "-" * max_name_length
+post = " " * (max_name_length - 5)
+post_2 = " " * 5
+
+print("# Test coverage\n")
+print(f"| Test {post} | Coverage |")
+print(f"| {bar} | -------- |")
+
+for key, value in coverage.items():
+    post = " " * (max_name_length - len(key))
+    print(f"| {key}{post} | {value}", end="")
+
+    post = " " * (8 - len(str(value)))
+    print(f"{post} |")
+
+post = " " * (max_name_length - 6)
+print(f"| Total {post} | {total}", end="")
+
+post = " " * (8 - len(str(total)))
+print(f"{post} |")

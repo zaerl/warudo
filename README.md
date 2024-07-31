@@ -15,8 +15,8 @@ Use the prebuilt binaries if you want to use this. But if you want to compile
 Warudo you will need some tools.
 
 1. [CMake](https://cmake.org).
-2. [Clang](https://clang.llvm.org) or another C11-capable compiler.
-3. [php](https://php.net).
+2. [Clang](https://clang.llvm.org) or another C17-capable compiler.
+3. [Python](https://www.python.org/).
 
 After installing the required tools run:
 
@@ -68,4 +68,4 @@ Warudo is built using the work of extraordinary individuals and teams.
 
 1. CMake is distributed under the [OSI-approved BSD 3-clause License](https://gitlab.kitware.com/cmake/cmake/raw/master/Copyright.txt).
 2. SQLite is in the [public domain](https://sqlite.org/copyright.html).
-3. PHP distributed under the [PHP License v3.01](https://www.php.net/license/3_01.txt).
+3. PHP distributed under the [PSFL](https://docs.python.org/3/license.html).
