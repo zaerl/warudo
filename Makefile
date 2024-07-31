@@ -15,7 +15,7 @@ generate_config:
 	php tools/generate-config.php h c conf server
 
 generate_tests:
-	php tools/generate-tests.php
+	python3 tools/generate-tests.py
 
 code_coverage:
 	php tools/code-coverage.php > TESTS.md
