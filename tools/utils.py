@@ -19,6 +19,7 @@ def generate_file(path, start, end, replacement, start_pos=0, save=True):
     return res
 
 
+# Function to generate a new content.
 def generate_content(content, start, end, replacement, start_pos=0):
     try:
         start_pos = content.find(start, start_pos)
