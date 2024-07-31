@@ -111,7 +111,7 @@ for value in map:
         for enum_value in enum_values:
             enums.append(f"WRD_{entry_name.upper()}_{enum_value.upper()}")
 
-        defines.append(",\n".join(ut.add_indentation(enums)))
+        defines.append(",\n".join(ut.add_indent(enums)))
         defines.append(f"}} {entry_type};\n")
         entry_type += " "
 
@@ -152,7 +152,7 @@ for value in map:
 
 defines = (
     ["// Configuration names.", "typedef enum {"]
-    + ut.add_indentation(names)
+    + ut.add_indent(names)
     + ["} wrd_config_name;"]
     + defines
 )
@@ -166,7 +166,7 @@ files = {
         "additionals": [
             {
                 "end": "\n    // Network",
-                "text": "\n" + "\n".join(ut.add_indentation(structs)) + "\n",
+                "text": "\n" + "\n".join(ut.add_indent(structs)) + "\n",
             },
         ],
     },
@@ -174,19 +174,19 @@ files = {
         "file": "src/conf.c",
         "start": "// Configurations.",
         "end": "\n    return WRD_OK;",
-        "text": "\n" + "\n".join(ut.add_indentation(init_configs)) + "\n",
+        "text": "\n" + "\n".join(ut.add_indent(init_configs)) + "\n",
         "additionals": [
             {
                 "end": "\n    return WRD_OK;",
-                "text": "\n" + "\n".join(ut.add_indentation(env_loads)) + "\n",
+                "text": "\n" + "\n".join(ut.add_indent(env_loads)) + "\n",
             },
             {
                 "end": "\n    return WRD_OK;",
-                "text": "\n" + "\n".join(ut.add_indentation(free_configs)) + "\n",
+                "text": "\n" + "\n".join(ut.add_indent(free_configs)) + "\n",
             },
             {
                 "end": "\n    wrd_load_config_env",
-                "text": "\n" + "\n".join(ut.add_indentation(db_loads)) + "\n",
+                "text": "\n" + "\n".join(ut.add_indent(db_loads)) + "\n",
             },
         ],
     },
@@ -194,14 +194,14 @@ files = {
         "file": "warudo.conf.default",
         "start": "{",
         "end": "}",
-        "text": "\n".join(ut.add_indentation(confs)) + "\n",
+        "text": "\n".join(ut.add_indent(confs)) + "\n",
         "additionals": [],
     },
     "server": {
         "file": "src/server.c",
         "start": "// Configurations.",
         "end": "ret = wrd_db_init(config->db_path, config);",
-        "text": "\n".join(ut.add_indentation(logs)) + "\n\n    ",
+        "text": "\n".join(ut.add_indent(logs)) + "\n\n    ",
         "additionals": [],
     },
 }

@@ -60,7 +60,7 @@ def value_to_conf(value):
 
 
 # Add indentation to a list of values.
-def add_indentation(values, indentation=1):
+def add_indent(values, indentation=1):
     indentation = " " * indentation * 4
 
     return [f"{indentation}{value}" for value in values]
