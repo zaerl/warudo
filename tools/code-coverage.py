@@ -30,20 +30,24 @@ def comparator(a: str, b: str) -> int:
         return 1
 
 
+def valid_input_line(index: int, lines: list[str]) -> bool:
+    line = lines[index]
+
+    return not (
+        line == ""
+        or line.startswith("Match #")
+        or line.startswith("Binding for")
+        or index == len(lines) - 2
+    )
+
+
 def analyze_output(output: str, verbose=False) -> Coverage:
     lines = output.split("\n")
     pattern = r"\b(\w+)\s+\*?\b(\w+)\s*\("
     coverage = {}
 
     for i, line in enumerate(lines):
-        if (
-            line == ""
-            or line.startswith("Match #")
-            or line.startswith("Binding for")
-            or i == len(lines) - 2
-        ):
-            continue
-        else:
+        if valid_input_line(i, lines):
             match = re.search(pattern, line)
 
             if match:
@@ -63,30 +67,25 @@ def analyze_test(output: str, coverage: Coverage, verbose=False) -> Coverage:
     pattern = r"\_Generic\(\(0\s,\s(.+)\),\schar: att_assert_c"
 
     for i, line in enumerate(lines):
-        if (
-            line == ""
-            or line.startswith("Match #")
-            or line.startswith("Binding for")
-            or i == len(lines) - 2
-        ):
-            continue
-        else:
+        if valid_input_line(i, lines):
             match = re.search(pattern, line)
 
-            if match:
+            if not match:
+                continue
+
+            if verbose:
+                print(match.group(1))
+
+            match_2 = re.search(r"([a-z0-9_]+)\(.*\)", match.group(1))
+
+            if match_2:
                 if verbose:
-                    print(match.group(1))
+                    print(f"    > {match_2.group(1)}")
 
-                match_2 = re.search(r"([a-z0-9_]+)\(.*\)", match.group(1))
+                if match_2.group(1) not in coverage:
+                    coverage[match_2.group(1)] = 0
 
-                if match_2:
-                    if verbose:
-                        print(f"    > {match_2.group(1)}")
-
-                    if match_2.group(1) not in coverage:
-                        coverage[match_2.group(1)] = 0
-
-                    coverage[match_2.group(1)] += 1
+                coverage[match_2.group(1)] += 1
 
     return coverage
 
