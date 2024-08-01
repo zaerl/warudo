@@ -2,8 +2,10 @@ import functools
 import re
 import subprocess
 
+type Coverage = dict[str, int]
 
-def run_process(cmd):
+
+def run_process(cmd: str) -> str:
     output = subprocess.run(cmd, shell=True, capture_output=True, text=True)
 
     if output.returncode != 0:
@@ -12,7 +14,7 @@ def run_process(cmd):
     return output.stdout
 
 
-def comparator(a, b):
+def comparator(a: str, b: str) -> int:
     if coverage[a] and coverage[b] or not coverage[a] and not coverage[b]:
         if a < b:
             return -1
@@ -28,7 +30,7 @@ def comparator(a, b):
         return 1
 
 
-def analyze_output(output, verbose=False):
+def analyze_output(output: str, verbose=False) -> Coverage:
     lines = output.split("\n")
     pattern = r"\b(\w+)\s+\*?\b(\w+)\s*\("
     coverage = {}
@@ -56,7 +58,7 @@ def analyze_output(output, verbose=False):
     return coverage
 
 
-def analyze_test(output, coverage, verbose=False):
+def analyze_test(output: str, coverage: Coverage, verbose=False) -> Coverage:
     lines = output.split("\n")
     pattern = r"\_Generic\(\(0\s,\s(.+)\),\schar: att_assert_c"
 

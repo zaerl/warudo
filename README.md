@@ -1,5 +1,5 @@
 # Warudo
-Warudo is a lightweight web server written in C11 with no run-time dependencies
+Warudo is a lightweight web server written in C17 with no run-time dependencies
 and a client that processes JSON data.
 
 ## Installation

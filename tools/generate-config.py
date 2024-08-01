@@ -5,8 +5,10 @@ if len(argv) < 2:
     print("Usage: python3 generate-config.py h|c|conf")
     exit(1)
 
+type Configuration = list[str | list[str | int | list[str | int]]]
+
 # List of configurations.
-map = [
+map: Configuration = [
     "Database",
     ["db_path", "file:warudo.db"],
     [
@@ -30,22 +32,22 @@ map = [
 ]
 
 # Configuration file.
-confs = []
+confs: list[str] = []
 
 # H header file.
-defines = []
-names = []
-statuses = []
-structs = []
+defines: list[str] = []
+names: list[str] = []
+statuses: list[str] = []
+structs: list[str] = []
 
 # C file.
-init_configs = []
-free_configs = []
-db_loads = []
-env_loads = []
+init_configs: list[str] = []
+free_configs: list[str] = []
+db_loads: list[str] = []
+env_loads: list[str] = []
 
 # Server file.
-logs = []
+logs: list[str] = []
 
 struct_count = sum(isinstance(item, list) for item in map)
 statuses.append("// Configuration statuses.")
@@ -150,14 +152,16 @@ for value in map:
 
     env_loads.append(f"{env_function}({define_name}, {entry_name})")
 
-defines = (
+defines: list[str] = (
     ["// Configuration names.", "typedef enum {"]
     + ut.add_indent(names)
     + ["} wrd_config_name;"]
     + defines
 )
 
-files = {
+type File = dict[str, str | list[dict[str, str]]]
+
+files: File = {
     "h": {
         "file": "src/warudo.h",
         "start": "// Configurations.",

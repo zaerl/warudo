@@ -13,9 +13,9 @@ if "src/main.c" in c_files:
 if "cli/main.c" in c_files:
     c_files.remove("cli/main.c")
 
-functs = []
-names = []
-run_macro = []
+functs: list[str] = []
+names: list[str] = []
+run_macro: list[str] = []
 
 for file in c_files:
     base_name = os.path.basename(file)
