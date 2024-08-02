@@ -74,4 +74,4 @@
 | wrd_server_init              | 0        |
 | wrd_set_config_status        | 0        |
 | wrd_start_time               | 0        |
-| Total                        | 74       |
+| **Total**                    | **74**   |

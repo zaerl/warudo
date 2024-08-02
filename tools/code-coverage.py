@@ -122,8 +122,8 @@ with open("TESTS.md", "w") as f:
         post = " " * (8 - len(str(value)))
         print(f"{post} |", file=f)
 
-    post = " " * (max_name_length - 6)
-    print(f"| Total {post} | {total}", end="", file=f)
+    post = " " * (max_name_length - 10)
+    print(f"| **Total** {post} | **{total}**", end="", file=f)
 
-    post = " " * (8 - len(str(total)))
+    post = " " * (4 - len(str(total)))
     print(f"{post} |", file=f)
