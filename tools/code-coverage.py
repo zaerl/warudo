@@ -1,8 +1,11 @@
 import functools
+import os
 import re
 import subprocess
 
 type Coverage = dict[str, int]
+
+verbose = "VERBOSE" in os.environ
 
 
 def run_process(cmd: str) -> str:
@@ -41,7 +44,7 @@ def valid_input_line(index: int, lines: list[str]) -> bool:
     )
 
 
-def analyze_output(output: str, verbose=False) -> Coverage:
+def analyze_output(output: str) -> Coverage:
     lines = output.split("\n")
     pattern = r"\b(\w+)\s+\*?\b(\w+)\s*\("
     coverage = {}
@@ -51,19 +54,17 @@ def analyze_output(output: str, verbose=False) -> Coverage:
             match = re.search(pattern, line)
 
             if match:
+                found_str = match.group(2)
                 if verbose:
-                    print(line)
-                    print(f"    > {match.group(2)}")
+                    replace = f"\x1B[32m{found_str}\033[0m"
+                    print(line.replace(found_str, replace, 1))
 
-                coverage[match.group(2)] = 0
-            else:
-                if verbose:
-                    print(line)
+                coverage[found_str] = 0
 
     return coverage
 
 
-def analyze_test(output: str, coverage: Coverage, verbose=False) -> Coverage:
+def analyze_test(output: str, coverage: Coverage) -> Coverage:
     lines = output.split("\n")
     pattern = r"\_Generic\(\(0\s,\s(.+)\),\schar: att_assert_c"
 
@@ -74,15 +75,9 @@ def analyze_test(output: str, coverage: Coverage, verbose=False) -> Coverage:
             if not match:
                 continue
 
-            if verbose:
-                print(match.group(1))
-
             match_2 = re.search(r"([a-z0-9_]+)\(.*\)", match.group(1))
 
             if match_2:
-                if verbose:
-                    print(f"    > {match_2.group(1)}")
-
                 if match_2.group(1) not in coverage:
                     continue
 
