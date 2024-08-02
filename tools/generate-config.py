@@ -7,29 +7,7 @@ if len(argv) < 2:
 
 type Configuration = list[str | list[str | int | list[str | int]]]
 
-# List of configurations.
-map: Configuration = [
-    "Database",
-    ["db_path", "file:warudo.db"],
-    [
-        "log_level",
-        0,
-        ["no_log", "info", "error", "debug"],
-        "Log level can be one of the following [0, 1, 2, 3]: no_log, info, "
-        "error, debug",
-    ],
-    "Net",
-    ["access_origin", None],
-    ["listen_backlog", 1024],
-    ["max_columns", 64],
-    ["net_buffer_size", 1],
-    ["net_headers_buffer_size", 4096],
-    ["net_input_buffer_size", 1],
-    ["socket_port", 6251],
-    ["timing", 1],
-    "Server",
-    ["worker_processes", "auto"],
-]
+map: Configuration = ut.get_data_from_json_file("tools/configs.json")
 
 # Configuration file.
 confs: list[str] = []

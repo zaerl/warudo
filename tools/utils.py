@@ -1,3 +1,4 @@
+import json
 import sys
 
 
@@ -60,7 +61,7 @@ def value_to_conf(value: str | int | None) -> str | int:
     if isinstance(value, int):
         return value
 
-    return "'" + value.replace("'", "\\'") + "'"
+    return '"' + value.replace('"', '\\"') + '"'
 
 
 # Add indentation to a list of values.
@@ -79,3 +80,8 @@ def value_to_c(value: str | int | None) -> str | int:
         return value
 
     return '"' + value.replace('"', '\\"') + '"'
+
+
+def get_data_from_json_file(path: str) -> list | dict:
+    with open(path, "r") as f:
+        return json.load(f)
