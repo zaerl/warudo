@@ -2,11 +2,9 @@
 
 | Test                         | Coverage |
 | ---------------------------- | -------- |
-| test_file_size               | 3        |
 | wrd_base64_decode            | 8        |
 | wrd_base64_encode            | 3        |
 | wrd_config_init              | 12       |
-| wrd_debug_dump               | 5        |
 | wrd_error_description        | 4        |
 | wrd_escape_html              | 4        |
 | wrd_get_config_status        | 4        |
@@ -74,4 +72,4 @@
 | wrd_server_init              | 0        |
 | wrd_set_config_status        | 0        |
 | wrd_start_time               | 0        |
-| **Total**                    | **74**   |
+| **Total**                    | **66**   |

@@ -52,7 +52,8 @@ def analyze_output(output: str, verbose=False) -> Coverage:
 
             if match:
                 if verbose:
-                    print(f"{line}\n    > {match.group(2)}")
+                    print(line)
+                    print(f"    > {match.group(2)}")
 
                 coverage[match.group(2)] = 0
             else:
@@ -83,7 +84,7 @@ def analyze_test(output: str, coverage: Coverage, verbose=False) -> Coverage:
                     print(f"    > {match_2.group(1)}")
 
                 if match_2.group(1) not in coverage:
-                    coverage[match_2.group(1)] = 0
+                    continue
 
                 coverage[match_2.group(1)] += 1
 
