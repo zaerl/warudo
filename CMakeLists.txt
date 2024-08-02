@@ -35,8 +35,5 @@ add_subdirectory(src)
 # SQLite library
 add_subdirectory(src/sqlite3)
 
-# CLI
-add_subdirectory(cli)
-
 # Tests
 add_subdirectory(test)

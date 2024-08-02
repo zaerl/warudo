@@ -25,4 +25,4 @@ set(TEST_SOURCES
 )
 
 add_executable(warudo-test ${TEST_SOURCES})
-target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite warudo_data_lib)
+target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite)

@@ -1,9 +1,9 @@
 BUILD_DIR ?= build
 BUILD_TYPE ?= Release
 
-all: configure build
+all: generate_config configure build
 
-configure: generate_config
+configure:
 	@cmake -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 build: configure

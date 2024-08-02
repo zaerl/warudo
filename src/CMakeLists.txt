@@ -2,6 +2,7 @@ set(SOURCES
     auth.c
     code.c
     conf.c
+    data.c
     db.c
     env.c
     fs.c
@@ -20,17 +21,17 @@ set(SOURCES
     version.c
 )
 
-find_package(MbedTLS REQUIRED)
+# find_package(MbedTLS REQUIRED)
 add_library(warudo_lib STATIC ${SOURCES})
 
 # warudo
 add_executable(warudo main.c)
-target_include_directories(warudo PRIVATE ${MbedTLS_INCLUDE_DIRS})
+# target_include_directories(warudo PRIVATE ${MbedTLS_INCLUDE_DIRS})
 target_link_libraries(warudo
-    PUBLIC
-        MbedTLS::mbedtls
-        MbedTLS::mbedcrypto
-        MbedTLS::mbedx509
+#    PUBLIC
+#        MbedTLS::mbedtls
+#        MbedTLS::mbedcrypto
+#        MbedTLS::mbedx509
     PRIVATE
         warudo_lib
         warudo_sqlite
