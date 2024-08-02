@@ -5,7 +5,6 @@
  */
 
 #include <getopt.h>
-#include <pthread.h>
 #include <time.h>
 
 #include "../src/version.h"
@@ -38,9 +37,9 @@ void show_help(const char *executable, struct option options[], const char *desc
 
 int main(int argc, char * const argv[]) {
     struct timespec start, end;
-    double elapsed;
+    double elapsed = 0;
     unsigned int verbosity = 2;
-    int option;
+    int option = 0;
     int option_index = 0;
     char *filter = NULL;
 
@@ -86,9 +85,7 @@ int main(int argc, char * const argv[]) {
     #define RUN_TEST(NAME) \
         if(!filter || strstr(filter, #NAME)) { \
             printf("\nTest: \x1b[1;32m%s\x1b[0m\n", #NAME); \
-            pthread_t thread_##NAME; \
-            pthread_create(&thread_##NAME, NULL, test_##NAME, NULL); \
-            pthread_join(thread_##NAME, NULL); \
+            test_##NAME(NULL); \
         }
 
     // Start tests declarations.

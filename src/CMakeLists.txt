@@ -17,7 +17,7 @@ set(SOURCES
     route-home.c
     server.c
     timing.c
-    tls.c
+    # tls.c
     version.c
 )
 

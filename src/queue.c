@@ -50,7 +50,9 @@ WRD_API wrd_code wrd_queue_init(warudo *config) {
 }
 
 WRD_API wrd_code wrd_get_workers(warudo *config, long *workers) {
-    CHECK_CONFIG
+    if(!config) {
+        return WRD_ERROR;
+    }
 
     if(!workers) {
         return WRD_ERROR;

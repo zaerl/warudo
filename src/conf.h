@@ -11,7 +11,6 @@ typedef enum {
     WRD_DEFAULT_CONFIG = 'D',
     WRD_LOADED_CONFIG = 'C',
     WRD_ENV_CONFIG = 'E',
-    WRD_NOT_LOADED_CONFIG = 'N',
 } wrd_config_status;
 
 // Init configurations with default values.

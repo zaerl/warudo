@@ -4,15 +4,17 @@
 #include "test.h"
 
 void *test_queue(void *arg) {
-    long worker_processes;
-    wrd_code ret;
+    long worker_processes = 0;
+    wrd_code ret = WRD_OK;
     MOCK_CONFIG
 
     ATT_ASSERT(wrd_get_workers(NULL, NULL), WRD_ERROR, "NULL NULL workers")
     ATT_ASSERT(wrd_get_workers(&config, NULL), WRD_ERROR, "NULL workers")
-    ATT_ASSERT(wrd_get_workers(&config, &worker_processes), WRD_INVALID_CONFIG, "Invalid config")
+    ATT_ASSERT(wrd_get_workers(&config, &worker_processes), WRD_OK, "Invalid config")
+    ATT_ASSERT(worker_processes, sysconf(_SC_NPROCESSORS_ONLN), "System cores")
 
     config.worker_processes = "0";
+    worker_processes = 0;
     ret = wrd_get_workers(&config, &worker_processes);
     ATT_ASSERT(ret, WRD_INVALID_CONFIG, "0 workers")
     ATT_ASSERT(worker_processes, 0, "0 cores")

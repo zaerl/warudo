@@ -8,7 +8,6 @@
 // Generate a temporary file with the given content.
 char *wrd_mock_file(const char *content) {
     char template[] = "wrd_mock_file_XXXXXX";
-
     int fd = mkstemp(template);
 
     if(fd == -1) {

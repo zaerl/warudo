@@ -11,6 +11,7 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     config->requests_count = 0;
     config->timing_count = 0;
     config->timing_end_count = 0;
+    config->status = WRD_DEFAULT;
 
     // Configurations.
 
@@ -38,7 +39,7 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
 // Set configurations to environment variable values, if they exist.
 WRD_API wrd_code wrd_load_config_env(warudo *config) {
     // Status of the loaded configuration.
-    wrd_code ret;
+    wrd_code ret = WRD_OK;
 
     // Used to shorten the declarations.
     #define LOAD_ENV_CONFIG_INT(NAME, FIELD) \
@@ -71,6 +72,8 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
 
 // Close loaded configurations.
 WRD_API wrd_code wrd_config_close(warudo *config) {
+    CHECK_CONFIG
+
     // Used to shorten the declarations.
     #define FREE_CONFIG_STRING(NAME, FIELD) \
         if(config->FIELD && wrd_get_config_status(config, NAME) != WRD_DEFAULT_CONFIG) { \
@@ -153,12 +156,14 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
 
     sqlite3 *db = NULL;
     void *file_buffer = NULL;
-    long file_size;
+    long file_size = 0;
     int rc = 0;
-    wrd_code ret;
+    wrd_code ret = WRD_OK;;
     sqlite3_stmt *stmt = NULL;
 
     if(file_path == NULL) {
+        config->status = WRD_LOADED;
+
         return WRD_DEFAULT;
     }
 
@@ -236,7 +241,7 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
     }
 
     // Status of the new configurations.
-    wrd_config_status status;
+    wrd_config_status status = WRD_DEFAULT_CONFIG;
 
     // Used to shorten the declarations.
     #define LOAD_DB_CONFIG_INT(NAME, FIELD) \
@@ -262,6 +267,7 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
     LOAD_DB_CONFIG_STR(WRD_WORKER_PROCESSES, worker_processes)
 
     wrd_load_config_env(config);
+    config->status = WRD_LOADED;
 
     ret = WRD_OK;
 
@@ -283,14 +289,6 @@ error:
 
 // Get the status of a configuration.
 WRD_API wrd_config_status wrd_get_config_status(warudo *config, wrd_config_name name) {
-    if(!config) {
-        return WRD_NOT_LOADED_CONFIG;
-    }
-
-    if(!config->config_status[name]) {
-        return WRD_NOT_LOADED_CONFIG;
-    }
-
     return config->config_status[name];
 }
 

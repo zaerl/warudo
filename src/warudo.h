@@ -80,6 +80,7 @@ typedef enum {
     // Success codes
     WRD_OK = 0,
     WRD_DEFAULT = 1,
+    WRD_LOADED = 2,
 
     // HTTP codes
     WRD_HTTP_BAD_REQUEST = 400,
@@ -124,7 +125,7 @@ typedef enum {
     WRD_UNKNOWN_ERROR = -80
 } wrd_code;
 
-#define CHECK_CONFIG if(!config) return WRD_ERROR;
+#define CHECK_CONFIG if(!config || config->status != WRD_LOADED) return WRD_ERROR;
 
 typedef struct wrd_column {
     char *name;
@@ -169,7 +170,7 @@ typedef struct warudo {
     // Configurations.
 
     char config_status[11];
-    
+
     // Database
     char *db_path;
     wrd_log_level log_level;
@@ -210,6 +211,7 @@ typedef struct warudo {
     struct timespec start;
     unsigned long long int timing_count;
     unsigned long long int timing_end_count;
+    wrd_code status;
 
     // Query string
     wrd_query query;

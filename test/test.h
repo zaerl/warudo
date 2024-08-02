@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../src/conf.h"
 #include "../src/warudo.h"
 #include "./attractor/attractor.h"
 
@@ -12,7 +13,7 @@
 extern "C" {
 #endif
 
-#define MOCK_CONFIG warudo config;
+#define MOCK_CONFIG warudo config; wrd_config_init(&config, NULL);
 #define MOCK_CONFIG_S char *tmp_mock_file = NULL;
 
 #define WRD_TMP_FILE(NAME) \
