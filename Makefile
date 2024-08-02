@@ -18,7 +18,7 @@ generate_tests:
 	python3 tools/generate-tests.py
 
 code_coverage:
-	python3 tools/code-coverage.py > TESTS.md
+	python3 tools/code-coverage.py
 
 start: configure build
 	WRD_CORS="*" WRD_LOG_LEVEL=3 WRD_CONF_PATH=warudo.conf build/src/warudo

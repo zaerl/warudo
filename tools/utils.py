@@ -30,7 +30,7 @@ def generate_content(
         start_pos = content.find(start, start_pos)
         end_pos = content.find(end, start_pos)
     except ValueError:
-        print("Could not find the start/end tests declarations in file.")
+        print("Could not find the start/end declarations.")
         sys.exit(1)
 
     start_pos += len(start) + 1

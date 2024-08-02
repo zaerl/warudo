@@ -110,19 +110,20 @@ bar = "-" * max_name_length
 post = " " * (max_name_length - 5)
 post_2 = " " * 5
 
-print("# Test coverage\n")
-print(f"| Test {post} | Coverage |")
-print(f"| {bar} | -------- |")
+with open("TESTS.md", "w") as f:
+    print("# Test coverage\n", file=f)
+    print(f"| Test {post} | Coverage |", file=f)
+    print(f"| {bar} | -------- |", file=f)
 
-for key, value in coverage.items():
-    post = " " * (max_name_length - len(key))
-    print(f"| {key}{post} | {value}", end="")
+    for key, value in coverage.items():
+        post = " " * (max_name_length - len(key))
+        print(f"| {key}{post} | {value}", end="", file=f)
 
-    post = " " * (8 - len(str(value)))
-    print(f"{post} |")
+        post = " " * (8 - len(str(value)))
+        print(f"{post} |", file=f)
 
-post = " " * (max_name_length - 6)
-print(f"| Total {post} | {total}", end="")
+    post = " " * (max_name_length - 6)
+    print(f"| Total {post} | {total}", end="", file=f)
 
-post = " " * (8 - len(str(total)))
-print(f"{post} |")
+    post = " " * (8 - len(str(total)))
+    print(f"{post} |", file=f)

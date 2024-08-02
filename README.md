@@ -66,5 +66,5 @@ Why not? And so on.
 Warudo is built using the work of extraordinary individuals and teams.
 
 1. CMake is distributed under the [OSI-approved BSD 3-clause License](https://gitlab.kitware.com/cmake/cmake/raw/master/Copyright.txt).
-2. SQLite is in the [public domain](https://sqlite.org/copyright.html).
-3. Python is distributed under the [PSFL](https://docs.python.org/3/license.html).
+2. Python is distributed under the [PSFL](https://docs.python.org/3/license.html).
+3. SQLite is in the [public domain](https://sqlite.org/copyright.html).
