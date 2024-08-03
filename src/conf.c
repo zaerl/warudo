@@ -11,7 +11,7 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     config->requests_count = 0;
     config->timing_count = 0;
     config->timing_end_count = 0;
-    config->status = WRD_DEFAULT;
+    config->status = WRD_NOT_LOADED;
 
     // Configurations.
 
@@ -73,6 +73,8 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
 // Close loaded configurations.
 WRD_API wrd_code wrd_config_close(warudo *config) {
     CHECK_CONFIG
+
+    config->status = WRD_NOT_LOADED;
 
     // Used to shorten the declarations.
     #define FREE_CONFIG_STRING(NAME, FIELD) \
@@ -151,14 +153,23 @@ error:
 
 // Init config from a configuration file.
 WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
-    wrd_config_close(config);
-    wrd_config_init_defaults(config);
+    if(!config) {
+        return WRD_ERROR;
+    }
+
+    if(config->status == WRD_LOADED) {
+        wrd_config_close(config);
+    }
+
+    if(config->status == WRD_NOT_LOADED) {
+        wrd_config_init_defaults(config);
+    }
 
     sqlite3 *db = NULL;
     void *file_buffer = NULL;
     long file_size = 0;
     int rc = 0;
-    wrd_code ret = WRD_OK;;
+    wrd_code ret = WRD_OK;
     sqlite3_stmt *stmt = NULL;
 
     if(file_path == NULL) {
@@ -174,6 +185,7 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
     }
 
     if(file_size == 0) {
+        config->status = WRD_LOADED;
         // Empty file, return.
         ret = WRD_DEFAULT;
         goto error;
@@ -294,7 +306,9 @@ WRD_API wrd_config_status wrd_get_config_status(warudo *config, wrd_config_name 
 
 // Set the status of a configuration.
 WRD_API wrd_code wrd_set_config_status(warudo *config, wrd_config_name name, wrd_config_status status) {
-    CHECK_CONFIG
+    if(!config) {
+        return WRD_ERROR;
+    }
 
     config->config_status[name] = status;
 

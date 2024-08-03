@@ -13,7 +13,7 @@
 extern "C" {
 #endif
 
-#define MOCK_CONFIG warudo config; wrd_config_init(&config, NULL);
+#define MOCK_CONFIG warudo config = {0}; wrd_config_init(&config, NULL);
 #define MOCK_CONFIG_S char *tmp_mock_file = NULL;
 
 #define WRD_TMP_FILE(NAME) \

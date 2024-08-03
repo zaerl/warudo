@@ -5,8 +5,6 @@ WRD_API const char *wrd_error_description(wrd_code code, int extended) {
         // Success codes
         case WRD_OK:
             return extended ? u8"Success" : u8"OK";
-        case WRD_DEFAULT:
-            return extended ? u8"Default" : u8"DEFAULT";
         case WRD_LOADED:
             return extended ? u8"Loaded config" : u8"LOADED";
 

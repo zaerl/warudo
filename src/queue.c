@@ -50,16 +50,14 @@ WRD_API wrd_code wrd_queue_init(warudo *config) {
 }
 
 WRD_API wrd_code wrd_get_workers(warudo *config, long *workers) {
-    if(!config) {
-        return WRD_ERROR;
-    }
+    CHECK_CONFIG
 
     if(!workers) {
         return WRD_ERROR;
     }
 
     // The 'auto' value is used to automatically determine the number of workers.
-    if(config && config->worker_processes && strncasecmp(config->worker_processes, "auto", 4) == 0) {
+    if(config->worker_processes && strncasecmp(config->worker_processes, "auto", 4) == 0) {
         *workers = sysconf(_SC_NPROCESSORS_ONLN);
 
         return WRD_OK;
