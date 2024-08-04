@@ -57,7 +57,7 @@ typedef enum {
     WRD_LOG_LEVEL_DEBUG
 } wrd_log_level;
 
-#define WRD_DEFAULT_LOG_LEVEL 0
+#define WRD_DEFAULT_LOG_LEVEL WRD_LOG_LEVEL_NO_LOG
 
 // Net
 #define WRD_DEFAULT_ACCESS_ORIGIN NULL

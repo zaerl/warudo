@@ -67,6 +67,7 @@ for value in map:
     is_int = isinstance(entry_value, int)
     define_name = entry_name.upper()
     define = f"WRD_DEFAULT_{define_name}"
+    has_enum = len(enum_values)
 
     if is_int:
         entry_type = "int "
@@ -82,7 +83,7 @@ for value in map:
     confs.append(f"{entry_name}: {conf_entry_value},")
 
     # An enum.
-    if len(enum_values):
+    if has_enum:
         entry_type = f"wrd_{entry_name}"
         defines.append("typedef enum {")
         enums = []
@@ -98,7 +99,11 @@ for value in map:
     define_name = f"WRD_{define_name}"
 
     # h file.
-    defines.append(f"#define {define} {c_entry_value}")
+    if has_enum:
+        defines.append(f"#define {define} {enums[c_entry_value]}")
+    else:
+        defines.append(f"#define {define} {c_entry_value}")
+
     structs.append(f"{entry_type}{entry_name};")
     names.append(f"{define_name},")
 
