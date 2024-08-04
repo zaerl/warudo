@@ -12,7 +12,9 @@
 #include "timing.h"
 
 WRD_API wrd_code wrd_server_init(warudo *config) {
-    CHECK_CONFIG
+    if(!config) {
+        return WRD_ERROR;
+    }
 
     wrd_code ret;
 

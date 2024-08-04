@@ -17,7 +17,7 @@ int main(void) {
     ret = wrd_server_init(config);
 
     if(ret != WRD_OK) {
-        wrd_log_error(config, "Failed to Initialize. Code %s\n", wrd_error_description(ret, 0));
+        wrd_log_error(config, "Failed to initialize. Code %s\n", wrd_error_description(ret, 0));
 
         return ret;
     }
