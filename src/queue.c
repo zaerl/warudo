@@ -25,11 +25,6 @@ WRD_API wrd_code wrd_queue_init(warudo *config) {
         num_workers = 1;
     }
 
-    // Allocate memory for the workers.
-    if(!config->workers) {
-        config->workers = malloc(num_workers * sizeof(wrd_worker));
-    }
-
     for(int i = 0; i < num_workers; ++i) {
         pid_t pid = fork();
 
@@ -43,6 +38,12 @@ WRD_API wrd_code wrd_queue_init(warudo *config) {
             config->is_worker = 1;
 
             return WRD_OK;
+        }
+
+
+        // Allocate memory for the workers.
+        if(!config->workers) {
+            config->workers = malloc(num_workers * sizeof(wrd_worker));
         }
 
         // Parent process.

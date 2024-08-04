@@ -74,10 +74,8 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
 
     // Current process is a worker.
     if(config->is_worker) {
-        wrd_log_info(config, u8"Start worker\n", NULL);
-
         // Load net
-        ret = wrd_net_init(config, config->listen_backlog);
+        /*ret = wrd_net_init(config, config->listen_backlog);
 
         if(ret != WRD_OK) {
             wrd_server_close(config);
@@ -91,7 +89,7 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
         config->query_string = NULL;
 
         // Query string
-        /*wrd_parse_query_string(config, NULL);
+        wrd_parse_query_string(config, NULL);
 
         while(wrd_accept_connection(config) == WRD_OK) {
             wrd_http_parse_query_headers(config);
