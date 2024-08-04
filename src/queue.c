@@ -44,6 +44,11 @@ WRD_API wrd_code wrd_queue_init(warudo *config) {
 
             return WRD_OK;
         }
+
+        // Parent process.
+        config->workers[i].pid = pid;
+        config->workers[i].status = WRD_LOADED;
+        wrd_log_info(config, "Worker process %d started with PID %d\n", i, pid);
     }
 
     return WRD_OK;

@@ -46,7 +46,6 @@ void *test_conf(void *arg) {
     // Loaded from config file.
     WRD_MOCK_FILE("{ db_path: \"Test\" }")
     ATT_ASSERT(wrd_config_init(&config, tmp_mock_file), WRD_OK, "Add db_path")
-    puts(config.db_path);
     ATT_ASSERT(wrd_get_config_status(&config, WRD_DB_PATH), WRD_LOADED_CONFIG, "Loaded db_path")
 
     // Loaded from environment variable.

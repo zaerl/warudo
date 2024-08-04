@@ -11,7 +11,8 @@ extern "C" {
 
 #ifndef WRD_API
 #ifdef WRD_TEST
-# define WRD_API __attribute__((weak))
+// # define WRD_API __attribute__((weak))
+# define WRD_API
 #else
 # define WRD_API
 #endif
@@ -155,7 +156,7 @@ typedef struct wrd_query {
 
 typedef struct wrd_worker {
     pid_t pid;
-    int status;
+    wrd_status status;
 } wrd_worker;
 
 // Main Warudo confuguration.
@@ -215,6 +216,8 @@ typedef struct warudo {
     struct timespec start;
     unsigned long long int timing_count;
     unsigned long long int timing_end_count;
+
+    // Status.
     wrd_status status;
 
     // Query string
