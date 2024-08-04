@@ -29,8 +29,7 @@ logs: list[str] = []
 
 struct_count = sum(isinstance(item, list) for item in map)
 statuses.append("// Configuration statuses.")
-structs.append(f"char config_status[{struct_count}];")
-structs.append("")
+structs.append(f"char config_status[{struct_count}];\n")
 init_configs.append("// Initialize to defaults.")
 init_configs.append(
     f"memset(config->config_status, WRD_DEFAULT_CONFIG, {struct_count});\n"
