@@ -19,5 +19,10 @@ target_compile_options(warudo_sqlite
     -DSQLITE_OMIT_AUTOINIT
     -DSQLITE_STRICT_SUBTYPE=1
     -DSQLITE_USE_URI=1
-    -Wno-constant-logical-operand # C23 warning.
+    -Wno-macro-redefined # hctree
+    -Wno-unused-function # hctree
+    -Wno-unused-variable # hctree
+    -Wno-sign-compare # hctree
+    -Wno-missing-field-initializers # hctree
+    -Wno-zero-length-array # hctree
 )

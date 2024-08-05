@@ -20,13 +20,16 @@ COPY src ./src/
 COPY test ./test/
 COPY warudo.conf.default ./warudo.conf
 
-# RUN make build
+# musl's unistd.h header is located at the system headers root folder,
+# /usr/include, and not under /usr/include/sys as in glibc.
+RUN echo "#include <unistd.h>" > /usr/include/sys/unistd.h
+
 RUN make test
 RUN make clean
 RUN make build
 
-FROM alpine:latest
+# FROM alpine:latest
 
-WORKDIR /app
-COPY --from=build /app/build/src/warudo ./warudo
+# WORKDIR /app
+# COPY --from=build /app/build/src/warudo /app/warudo.conf ./
 # ENTRYPOINT ["./build/src/warudo"]
