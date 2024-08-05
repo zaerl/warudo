@@ -69,8 +69,10 @@
 | wrd_route_home               | 0        |
 | wrd_server_close             | 0        |
 | wrd_server_init              | 0        |
+| wrd_server_loop              | 0        |
 | wrd_set_config_status        | 0        |
 | wrd_start_time               | 0        |
 | wrd_worker_close             | 0        |
 | wrd_worker_init              | 0        |
+| wrd_worker_loop              | 0        |
 | **Total**                    | **71**   |

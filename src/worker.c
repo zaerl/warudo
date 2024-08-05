@@ -36,6 +36,7 @@ WRD_API wrd_code wrd_worker_init(warudo *config) {
         } else if(pid == 0) {
             // Child process.
             config->is_worker = 1;
+            wrd_worker_loop(config);
 
             return WRD_OK;
         }
@@ -46,7 +47,7 @@ WRD_API wrd_code wrd_worker_init(warudo *config) {
             config->workers = malloc(num_workers * sizeof(wrd_worker));
         }
 
-        // Parent process.
+        // Parent process, add worker.
         config->workers[i].pid = pid;
         config->workers[i].status = WRD_LOADED;
         wrd_log_info(config, "Worker process %d started with PID %d\n", i, pid);
@@ -92,5 +93,9 @@ WRD_API wrd_code wrd_worker_close(warudo *config) {
         free(config->workers);
     }
 
+    return WRD_OK;
+}
+
+WRD_API wrd_code wrd_worker_loop(warudo *config) {
     return WRD_OK;
 }

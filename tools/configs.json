@@ -1,6 +1,6 @@
 [
     "Database",
-    [ "db_path", "file:warudo.db" ],
+    [ "db_path", "file:warudo.db?hctree=1" ],
     [
         "log_level",
         0,

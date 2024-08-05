@@ -49,7 +49,7 @@ typedef enum {
 } wrd_config_name;
 
 // Database
-#define WRD_DEFAULT_DB_PATH "file:warudo.db"
+#define WRD_DEFAULT_DB_PATH "file:warudo.db?hctree=1"
 typedef enum {
     WRD_LOG_LEVEL_NO_LOG,
     WRD_LOG_LEVEL_INFO,

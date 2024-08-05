@@ -11,7 +11,7 @@ variable.
 
 {
     // Database
-    db_path: "file:warudo.db",
+    db_path: "file:warudo.db?hctree=1",
     // Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
     log_level: 0,
     // Net

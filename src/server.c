@@ -1,4 +1,6 @@
+#include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "code.h"
 #include "conf.h"
@@ -104,6 +106,7 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
         return WRD_OK;
     } else {
         wrd_log_info(config, u8"Master process\n", NULL);
+        wrd_server_loop(config);
     }
 
     // Master process.
@@ -134,6 +137,30 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
         }
     }*/
 
+
+    return WRD_OK;
+}
+
+WRD_API wrd_code wrd_server_loop(warudo *config) {
+    CHECK_CONFIG
+
+    if(config->is_worker) {
+        // This is the parent loop.
+        return WRD_ERROR;
+    }
+
+    while(1) {
+        int status;
+        pid_t exit_pid = wait(&status);
+
+        if(exit_pid < 0) {
+            wrd_log_error(config, u8"Failed to wait for worker process. Code %s\n", strerror(errno));
+
+            return WRD_ERROR;
+        }
+
+        wrd_log_info(config, u8"Worker process %d exited with status %d\n", exit_pid, status);
+    }
 
     return WRD_OK;
 }

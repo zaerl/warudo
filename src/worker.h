@@ -11,6 +11,7 @@ extern "C" {
 WRD_API wrd_code wrd_worker_init(warudo *config);
 WRD_API wrd_code wrd_get_workers(warudo *config, long *workers);
 WRD_API wrd_code wrd_worker_close(warudo *config);
+WRD_API wrd_code wrd_worker_loop(warudo *config);
 
 #ifdef __cplusplus
 }
