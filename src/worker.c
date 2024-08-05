@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #include "log.h"
-#include "queue.h"
+#include "worker.h"
 
 /*
 #ifdef __linux__
@@ -14,8 +14,8 @@
 #endif
 */
 
-WRD_API wrd_code wrd_queue_init(warudo *config) {
-    // Start the event queue.
+WRD_API wrd_code wrd_worker_init(warudo *config) {
+    // Start the workers.
     long num_workers;
     wrd_code code = wrd_get_workers(config, &num_workers);
 
@@ -86,8 +86,8 @@ WRD_API wrd_code wrd_get_workers(warudo *config, long *workers) {
     return WRD_INVALID_CONFIG;
 }
 
-WRD_API wrd_code wrd_queue_close(warudo *config) {
-    // Close the event queue.
+WRD_API wrd_code wrd_worker_close(warudo *config) {
+    // Close the workers.
     if(config->workers) {
         free(config->workers);
     }

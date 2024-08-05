@@ -13,7 +13,6 @@ set(TEST_SOURCES
     net.c
     output.c
     query.c
-    queue.c
     route-app.c
     route-home.c
     server.c
@@ -22,6 +21,7 @@ set(TEST_SOURCES
     timing.c
     tls.c
     version.c
+    worker.c
 )
 
 add_executable(warudo-test ${TEST_SOURCES})

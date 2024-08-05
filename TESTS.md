@@ -5,6 +5,7 @@
 | wrd_base64_decode            | 8        |
 | wrd_base64_encode            | 3        |
 | wrd_config_init              | 12       |
+| wrd_debug_dump               | 5        |
 | wrd_error_description        | 4        |
 | wrd_escape_html              | 4        |
 | wrd_get_config_status        | 4        |
@@ -61,8 +62,6 @@
 | wrd_parse_formdata           | 0        |
 | wrd_parse_json               | 0        |
 | wrd_parse_query_string       | 0        |
-| wrd_queue_close              | 0        |
-| wrd_queue_init               | 0        |
 | wrd_read_content             | 0        |
 | wrd_read_file                | 0        |
 | wrd_route_app                | 0        |
@@ -72,4 +71,6 @@
 | wrd_server_init              | 0        |
 | wrd_set_config_status        | 0        |
 | wrd_start_time               | 0        |
-| **Total**                    | **66**   |
+| wrd_worker_close             | 0        |
+| wrd_worker_init              | 0        |
+| **Total**                    | **71**   |

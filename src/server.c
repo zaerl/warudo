@@ -7,7 +7,7 @@
 #include "log.h"
 #include "net.h"
 #include "query.h"
-#include "queue.h"
+#include "worker.h"
 #include "server.h"
 #include "timing.h"
 
@@ -64,7 +64,7 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
     }
 
     // Start all the workers.
-    ret = wrd_queue_init(config);
+    ret = wrd_worker_init(config);
 
     if(ret != WRD_OK) {
         wrd_server_close(config);
@@ -182,7 +182,7 @@ WRD_API wrd_code wrd_server_close(warudo *config) {
     CHECK_CONFIG
 
     wrd_config_close(config);
-    wrd_queue_close(config);
+    wrd_worker_close(config);
     wrd_net_close(config);
     wrd_db_close(config);
 

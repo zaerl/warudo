@@ -54,13 +54,13 @@ void *test_log(void *arg);
 void *test_net(void *arg);
 void *test_output(void *arg);
 void *test_query(void *arg);
-void *test_queue(void *arg);
 void *test_route_app(void *arg);
 void *test_route_home(void *arg);
 void *test_server(void *arg);
 void *test_timing(void *arg);
 void *test_tls(void *arg);
 void *test_version(void *arg);
+void *test_worker(void *arg);
 
 #ifdef __cplusplus
 }

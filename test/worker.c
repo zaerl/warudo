@@ -1,9 +1,9 @@
 #include <unistd.h>
 
-#include "../src/queue.h"
+#include "../src/worker.h"
 #include "test.h"
 
-void *test_queue(void *arg) {
+void *test_worker(void *arg) {
     long worker_processes = 0;
     long default_workers = sysconf(_SC_NPROCESSORS_ONLN);
     wrd_code ret = WRD_OK;

@@ -102,13 +102,13 @@ int main(int argc, char * const argv[]) {
     RUN_TEST(net)
     RUN_TEST(output)
     RUN_TEST(query)
-    RUN_TEST(queue)
     RUN_TEST(route_app)
     RUN_TEST(route_home)
     RUN_TEST(server)
     RUN_TEST(timing)
     RUN_TEST(tls)
     RUN_TEST(version)
+    RUN_TEST(worker)
 
     unsigned int tests_valid = att_get_valid_tests();
     unsigned int tests_total = att_get_total_tests();
