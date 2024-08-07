@@ -72,14 +72,14 @@ def add_indent(values: str, indentation=1) -> list[str]:
 
 
 # Transform a value to a C file value.
-def value_to_c(value: str | int | None) -> str | int:
+def value_to_c(value: str | int | None, is_int=False) -> str | int:
     if value is None:
         return "NULL"
 
-    if isinstance(value, int):
+    if is_int:
         return value
 
-    return '"' + value.replace('"', '\\"') + '"'
+    return '"' + str(value).replace('"', '\\"') + '"'
 
 
 def get_data_from_json_file(path: str) -> list | dict:

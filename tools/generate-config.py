@@ -65,7 +65,7 @@ for value in cfg_map:
     entry_name = value["name"]
     entry_value = value["default"]
     enum_values = value.get("enum", [])
-    is_int = isinstance(entry_value, int)
+    is_int = isinstance(entry_value, int) and not value.get("type") == "mixed"
     define_name = entry_name.upper()
     define = f"WRD_DEFAULT_{define_name}"
     has_enum = len(enum_values)
@@ -96,7 +96,7 @@ for value in cfg_map:
         defines.append(f"}} {entry_type};\n")
         entry_type += " "
 
-    c_entry_value = ut.value_to_c(entry_value)
+    c_entry_value = ut.value_to_c(entry_value, is_int)
     define_name = f"WRD_{define_name}"
 
     # h file.
