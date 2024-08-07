@@ -5,9 +5,9 @@ if len(argv) < 2:
     print("Usage: python3 generate-config.py h|c|conf")
     exit(1)
 
-type Configuration = list[str | list[str | int | list[str | int]]]
+type Configuration = list[str | map]
 
-map: Configuration = ut.get_data_from_json_file("tools/configs.json")
+cfg_map: Configuration = ut.get_data_from_json_file("tools/configs.json")
 
 # Configuration file.
 confs: list[str] = []
@@ -27,7 +27,7 @@ env_loads: list[str] = []
 # Server file.
 logs: list[str] = []
 
-struct_count = sum(isinstance(item, list) for item in map)
+struct_count = sum(isinstance(item, dict) for item in cfg_map)
 statuses.append("// Configuration statuses.")
 structs.append(f"char config_status[{struct_count}];\n")
 init_configs.append("// Initialize to defaults.")
@@ -35,7 +35,8 @@ init_configs.append(
     f"memset(config->config_status, WRD_DEFAULT_CONFIG, {struct_count});\n"
 )
 
-for value in map:
+# Loop configs.json.
+for value in cfg_map:
     comment = None
 
     if isinstance(value, str):
@@ -55,15 +56,15 @@ for value in map:
 
         continue
 
-    if not isinstance(value, list) or not len(value):
+    if not isinstance(value, dict):
         continue
 
-    if len(value) == 4:
-        confs.append(f"// {value[3]}")
+    if "comment" in value:
+        confs.append(f"// {value["comment"]}")
 
-    entry_name = ut.safe_get(value, 0)
-    entry_value = ut.safe_get(value, 1)
-    enum_values = ut.safe_get(value, 2, [])
+    entry_name = value["name"]
+    entry_value = value["default"]
+    enum_values = value.get("enum", [])
     is_int = isinstance(entry_value, int)
     define_name = entry_name.upper()
     define = f"WRD_DEFAULT_{define_name}"

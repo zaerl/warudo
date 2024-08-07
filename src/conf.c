@@ -106,19 +106,17 @@ WRD_API wrd_config_status wrd_load_string(sqlite3_stmt *stmt, const char *name, 
         goto error;
     }
 
-    if(sqlite3_column_type(stmt, 0) == SQLITE_TEXT) {
-        const char *res = (const char*)sqlite3_column_text(stmt, 0);
+    const char *res = (const char*)sqlite3_column_text(stmt, 0);
 
-        if(!res) {
-            goto error;
-        }
+    if(!res) {
+        goto error;
+    }
 
-        int length = sqlite3_column_bytes(stmt, 0);
+    int length = sqlite3_column_bytes(stmt, 0);
 
-        if(length) {
-            *output = strndup(res, length);
-            ret = WRD_LOADED_CONFIG;
-        }
+    if(length) {
+        *output = strndup(res, length);
+        ret = WRD_LOADED_CONFIG;
     }
 
 error:
