@@ -6,6 +6,8 @@ RUN apk update && apk add --no-cache \
     cmake \
     lldb-dev \
     make \
+    mbedtls-dev \
+    mbedtls-static \
     py3-lldb \
     python3 \
     && rm -rf /var/lib/apt/lists/*
