@@ -14,11 +14,9 @@
 | wrd_is_valid_boundary        | 5        |
 | wrd_url_decode               | 13       |
 | wrd_version                  | 1        |
-| wrd_accept_connection        | 0        |
 | wrd_add_entries              | 0        |
 | wrd_add_entry                | 0        |
 | wrd_add_index                | 0        |
-| wrd_after_connection         | 0        |
 | wrd_compress_header          | 0        |
 | wrd_config_close             | 0        |
 | wrd_config_init_defaults     | 0        |

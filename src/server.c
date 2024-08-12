@@ -167,7 +167,32 @@ WRD_API wrd_code wrd_server_loop(warudo *config) {
     return WRD_OK;
 }
 
-WRD_API wrd_code wrd_accept_connection(warudo *config) {
+WRD_API wrd_code wrd_server_close(warudo *config) {
+    CHECK_CONFIG
+
+    wrd_config_close(config);
+    wrd_worker_close(config);
+    wrd_net_close(config);
+    wrd_db_close(config);
+
+    if(config->net_headers_buffer.buffer != NULL) {
+        free(config->net_headers_buffer.buffer);
+    }
+
+    if(config->net_buffer.buffer != NULL) {
+        free(config->net_buffer.buffer);
+    }
+
+    if(config->net_input_buffer.buffer != NULL) {
+        free(config->net_input_buffer.buffer);
+    }
+
+    free(config);
+
+    return WRD_OK;
+}
+
+/*WRD_API wrd_code wrd_accept_connection(warudo *config) {
     CHECK_CONFIG
 
     wrd_code accepted = wrd_net_accept(config);
@@ -206,28 +231,4 @@ WRD_API wrd_code wrd_after_connection(warudo *config) {
 
     return WRD_OK;
 }
-
-WRD_API wrd_code wrd_server_close(warudo *config) {
-    CHECK_CONFIG
-
-    wrd_config_close(config);
-    wrd_worker_close(config);
-    wrd_net_close(config);
-    wrd_db_close(config);
-
-    if(config->net_headers_buffer.buffer != NULL) {
-        free(config->net_headers_buffer.buffer);
-    }
-
-    if(config->net_buffer.buffer != NULL) {
-        free(config->net_buffer.buffer);
-    }
-
-    if(config->net_input_buffer.buffer != NULL) {
-        free(config->net_input_buffer.buffer);
-    }
-
-    free(config);
-
-    return WRD_OK;
-}
+*/
