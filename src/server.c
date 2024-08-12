@@ -56,6 +56,7 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
     wrd_log_info(config, u8"Net Input Buffer Size: %d [%c]\n", config->net_input_buffer_size, wrd_get_config_status(config, WRD_NET_INPUT_BUFFER_SIZE));
     wrd_log_info(config, u8"Socket Port: %d [%c]\n", config->socket_port, wrd_get_config_status(config, WRD_SOCKET_PORT));
     wrd_log_info(config, u8"Timing: %d [%c]\n", config->timing, wrd_get_config_status(config, WRD_TIMING));
+    wrd_log_info(config, u8"Pid File: %s [%c]\n", config->pid_file, wrd_get_config_status(config, WRD_PID_FILE));
     wrd_log_info(config, u8"Worker Processes: %s [%c]\n", config->worker_processes, wrd_get_config_status(config, WRD_WORKER_PROCESSES));
 
     ret = wrd_db_init(config->db_path, config);

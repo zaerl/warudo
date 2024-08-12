@@ -13,7 +13,7 @@
             "error",
             "debug"
         ],
-        "comment": "Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug"
+        "comment": "Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug."
     },
     "Net",
     {
@@ -49,6 +49,11 @@
         "default": 1
     },
     "Server",
+    {
+        "name": "pid_file",
+        "default": "/var/run/warudo.pid",
+        "comment": "In this file is saved the PID of the master process."
+    },
     {
         "name": "worker_processes",
         "default": "auto",

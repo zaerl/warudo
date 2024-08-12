@@ -12,7 +12,7 @@ variable.
 {
     // Database
     db_path: "file:warudo.db?hctree=1",
-    // Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug
+    // Log level can be one of the following [0, 1, 2, 3]: no_log, info, error, debug.
     log_level: 0,
     // Net
     access_origin: null,
@@ -24,5 +24,7 @@ variable.
     socket_port: 6251,
     timing: 1,
     // Server
+    // In this file is saved the PID of the master process.
+    pid_file: "/var/run/warudo.pid",
     worker_processes: "auto",
 }

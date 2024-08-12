@@ -45,6 +45,7 @@ typedef enum {
     WRD_NET_INPUT_BUFFER_SIZE,
     WRD_SOCKET_PORT,
     WRD_TIMING,
+    WRD_PID_FILE,
     WRD_WORKER_PROCESSES,
 } wrd_config_name;
 
@@ -70,6 +71,7 @@ typedef enum {
 #define WRD_DEFAULT_TIMING 1
 
 // Server
+#define WRD_DEFAULT_PID_FILE "/var/run/warudo.pid"
 #define WRD_DEFAULT_WORKER_PROCESSES "auto"
 
 #include <netinet/in.h>
@@ -174,7 +176,7 @@ typedef struct warudo {
 
     // Configurations.
 
-    char config_status[11];
+    char config_status[12];
 
     // Database
     char *db_path;
@@ -189,6 +191,7 @@ typedef struct warudo {
     int socket_port;
     int timing;
     // Server
+    char *pid_file;
     char *worker_processes;
 
     // Network
