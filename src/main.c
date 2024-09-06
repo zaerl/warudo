@@ -13,7 +13,6 @@ int main(void) {
     wrd_code ret;
 
     config = malloc(sizeof(warudo));
-
     ret = wrd_server_init(config);
 
     if(ret != WRD_OK) {

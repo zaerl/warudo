@@ -1,12 +1,16 @@
 #include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #include "code.h"
 #include "conf.h"
 #include "db.h"
 #include "env.h"
+#include "fs.h"
 #include "log.h"
 #include "net.h"
 #include "query.h"
@@ -24,7 +28,7 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
     char *conf_file = NULL;
     wrd_get_env_string(&conf_file, "WRD_CONF_PATH");
 
-    // load warudo.conf file.
+    // Load configuration file.
     ret = wrd_config_init(config, conf_file ? conf_file : WRD_DEFAULT_CONF_PATH);
 
     if(conf_file) {
@@ -37,13 +41,15 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
         return ret;
     }
 
-    wrd_log_info(config, u8"Starting Warudo %s\n", WRD_VERSION);
+    ret = wrd_server_save_pid(config);
 
     if(ret != WRD_OK) {
         wrd_server_close(config);
 
         return ret;
     }
+
+    wrd_log_info(config, u8"Starting Warudo %s\n", WRD_VERSION);
 
     // Configurations.
     wrd_log_info(config, u8"Db Path: %s [%c]\n", config->db_path, wrd_get_config_status(config, WRD_DB_PATH));
@@ -139,6 +145,44 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
         }
     }*/
 
+
+    return WRD_OK;
+}
+
+// Save PID file.
+WRD_API wrd_code wrd_server_save_pid(warudo *config) {
+    CHECK_CONFIG
+
+    if(config->pid_file == NULL) {
+        // Nothing to load, return.
+        return WRD_ERROR;
+    }
+
+    int fd;
+
+    // Try to open the file and ensure it is created only if it doesn't exist.
+    fd = open(config->pid_file, O_WRONLY | O_CREAT | O_EXCL, 0644);
+
+    if(fd == -1) {
+        if(errno == EEXIST) {
+            wrd_log_info(config, u8"PID file already exists %s. Error: %s\n",
+                config->pid_file, strerror(errno));
+        } else {
+            wrd_log_info(config, u8"Failed to open PID file: %s. Error: %s\n",
+                config->pid_file, strerror(errno));
+        }
+
+        return WRD_ERROR;
+    }
+
+    // Get the current process ID.
+    pid_t pid = getpid();
+
+    // Write the PID to the file.
+    dprintf(fd, "%d\n", pid);
+
+    // Close the file.
+    close(fd);
 
     return WRD_OK;
 }

@@ -179,7 +179,7 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
         return WRD_DEFAULT;
     }
 
-    ret = wrd_read_file(file_path, &file_buffer, &file_size);
+    ret = wrd_read_file(file_path, &file_buffer, &file_size, WRD_MAX_CONFIG_SIZE);
 
     if(ret != WRD_OK) {
         goto error;
