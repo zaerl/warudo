@@ -20,7 +20,7 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     // Configurations.
 
     // Initialize to defaults.
-    memset(config->config_status, WRD_DEFAULT_CONFIG, 12);
+    memset(config->config_status, WRD_DEFAULT_CONFIG, 15);
 
     // Database
     config->db_path = WRD_DEFAULT_DB_PATH;
@@ -37,6 +37,9 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     // Server
     config->pid_file = WRD_DEFAULT_PID_FILE;
     config->worker_processes = WRD_DEFAULT_WORKER_PROCESSES;
+    config->keep_alive_timeout = WRD_DEFAULT_KEEP_ALIVE_TIMEOUT;
+    config->keep_alive_max = WRD_DEFAULT_KEEP_ALIVE_MAX;
+    config->document_root = WRD_DEFAULT_DOCUMENT_ROOT;
 
     return WRD_OK;
 }
@@ -72,6 +75,9 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
     // Server
     LOAD_ENV_CONFIG_STRING(WRD_PID_FILE, pid_file)
     LOAD_ENV_CONFIG_STRING(WRD_WORKER_PROCESSES, worker_processes)
+    LOAD_ENV_CONFIG_INT(WRD_KEEP_ALIVE_TIMEOUT, keep_alive_timeout)
+    LOAD_ENV_CONFIG_INT(WRD_KEEP_ALIVE_MAX, keep_alive_max)
+    LOAD_ENV_CONFIG_STRING(WRD_DOCUMENT_ROOT, document_root)
 
     return WRD_OK;
 }
@@ -98,6 +104,7 @@ WRD_API wrd_code wrd_config_close(warudo *config) {
     // Server
     FREE_CONFIG_STRING(WRD_PID_FILE, pid_file)
     FREE_CONFIG_STRING(WRD_WORKER_PROCESSES, worker_processes)
+    FREE_CONFIG_STRING(WRD_DOCUMENT_ROOT, document_root)
 
     return WRD_OK;
 }
@@ -283,6 +290,9 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
     LOAD_DB_CONFIG_INT(WRD_TIMING, timing)
     LOAD_DB_CONFIG_STR(WRD_PID_FILE, pid_file)
     LOAD_DB_CONFIG_STR(WRD_WORKER_PROCESSES, worker_processes)
+    LOAD_DB_CONFIG_INT(WRD_KEEP_ALIVE_TIMEOUT, keep_alive_timeout)
+    LOAD_DB_CONFIG_INT(WRD_KEEP_ALIVE_MAX, keep_alive_max)
+    LOAD_DB_CONFIG_STR(WRD_DOCUMENT_ROOT, document_root)
 
     wrd_load_config_env(config);
     config->status = WRD_LOADED;

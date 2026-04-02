@@ -58,5 +58,20 @@
         "name": "worker_processes",
         "default": "auto",
         "type": "mixed"
+    },
+    {
+        "name": "keep_alive_timeout",
+        "default": 30,
+        "comment": "Keep-alive timeout in seconds (0 = disabled)."
+    },
+    {
+        "name": "keep_alive_max",
+        "default": 100,
+        "comment": "Maximum number of requests per keep-alive connection."
+    },
+    {
+        "name": "document_root",
+        "default": null,
+        "comment": "Document root for static file serving (null = disabled)."
     }
 ]

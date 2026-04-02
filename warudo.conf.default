@@ -27,4 +27,10 @@ variable.
     // In this file is saved the PID of the master process.
     pid_file: "/var/run/warudo.pid",
     worker_processes: "auto",
+    // Keep-alive timeout in seconds (0 = disabled).
+    keep_alive_timeout: 30,
+    // Maximum number of requests per keep-alive connection.
+    keep_alive_max: 100,
+    // Document root for static file serving (null = disabled).
+    document_root: null,
 }

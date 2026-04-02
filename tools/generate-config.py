@@ -148,7 +148,7 @@ files: File = {
     "h": {
         "file": "src/warudo.h",
         "start": "// Configurations.",
-        "end": "\n#include <",
+        "end": "\n// End Configurations.",
         "text": "\n".join(defines) + "\n",
         "additionals": [
             {

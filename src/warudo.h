@@ -45,13 +45,15 @@ extern "C" {
 
 #define WRD_DEFAULT_CONF_PATH "warudo.conf"
 
-// Configurations.
-
 #ifndef WRD_MAX_CONFIG_SIZE
 // Maximum size of the configuration file (512 kylobyte).
 #define WRD_MAX_CONFIG_SIZE 524288
 #endif
 
+// Static file serving.
+#define WRD_MAX_FILE_SIZE (64 * 1048576)
+
+// Configurations.
 // Configuration names.
 typedef enum {
     WRD_DB_PATH,
@@ -73,7 +75,6 @@ typedef enum {
 
 // Database
 #define WRD_DEFAULT_DB_PATH "file:warudo.db?hctree=1"
-
 typedef enum {
     WRD_LOG_LEVEL_NO_LOG,
     WRD_LOG_LEVEL_INFO,
@@ -96,14 +97,11 @@ typedef enum {
 // Server
 #define WRD_DEFAULT_PID_FILE "/var/run/warudo.pid"
 #define WRD_DEFAULT_WORKER_PROCESSES "auto"
-
-// Keep-alive timeout in seconds (0 = disabled).
 #define WRD_DEFAULT_KEEP_ALIVE_TIMEOUT 30
 #define WRD_DEFAULT_KEEP_ALIVE_MAX 100
 #define WRD_DEFAULT_DOCUMENT_ROOT NULL
 
-// Static file serving.
-#define WRD_MAX_FILE_SIZE (64 * 1048576)
+// End Configurations.
 
 // Database
 #define WRD_DASHBOARDS_TABLE "dashboards"
@@ -282,12 +280,12 @@ typedef struct warudo {
     int net_input_buffer_size;
     int socket_port;
     int timing;
-    int keep_alive_timeout;
-    int keep_alive_max;
-    char *document_root;
     // Server
     char *pid_file;
     char *worker_processes;
+    int keep_alive_timeout;
+    int keep_alive_max;
+    char *document_root;
 
     // Network
     int server_fd;

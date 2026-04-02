@@ -26,11 +26,16 @@ def generate_file(
 def generate_content(
     content: str, start: str, end: str, replacement: str, start_pos=0
 ) -> dict[str, int | str]:
-    try:
-        start_pos = content.find(start, start_pos)
-        end_pos = content.find(end, start_pos)
-    except ValueError:
-        print("Could not find the start/end declarations.")
+    start_pos = content.find(start, start_pos)
+
+    if start_pos == -1:
+        print(f"Could not find start marker: {repr(start)}")
+        sys.exit(1)
+
+    end_pos = content.find(end, start_pos + len(start))
+
+    if end_pos == -1:
+        print(f"Could not find end marker: {repr(end)} after position {start_pos}")
         sys.exit(1)
 
     start_pos += len(start) + 1
