@@ -1,3 +1,9 @@
+/**
+ * The Warudo web server
+ *
+ * This file is distributed under the MIT License. See LICENSE for details.
+ */
+
 
 #ifndef WARUDO_H
 #define WARUDO_H

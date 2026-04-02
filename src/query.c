@@ -1,3 +1,9 @@
+/**
+ * The Warudo web server
+ *
+ * This file is distributed under the MIT License. See LICENSE for details.
+ */
+
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
