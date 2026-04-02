@@ -7,6 +7,11 @@
 extern "C" {
 #endif
 
+#ifndef WRD_MAX_CONFIG_SIZE
+// Maximum size of the configuration file (512 kylobyte).
+#define WRD_MAX_CONFIG_SIZE 524288
+#endif
+
 typedef enum {
     WRD_DEFAULT_CONFIG = 'D',
     WRD_LOADED_CONFIG = 'C',

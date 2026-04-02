@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmake --preset start)",
+      "Bash(ls /Users/zaerl/Desktop/work/personal/warudo/build*)",
+      "Bash(brew list:*)",
+      "Read(//opt/homebrew/Cellar/mbedtls/4.0.0/lib/cmake/MbedTLS/**)",
+      "Read(//opt/homebrew/lib/**)",
+      "Bash(cmake ..)"
+    ]
+  }
+}

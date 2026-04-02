@@ -30,7 +30,7 @@ add_executable(warudo main.c)
 target_link_libraries(warudo
     PUBLIC
         MbedTLS::mbedtls
-        MbedTLS::mbedcrypto
+        MbedTLS::tfpsacrypto
         MbedTLS::mbedx509
     PRIVATE
         warudo_lib

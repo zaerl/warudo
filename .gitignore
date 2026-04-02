@@ -94,5 +94,6 @@ warudo/*
 hctree-build/
 
 warudo.conf
+warudo.pid
 
 __pycache__/

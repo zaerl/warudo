@@ -1,4 +1,5 @@
 set traversal IgnoreUnlessSpelledInSource
 set bind-root true
-set output print
+set output dump
+# match functionDecl(isExpansionInMainFile())
 match functionDecl(isExpansionInMainFile())

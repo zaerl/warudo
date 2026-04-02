@@ -10,6 +10,9 @@ extern "C" {
 // Init the server.
 WRD_API wrd_code wrd_server_init(warudo *config);
 
+// Save PID file.
+WRD_API wrd_code wrd_server_save_pid(warudo *config);
+
 // Server loop.
 WRD_API wrd_code wrd_server_loop(warudo *config);
 
