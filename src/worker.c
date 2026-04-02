@@ -119,16 +119,7 @@ WRD_API wrd_code wrd_worker_loop(warudo *config) {
     while(wrd_net_accept(config) == WRD_OK) {
         wrd_net_read(config);
         wrd_http_parse_query_headers(config);
-
-        // Initialize query defaults (until query string parsing is connected).
-        config->query.limit = WRD_DEFAULT_QUERY_LIMIT;
-        config->query.multi = WRD_DEFAULT_QUERY_MULTI;
-        config->query.id = 0;
-        config->query.offset = 0;
-        config->query.key = NULL;
-        config->query.value = NULL;
-        config->query.orderby = NULL;
-        config->query.sort = NULL;
+        wrd_parse_query_string(config, config->request_query_string);
 
         ++config->requests_count;
         wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);

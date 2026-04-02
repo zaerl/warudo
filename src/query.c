@@ -13,54 +13,51 @@
 WRD_API wrd_code wrd_parse_query_string(warudo *config, char *query_string) {
     CHECK_CONFIG
 
+    // Reset to defaults.
     config->query.id = 0;
     config->query.offset = 0;
-    config->query.limit = 0;
-    config->query.multi = 0;
+    config->query.limit = WRD_DEFAULT_QUERY_LIMIT;
+    config->query.multi = WRD_DEFAULT_QUERY_MULTI;
     config->query.key = NULL;
     config->query.value = NULL;
     config->query.orderby = NULL;
     config->query.sort = NULL;
 
-    config->valid_query.id = 0;
-    config->valid_query.offset = 0;
-    config->valid_query.limit = 0;
-    config->valid_query.multi = 0;
-    config->valid_query.key = NULL;
-    config->valid_query.value = NULL;
-    config->valid_query.orderby = NULL;
-    config->valid_query.sort = NULL;
-
-    if(query_string == NULL) {
-        return WRD_EMPTY_QUERY_STRING_ERROR;
+    if(query_string == NULL || query_string[0] == '\0') {
+        return WRD_OK;
     }
 
-    /*char *saveptr;
+    char *saveptr;
     char *parameter = strtok_r(query_string, "&", &saveptr);
 
     while(parameter != NULL) {
         char *delimiter = strchr(parameter, '=');
 
         if(delimiter != NULL) {
-            int delimiter_idx = delimiter - parameter;
-            int length_1 = delimiter_idx;
-            // int length_2 = strlen(parameter) - delimiter_idx - 1;
+            int name_len = delimiter - parameter;
             char *value = delimiter + 1;
 
-            if(value != NULL) {
-                WRD_GET_QUERY_ULLINT_VALUE(parameter, limit, value, length_1)
-                else WRD_GET_QUERY_INT_VALUE(parameter, offset, value, length_1)
-                else WRD_GET_QUERY_ULLINT_VALUE(parameter, id, value, length_1)
-                else WRD_GET_QUERY_INT_VALUE(parameter, multi, value, length_1)
-                else WRD_GET_QUERY_STRING_VALUE(parameter, key, value, length_1)
-                else WRD_GET_QUERY_STRING_VALUE(parameter, value, value, length_1)
-                else WRD_GET_QUERY_STRING_VALUE(parameter, orderby, value, length_1)
-                else WRD_GET_QUERY_STRING_VALUE(parameter, sort, value, length_1)
+            if(name_len == 5 && strncmp(parameter, "limit", 5) == 0) {
+                config->query.limit = (unsigned int)strtol(value, NULL, 10);
+            } else if(name_len == 6 && strncmp(parameter, "offset", 6) == 0) {
+                config->query.offset = strtoull(value, NULL, 10);
+            } else if(name_len == 2 && strncmp(parameter, "id", 2) == 0) {
+                config->query.id = strtoull(value, NULL, 10);
+            } else if(name_len == 5 && strncmp(parameter, "multi", 5) == 0) {
+                config->query.multi = (unsigned int)strtol(value, NULL, 10);
+            } else if(name_len == 3 && strncmp(parameter, "key", 3) == 0) {
+                config->query.key = strdup(value);
+            } else if(name_len == 5 && strncmp(parameter, "value", 5) == 0) {
+                config->query.value = strdup(value);
+            } else if(name_len == 7 && strncmp(parameter, "orderby", 7) == 0) {
+                config->query.orderby = strdup(value);
+            } else if(name_len == 4 && strncmp(parameter, "sort", 4) == 0) {
+                config->query.sort = strdup(value);
             }
         }
 
         parameter = strtok_r(NULL, "&", &saveptr);
-    }*/
+    }
 
     return WRD_OK;
 }
@@ -256,25 +253,36 @@ WRD_API long wrd_content_length(warudo *config) {
         return 0;
     }
 
-    /*const char *length = wrd_http_get_param(config, "CONTENT_LENGTH");
-    long int len = 0;
+    char *value = NULL;
 
-    if(length != NULL) {
-        len = strtol(length, NULL, 10);
+    if(wrd_http_get_header(config, "Content-Length", &value) == WRD_OK && value) {
+        return strtol(value, NULL, 10);
     }
 
-    return len;*/
     return 0;
 }
 
 WRD_API char *wrd_read_content(long int length, warudo *config) {
     long int len = length == 0 ? wrd_content_length(config) : length;
 
-    if(len <= 0) {
+    if(len <= 0 || !config) {
         return NULL;
     }
 
-    char *data = malloc(len);
+    // Read body from the already-parsed input buffer.
+    char *body_start = config->net_input_buffer.buffer + config->request_body_offset;
+    unsigned int available = config->net_input_buffer.position - config->request_body_offset;
 
-    return data;;
+    if((unsigned long)len > available) {
+        len = available;
+    }
+
+    char *data = malloc(len + 1);
+
+    if(data) {
+        memcpy(data, body_start, len);
+        data[len] = '\0';
+    }
+
+    return data;
 }
