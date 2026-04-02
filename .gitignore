@@ -98,4 +98,4 @@ warudo.pid
 
 __pycache__/
 
-./claude/*
+.claude/*
