@@ -491,7 +491,7 @@ WRD_API wrd_code wrd_get_keys(warudo *config) {
     int must_finalize = 1;
     int must_output_error = 1;
     int rc;
-    char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WRD_ENTRIES_TABLE ", json_tree(data) GROUP BY key;";
+    char *query = "SELECT key, COUNT(*) AS occurrence_count FROM " WRD_ENTRIES_TABLE ", json_each(data) GROUP BY key;";
     int count = 0;
     sqlite3_stmt *stmt;
 
