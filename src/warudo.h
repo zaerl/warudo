@@ -133,8 +133,24 @@ typedef enum {
 #define WRD_PAGE_APP_KEYS 3
 #define WRD_PAGE_APP_VIEWS 4
 
+#define WRD_REQUEST_HEAD 3
+#define WRD_REQUEST_PUT 4
+#define WRD_REQUEST_DELETE 5
+#define WRD_REQUEST_OPTIONS 6
+
 #define WRD_DEFAULT_QUERY_LIMIT 10
 #define WRD_DEFAULT_QUERY_MULTI 0
+
+// HTTP request headers
+#define WRD_MAX_HEADERS 64
+#define WRD_MAX_HEADER_NAME 128
+#define WRD_MAX_HEADER_VALUE 4096
+#define WRD_MAX_PATH 2048
+
+typedef struct wrd_http_header_entry {
+    char name[WRD_MAX_HEADER_NAME];
+    char value[WRD_MAX_HEADER_VALUE];
+} wrd_http_header_entry;
 
 #define WRD_QUERY_VALUE(TYPE, NAME) short query_valid_##NAME; TYPE query_##NAME;
 
@@ -274,11 +290,18 @@ typedef struct warudo {
     wrd_buffer net_buffer;
     wrd_buffer net_input_buffer;
 
-    // HTTP various.
+    // HTTP request (parsed from input buffer).
     int page;
     int request_method;
+    char request_path[WRD_MAX_PATH];
     const char *script_name;
     const char *query_string;
+    char request_query_string[WRD_MAX_PATH];
+    int http_version_major;
+    int http_version_minor;
+    wrd_http_header_entry request_headers[WRD_MAX_HEADERS];
+    int request_headers_count;
+    unsigned int request_body_offset;
     wrd_column columns[WRD_DEFAULT_MAX_COLUMNS];
     unsigned int columns_count;
     unsigned long long int requests_count;
