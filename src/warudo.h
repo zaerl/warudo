@@ -94,6 +94,10 @@ typedef enum {
 #define WRD_DEFAULT_PID_FILE "/var/run/warudo.pid"
 #define WRD_DEFAULT_WORKER_PROCESSES "auto"
 
+// Keep-alive timeout in seconds (0 = disabled).
+#define WRD_DEFAULT_KEEP_ALIVE_TIMEOUT 30
+#define WRD_DEFAULT_KEEP_ALIVE_MAX 100
+
 // Database
 #define WRD_DASHBOARDS_TABLE "dashboards"
 #define WRD_ENTRIES_TABLE "entries"
@@ -271,6 +275,8 @@ typedef struct warudo {
     int net_input_buffer_size;
     int socket_port;
     int timing;
+    int keep_alive_timeout;
+    int keep_alive_max;
     // Server
     char *pid_file;
     char *worker_processes;
@@ -369,6 +375,7 @@ WRD_API wrd_code wrd_http_not_allowed(warudo *config, const char *allowed);
 WRD_API wrd_code wrd_http_server_error(warudo *config, const char *description);
 WRD_API wrd_code wrd_http_bad_request(warudo *config, const char *description);
 WRD_API wrd_code wrd_http_not_found(warudo *config);
+WRD_API wrd_code wrd_http_buffer_puts(warudo *config, wrd_buffer *buffer, const char *str);
 WRD_API wrd_code wrd_http_puts(warudo *config, const char *str);
 WRD_API wrd_code wrd_http_printf(warudo *config, const char *format, ...);
 WRD_API wrd_code wrd_http_parse_query_headers(warudo *config);

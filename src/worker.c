@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <errno.h>
 #include <unistd.h>
 
@@ -113,36 +114,86 @@ WRD_API wrd_code wrd_worker_close(warudo *config) {
     return WRD_OK;
 }
 
+// Determine if the connection should be kept alive based on HTTP version
+// and Connection header. HTTP/1.1 defaults to keep-alive, HTTP/1.0 does not.
+static int wrd_should_keep_alive(warudo *config) {
+    if(config->keep_alive_timeout <= 0) {
+        return 0;
+    }
+
+    char *conn_header = NULL;
+    wrd_http_get_header(config, "Connection", &conn_header);
+
+    if(conn_header) {
+        if(strcasecmp(conn_header, "close") == 0) {
+            return 0;
+        }
+
+        if(strcasecmp(conn_header, "keep-alive") == 0) {
+            return 1;
+        }
+    }
+
+    // HTTP/1.1 defaults to keep-alive, HTTP/1.0 does not.
+    return config->http_version_major == 1 && config->http_version_minor >= 1;
+}
+
 WRD_API wrd_code wrd_worker_loop(warudo *config) {
     CHECK_CONFIG
 
     while(wrd_net_accept(config) == WRD_OK) {
-        wrd_net_read(config);
-        wrd_http_parse_query_headers(config);
-        wrd_parse_query_string(config, config->request_query_string);
+        int keep_alive = 1;
+        int request_count = 0;
 
-        ++config->requests_count;
-        wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
+        while(keep_alive) {
+            if(wrd_net_read(config) != WRD_OK) {
+                break;
+            }
 
-        switch(config->page) {
-            case WRD_PAGE_ROOT:
-                wrd_route_home(config);
+            // Timeout or client closed connection.
+            if(config->net_input_buffer.position == 0) {
                 break;
-            case WRD_PAGE_APP:
-                wrd_route_app(WRD_ENTRY_TYPE_DATA, config);
-                break;
-            case WRD_PAGE_APP_KEYS:
-                wrd_route_app_keys(config);
-                break;
-            case WRD_PAGE_APP_VIEWS:
-                wrd_route_app(WRD_ENTRY_TYPE_VIEW, config);
-                break;
-            default:
-                wrd_http_not_found(config);
-                break;
+            }
+
+            wrd_http_parse_query_headers(config);
+            wrd_parse_query_string(config, config->request_query_string);
+
+            ++config->requests_count;
+            ++request_count;
+            wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
+
+            keep_alive = wrd_should_keep_alive(config)
+                && request_count < config->keep_alive_max;
+
+            switch(config->page) {
+                case WRD_PAGE_ROOT:
+                    wrd_route_home(config);
+                    break;
+                case WRD_PAGE_APP:
+                    wrd_route_app(WRD_ENTRY_TYPE_DATA, config);
+                    break;
+                case WRD_PAGE_APP_KEYS:
+                    wrd_route_app_keys(config);
+                    break;
+                case WRD_PAGE_APP_VIEWS:
+                    wrd_route_app(WRD_ENTRY_TYPE_VIEW, config);
+                    break;
+                default:
+                    wrd_http_not_found(config);
+                    break;
+            }
+
+            // Add Connection header after route handler has written status/headers.
+            if(keep_alive) {
+                wrd_http_buffer_puts(config, &config->net_headers_buffer,
+                    "Connection: keep-alive\r\n");
+            } else {
+                wrd_http_buffer_puts(config, &config->net_headers_buffer,
+                    "Connection: close\r\n");
+            }
+
+            wrd_http_flush(config);
         }
-
-        wrd_http_flush(config);
 
         wrd_net_finish_request(config);
     }

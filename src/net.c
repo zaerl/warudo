@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 #include "warudo.h"
@@ -98,9 +99,16 @@ WRD_API wrd_code wrd_net_accept(warudo *config) {
         config->client_fd = 0;
 
         return WRD_ACCEPT_ERROR;
-    } else {
-        // TODO: close after all listen
-        config->client_fd = client_fd;
+    }
+
+    config->client_fd = client_fd;
+
+    // Set receive timeout for keep-alive idle connections.
+    if(config->keep_alive_timeout > 0) {
+        struct timeval tv;
+        tv.tv_sec = config->keep_alive_timeout;
+        tv.tv_usec = 0;
+        setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
     }
 
     return WRD_OK;
@@ -122,6 +130,13 @@ WRD_API wrd_code wrd_net_read(warudo *config) {
     CHECK_CONFIG
 
     ssize_t res = read(config->client_fd, config->net_input_buffer.buffer, config->net_input_buffer.size);
+
+    if(res <= 0) {
+        config->net_input_buffer.position = 0;
+
+        return WRD_READ_ERROR;
+    }
+
     config->net_input_buffer.position = res;
 
     return WRD_OK;
