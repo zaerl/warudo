@@ -97,3 +97,5 @@ warudo.conf
 warudo.pid
 
 __pycache__/
+
+./claude/*
