@@ -1,5 +1,4 @@
 #include <stdlib.h>
-#include "../src/env.h"
 #include "test.h"
 
 void *test_env(void *arg) {

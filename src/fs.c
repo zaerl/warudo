@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fs.h"
+#include "warudo.h"
 
 // Read a file into a buffer.
 WRD_API wrd_code wrd_read_file(const char *file_path, void **file_buffer,

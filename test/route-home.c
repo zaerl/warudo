@@ -1,4 +1,3 @@
-#include "../src/routes.h"
 #include "test.h"
 
 void *test_route_home(void *arg) {

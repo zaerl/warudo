@@ -7,8 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "http.h"
-#include "net.h"
+#include "warudo.h"
 
 /*#define WRD_CHECK_CONNECTION(request) \
     if(request.in == NULL || \

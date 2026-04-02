@@ -7,9 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "conf.h"
-#include "env.h"
-#include "fs.h"
+#include "warudo.h"
 
 // Init configurations with default values.
 WRD_API wrd_code wrd_config_init_defaults(warudo *config) {

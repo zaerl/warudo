@@ -1,4 +1,3 @@
-#include "../src/query.h"
 #include "test.h"
 
 static int formdata_result = WRD_OK;

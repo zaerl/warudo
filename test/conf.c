@@ -1,4 +1,3 @@
-#include "../src/conf.h"
 #include "test.h"
 
 void *test_conf(void *arg) {

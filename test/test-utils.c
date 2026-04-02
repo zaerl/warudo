@@ -3,7 +3,6 @@
 #include <unistd.h>
 
 #include "test.h"
-#include "../src/code.h"
 
 // Generate a temporary file with the given content.
 char *wrd_mock_file(const char *content) {

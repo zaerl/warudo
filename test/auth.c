@@ -1,4 +1,3 @@
-#include "../src/auth.h"
 #include "test.h"
 
 void *test_auth(void *arg) {

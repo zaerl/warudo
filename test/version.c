@@ -1,4 +1,3 @@
-#include "../src/version.h"
 #include "test.h"
 
 void *test_version(void *arg) {

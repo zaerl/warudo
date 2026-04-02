@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "env.h"
+#include "warudo.h"
 
 // Get an integer from an environment variable.
 WRD_API wrd_code wrd_get_env_int(int *result, const char *name) {

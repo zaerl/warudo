@@ -4,10 +4,7 @@
  * This file is distributed under the MIT License. See LICENSE for details.
  */
 
-#include "db.h"
-#include "http.h"
-#include "server.h"
-#include "routes.h"
+#include "warudo.h"
 
 WRD_API wrd_code wrd_route_app(int entry_type, warudo *config) {
     CHECK_CONFIG

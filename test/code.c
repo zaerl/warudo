@@ -1,4 +1,3 @@
-#include "../src/code.h"
 #include "test.h"
 
 void *test_code(void *arg) {

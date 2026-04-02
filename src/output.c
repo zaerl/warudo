@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "output.h"
+#include "warudo.h"
 
 // Function to escape special characters in a string for HTML
 WRD_API char *wrd_escape_html(const char *input) {

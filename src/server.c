@@ -13,18 +13,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "code.h"
-#include "conf.h"
-#include "db.h"
-#include "env.h"
-#include "fs.h"
-#include "log.h"
-#include "net.h"
-#include "query.h"
-#include "routes.h"
-#include "server.h"
-#include "timing.h"
-#include "worker.h"
+#include "warudo.h"
 
 static volatile sig_atomic_t wrd_shutdown = 0;
 

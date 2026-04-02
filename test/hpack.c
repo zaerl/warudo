@@ -1,4 +1,3 @@
-#include "../src/hpack.h"
 #include "test.h"
 
 void *test_hpack(void *arg) {

@@ -6,9 +6,6 @@
 
 #include <stdlib.h>
 
-#include "code.h"
-#include "log.h"
-#include "server.h"
 #include "warudo.h"
 
 // /opt/homebrew/opt/nginx/bin/nginx -g "daemon off;"

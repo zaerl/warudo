@@ -4,8 +4,7 @@
  * This file is distributed under the MIT License. See LICENSE for details.
  */
 
-#include "http.h"
-#include "routes.h"
+#include "warudo.h"
 
 WRD_API wrd_code wrd_route_home(warudo *config) {
     CHECK_CONFIG

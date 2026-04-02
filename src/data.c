@@ -4,7 +4,7 @@
  * This file is distributed under the MIT License. See LICENSE for details.
  */
 
-#include "data.h"
+#include "warudo.h"
 
 size_t wrd_debug_dump(const char* text, FILE* stream, unsigned char* ptr, size_t size) {
     size_t i;

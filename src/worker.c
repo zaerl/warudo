@@ -11,10 +11,7 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "http.h"
-#include "log.h"
-#include "net.h"
-#include "worker.h"
+#include "warudo.h"
 
 /*
 #ifdef __linux__

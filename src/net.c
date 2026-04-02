@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "net.h"
+#include "warudo.h"
 
 WRD_API wrd_code wrd_net_init(warudo *config, int backlog) {
     CHECK_CONFIG

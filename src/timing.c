@@ -4,8 +4,7 @@
  * This file is distributed under the MIT License. See LICENSE for details.
  */
 
-#include "log.h"
-#include "timing.h"
+#include "warudo.h"
 
 WRD_API wrd_code wrd_start_time(warudo *config) {
     CHECK_CONFIG

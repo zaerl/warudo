@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hpack.h"
+#include "warudo.h"
 
 #define WRD_STATIC_TABLE_SIZE 61
 #define WRD_DYNAMIC_TABLE_SIZE 64

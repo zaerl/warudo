@@ -1,4 +1,3 @@
-#include "../src/timing.h"
 #include "test.h"
 
 void *test_timing(void *arg) {

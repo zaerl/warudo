@@ -1,4 +1,3 @@
-#include "../src/server.h"
 #include "test.h"
 
 void *test_server(void *arg) {

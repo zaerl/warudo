@@ -15,7 +15,7 @@
 #include <mbedtls/net_sockets.h>
 #include <mbedtls/timing.h>
 
-#include "tls.h"
+#include "warudo.h"
 
 // Init TLS with default values.
 WRD_API wrd_code wrd_init_tls(warudo *config) {

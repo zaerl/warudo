@@ -1,4 +1,3 @@
-#include "../src/output.h"
 #include "test.h"
 
 void *test_output(void *arg) {

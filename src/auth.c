@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "auth.h"
+#include "warudo.h"
 
 char *wrd_base64_encode(const char* input) {
     if(input == NULL) {

@@ -7,10 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "db.h"
-#include "http.h"
-#include "log.h"
-#include "query.h"
+#include "warudo.h"
 
 #define WRD_DB_RET_CALL(STMT, CALL, RET) \
     rc = CALL; \

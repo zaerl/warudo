@@ -1,4 +1,3 @@
-#include "../src/db.h"
 #include "test.h"
 
 void *test_db(void *arg) {

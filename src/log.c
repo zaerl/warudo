@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "log.h"
+#include "warudo.h"
 
 WRD_API wrd_code wrd_log(warudo *config, wrd_log_level level, const char *format, ...) {
     if(format == NULL) {

@@ -1,4 +1,3 @@
-#include "../src/log.h"
 #include "test.h"
 
 void *test_log(void *arg) {

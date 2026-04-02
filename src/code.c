@@ -4,7 +4,7 @@
  * This file is distributed under the MIT License. See LICENSE for details.
  */
 
-#include "code.h"
+#include "warudo.h"
 
 WRD_API const char *wrd_error_description(wrd_code code, int extended) {
     switch(code) {

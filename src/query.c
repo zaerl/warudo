@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "query.h"
+#include "warudo.h"
 
 WRD_API wrd_code wrd_parse_query_string(warudo *config, char *query_string) {
     CHECK_CONFIG

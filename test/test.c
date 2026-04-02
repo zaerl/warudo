@@ -7,7 +7,6 @@
 #include <getopt.h>
 #include <time.h>
 
-#include "../src/version.h"
 #include "test.h"
 
 int show_version(void) {

@@ -1,6 +1,5 @@
 #include <unistd.h>
 
-#include "../src/worker.h"
 #include "test.h"
 
 void *test_worker(void *arg) {
