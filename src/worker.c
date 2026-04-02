@@ -179,7 +179,7 @@ WRD_API wrd_code wrd_worker_loop(warudo *config) {
                     wrd_route_app(WRD_ENTRY_TYPE_VIEW, config);
                     break;
                 default:
-                    wrd_http_not_found(config);
+                    wrd_route_static(config);
                     break;
             }
 

@@ -34,8 +34,6 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     config->net_input_buffer_size = WRD_DEFAULT_NET_INPUT_BUFFER_SIZE;
     config->socket_port = WRD_DEFAULT_SOCKET_PORT;
     config->timing = WRD_DEFAULT_TIMING;
-    config->keep_alive_timeout = WRD_DEFAULT_KEEP_ALIVE_TIMEOUT;
-    config->keep_alive_max = WRD_DEFAULT_KEEP_ALIVE_MAX;
     // Server
     config->pid_file = WRD_DEFAULT_PID_FILE;
     config->worker_processes = WRD_DEFAULT_WORKER_PROCESSES;

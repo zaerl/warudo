@@ -66,6 +66,9 @@ typedef enum {
     WRD_TIMING,
     WRD_PID_FILE,
     WRD_WORKER_PROCESSES,
+    WRD_KEEP_ALIVE_TIMEOUT,
+    WRD_KEEP_ALIVE_MAX,
+    WRD_DOCUMENT_ROOT,
 } wrd_config_name;
 
 // Database
@@ -97,6 +100,10 @@ typedef enum {
 // Keep-alive timeout in seconds (0 = disabled).
 #define WRD_DEFAULT_KEEP_ALIVE_TIMEOUT 30
 #define WRD_DEFAULT_KEEP_ALIVE_MAX 100
+#define WRD_DEFAULT_DOCUMENT_ROOT NULL
+
+// Static file serving.
+#define WRD_MAX_FILE_SIZE (64 * 1048576)
 
 // Database
 #define WRD_DASHBOARDS_TABLE "dashboards"
@@ -261,7 +268,7 @@ typedef struct warudo {
 
     // Configurations.
 
-    char config_status[12];
+    char config_status[15];
 
     // Database
     char *db_path;
@@ -277,6 +284,7 @@ typedef struct warudo {
     int timing;
     int keep_alive_timeout;
     int keep_alive_max;
+    char *document_root;
     // Server
     char *pid_file;
     char *worker_processes;
@@ -359,6 +367,8 @@ WRD_API wrd_code wrd_get_env_string(char **result, const char *name);
 // Filesystem
 WRD_API wrd_code wrd_read_file(const char *file_path, void **file_buffer,
     long *file_size, long max_size);
+WRD_API const char *wrd_mime_type(const char *path);
+WRD_API wrd_code wrd_route_static(warudo *config);
 
 // HPACK
 WRD_API wrd_code wrd_compress_header(const char *name, const char *value, char *output);
