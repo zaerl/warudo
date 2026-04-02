@@ -1,9 +1,13 @@
+#include <signal.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 #include <unistd.h>
 
+#include "http.h"
 #include "log.h"
+#include "net.h"
 #include "worker.h"
 
 /*
@@ -25,7 +29,13 @@ WRD_API wrd_code wrd_worker_init(warudo *config) {
         num_workers = 1;
     }
 
+    config->num_workers = num_workers;
+
     for(int i = 0; i < num_workers; ++i) {
+        // Flush before fork to prevent child from duplicating buffered output.
+        fflush(stdout);
+        fflush(stderr);
+
         pid_t pid = fork();
 
         if(pid < 0) {
@@ -36,7 +46,6 @@ WRD_API wrd_code wrd_worker_init(warudo *config) {
         } else if(pid == 0) {
             // Child process.
             config->is_worker = 1;
-            wrd_worker_loop(config);
 
             return WRD_OK;
         }
@@ -88,8 +97,13 @@ WRD_API wrd_code wrd_get_workers(warudo *config, long *workers) {
 }
 
 WRD_API wrd_code wrd_worker_close(warudo *config) {
-    // Close the workers.
-    if(config->workers) {
+    if(!config->is_worker && config->workers) {
+        for(long i = 0; i < config->num_workers; ++i) {
+            if(config->workers[i].pid > 0) {
+                kill(config->workers[i].pid, SIGTERM);
+            }
+        }
+
         free(config->workers);
     }
 
@@ -97,5 +111,20 @@ WRD_API wrd_code wrd_worker_close(warudo *config) {
 }
 
 WRD_API wrd_code wrd_worker_loop(warudo *config) {
+    CHECK_CONFIG
+
+    while(wrd_net_accept(config) == WRD_OK) {
+        wrd_net_read(config);
+        wrd_http_parse_query_headers(config);
+        ++config->requests_count;
+        wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
+
+        wrd_http_ok(config);
+        wrd_http_puts(config, u8"{\"Hello\": \"World\"}");
+        wrd_http_flush(config);
+
+        wrd_net_finish_request(config);
+    }
+
     return WRD_OK;
 }

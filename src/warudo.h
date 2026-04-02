@@ -202,6 +202,7 @@ typedef struct warudo {
 
     // Worker
     int is_worker;
+    long num_workers;
     wrd_worker *workers;
 
     // Buffers

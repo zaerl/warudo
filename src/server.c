@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,9 +15,17 @@
 #include "log.h"
 #include "net.h"
 #include "query.h"
-#include "worker.h"
+#include "routes.h"
 #include "server.h"
 #include "timing.h"
+#include "worker.h"
+
+static volatile sig_atomic_t wrd_shutdown = 0;
+
+static void wrd_signal_handler(int sig) {
+    (void)sig;
+    wrd_shutdown = 1;
+}
 
 WRD_API wrd_code wrd_server_init(warudo *config) {
     if(!config) {
@@ -85,7 +94,7 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
     // Current process is a worker.
     if(config->is_worker) {
         // Load net
-        /*ret = wrd_net_init(config, config->listen_backlog);
+        ret = wrd_net_init(config, config->listen_backlog);
 
         if(ret != WRD_OK) {
             wrd_server_close(config);
@@ -101,50 +110,20 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
         // Query string
         wrd_parse_query_string(config, NULL);
 
-        while(wrd_accept_connection(config) == WRD_OK) {
-            wrd_http_parse_query_headers(config);
-            wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
-
-            wrd_http_ok(config);
-            wrd_http_puts(config, u8"{\"Hello\": \"World\"}");
-
-            wrd_after_connection(config);
-        }*/
+        wrd_worker_loop(config);
 
         return WRD_OK;
     } else {
+        struct sigaction sa;
+        sa.sa_handler = wrd_signal_handler;
+        sa.sa_flags = 0; // No SA_RESTART, so wait() returns EINTR.
+
+        sigemptyset(&sa.sa_mask);
+        sigaction(SIGTERM, &sa, NULL);
+        sigaction(SIGINT, &sa, NULL);
         wrd_log_info(config, u8"Master process\n", NULL);
         wrd_server_loop(config);
     }
-
-    // Master process.
-    /*while(true) {
-        int status;
-
-        pid_i exit_pid = wait(&status);
-
-        if(exit_pid < 0) {
-            wrd_log_error(config, u8"Failed to wait for worker process. Code %s\n", strerror(errno));
-
-            return WRD_ERROR;
-        }
-
-        wrd_log_info(config, u8"Worker process %d exited with status %d\n", exit_pid, status);
-
-        pid_t pid = fork();
-
-        if(pid < 0) {
-            wrd_log_error(config, u8"Failed to fork worker process. Code %s\n", strerror(errno));
-
-            return WRD_ERROR;
-        } else if(pid == 0) {
-            // Child process.
-            // config->is_worker = 1;
-
-            // return WRD_OK;
-        }
-    }*/
-
 
     return WRD_OK;
 }
@@ -165,14 +144,39 @@ WRD_API wrd_code wrd_server_save_pid(warudo *config) {
 
     if(fd == -1) {
         if(errno == EEXIST) {
-            wrd_log_info(config, u8"PID file already exists %s. Error: %s\n",
-                config->pid_file, strerror(errno));
-        } else {
-            wrd_log_info(config, u8"Failed to open PID file: %s. Error: %s\n",
-                config->pid_file, strerror(errno));
-        }
+            // Check if the process from the existing PID file is still running.
+            FILE *f = fopen(config->pid_file, "r");
 
-        return WRD_ERROR;
+            if(f) {
+                int old_pid = 0;
+
+                fscanf(f, "%d", &old_pid);
+                fclose(f);
+
+                if(old_pid > 0 && kill(old_pid, 0) == 0) {
+                    // Process is still running.
+                    wrd_log_error(config, u8"Another instance is running with PID %d\n", old_pid);
+
+                    return WRD_ERROR;
+                }
+            }
+
+            // Stale PID file, remove and retry.
+            unlink(config->pid_file);
+            fd = open(config->pid_file, O_WRONLY | O_CREAT | O_EXCL, 0644);
+
+            if(fd == -1) {
+                wrd_log_error(config, u8"Failed to create PID file: %s. Error: %s\n",
+                    config->pid_file, strerror(errno));
+
+                return WRD_ERROR;
+            }
+        } else {
+            wrd_log_error(config, u8"Failed to open PID file: %s. Error: %s\n",
+                config->pid_file, strerror(errno));
+
+            return WRD_ERROR;
+        }
     }
 
     // Get the current process ID.
@@ -195,17 +199,30 @@ WRD_API wrd_code wrd_server_loop(warudo *config) {
         return WRD_ERROR;
     }
 
-    while(1) {
+    while(!wrd_shutdown) {
         int status;
         pid_t exit_pid = wait(&status);
 
         if(exit_pid < 0) {
-            wrd_log_error(config, u8"Failed to wait for worker process. Code %s\n", strerror(errno));
+            if(errno == EINTR) {
+                // Interrupted by signal, check shutdown flag.
+                continue;
+            }
 
-            return WRD_ERROR;
+            if(errno == ECHILD) {
+                wrd_log_info(config, u8"All worker processes exited\n", NULL);
+            } else {
+                wrd_log_error(config, u8"Failed to wait for worker process. Code %s\n", strerror(errno));
+            }
+
+            break;
         }
 
-        wrd_log_info(config, u8"Worker process %d exited with status %d\n", exit_pid, status);
+        if(WIFEXITED(status)) {
+            wrd_log_info(config, u8"Worker process %d exited with status %d\n", exit_pid, WEXITSTATUS(status));
+        } else if(WIFSIGNALED(status)) {
+            wrd_log_info(config, u8"Worker process %d killed by signal %d\n", exit_pid, WTERMSIG(status));
+        }
     }
 
     return WRD_OK;
@@ -213,6 +230,11 @@ WRD_API wrd_code wrd_server_loop(warudo *config) {
 
 WRD_API wrd_code wrd_server_close(warudo *config) {
     CHECK_CONFIG
+
+    // Remove PID file on shutdown.
+    if(config->pid_file && !config->is_worker) {
+        unlink(config->pid_file);
+    }
 
     wrd_config_close(config);
     wrd_worker_close(config);

@@ -45,6 +45,10 @@ WRD_API wrd_code wrd_net_init(warudo *config, int backlog) {
 
     config->server_fd = server_fd;
 
+    // Allow reuse of the port if it's in TIME_WAIT.
+    int optval = 1;
+    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval));
+
     // Set up the address struct
     config->address.sin_family = AF_INET;
     config->address.sin_addr.s_addr = INADDR_ANY;
