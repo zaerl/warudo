@@ -119,11 +119,38 @@ WRD_API wrd_code wrd_worker_loop(warudo *config) {
     while(wrd_net_accept(config) == WRD_OK) {
         wrd_net_read(config);
         wrd_http_parse_query_headers(config);
+
+        // Initialize query defaults (until query string parsing is connected).
+        config->query.limit = WRD_DEFAULT_QUERY_LIMIT;
+        config->query.multi = WRD_DEFAULT_QUERY_MULTI;
+        config->query.id = 0;
+        config->query.offset = 0;
+        config->query.key = NULL;
+        config->query.value = NULL;
+        config->query.orderby = NULL;
+        config->query.sort = NULL;
+
         ++config->requests_count;
         wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
 
-        wrd_http_ok(config);
-        wrd_http_puts(config, u8"{\"Hello\": \"World\"}");
+        switch(config->page) {
+            case WRD_PAGE_ROOT:
+                wrd_route_home(config);
+                break;
+            case WRD_PAGE_APP:
+                wrd_route_app(WRD_ENTRY_TYPE_DATA, config);
+                break;
+            case WRD_PAGE_APP_KEYS:
+                wrd_route_app_keys(config);
+                break;
+            case WRD_PAGE_APP_VIEWS:
+                wrd_route_app(WRD_ENTRY_TYPE_VIEW, config);
+                break;
+            default:
+                wrd_http_not_found(config);
+                break;
+        }
+
         wrd_http_flush(config);
 
         wrd_net_finish_request(config);
