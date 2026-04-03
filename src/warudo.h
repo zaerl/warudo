@@ -71,6 +71,9 @@ typedef enum {
     WRD_KEEP_ALIVE_TIMEOUT,
     WRD_KEEP_ALIVE_MAX,
     WRD_DOCUMENT_ROOT,
+    WRD_TLS_ENABLED,
+    WRD_TLS_CERT_PATH,
+    WRD_TLS_KEY_PATH,
 } wrd_config_name;
 
 // Database
@@ -100,6 +103,11 @@ typedef enum {
 #define WRD_DEFAULT_KEEP_ALIVE_TIMEOUT 30
 #define WRD_DEFAULT_KEEP_ALIVE_MAX 100
 #define WRD_DEFAULT_DOCUMENT_ROOT NULL
+
+// TLS
+#define WRD_DEFAULT_TLS_ENABLED 0
+#define WRD_DEFAULT_TLS_CERT_PATH NULL
+#define WRD_DEFAULT_TLS_KEY_PATH NULL
 
 // End Configurations.
 
@@ -266,7 +274,7 @@ typedef struct warudo {
 
     // Configurations.
 
-    char config_status[15];
+    char config_status[18];
 
     // Database
     char *db_path;
@@ -286,6 +294,10 @@ typedef struct warudo {
     int keep_alive_timeout;
     int keep_alive_max;
     char *document_root;
+    // TLS
+    int tls_enabled;
+    char *tls_cert_path;
+    char *tls_key_path;
 
     // Network
     int server_fd;

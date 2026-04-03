@@ -33,4 +33,11 @@ variable.
     keep_alive_max: 100,
     // Document root for static file serving (null = disabled).
     document_root: null,
+    // TLS
+    // Enable TLS/HTTPS (0 = disabled, 1 = enabled).
+    tls_enabled: 0,
+    // Path to the TLS certificate file (PEM format).
+    tls_cert_path: null,
+    // Path to the TLS private key file (PEM format).
+    tls_key_path: null,
 }

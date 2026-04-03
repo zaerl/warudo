@@ -71,6 +71,9 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
     wrd_log_info(config, u8"Keep Alive Timeout: %d [%c]\n", config->keep_alive_timeout, wrd_get_config_status(config, WRD_KEEP_ALIVE_TIMEOUT));
     wrd_log_info(config, u8"Keep Alive Max: %d [%c]\n", config->keep_alive_max, wrd_get_config_status(config, WRD_KEEP_ALIVE_MAX));
     wrd_log_info(config, u8"Document Root: %s [%c]\n", config->document_root, wrd_get_config_status(config, WRD_DOCUMENT_ROOT));
+    wrd_log_info(config, u8"Tls Enabled: %d [%c]\n", config->tls_enabled, wrd_get_config_status(config, WRD_TLS_ENABLED));
+    wrd_log_info(config, u8"Tls Cert Path: %s [%c]\n", config->tls_cert_path, wrd_get_config_status(config, WRD_TLS_CERT_PATH));
+    wrd_log_info(config, u8"Tls Key Path: %s [%c]\n", config->tls_key_path, wrd_get_config_status(config, WRD_TLS_KEY_PATH));
 
     ret = wrd_db_init(config->db_path, config);
 

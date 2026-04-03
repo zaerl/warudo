@@ -53,6 +53,7 @@ dkms.conf
 
 bin
 build
+CMakeFiles/
 test-build
 obj
 warudo.db

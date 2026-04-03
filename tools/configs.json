@@ -73,5 +73,21 @@
         "name": "document_root",
         "default": null,
         "comment": "Document root for static file serving (null = disabled)."
+    },
+    "TLS",
+    {
+        "name": "tls_enabled",
+        "default": 0,
+        "comment": "Enable TLS/HTTPS (0 = disabled, 1 = enabled)."
+    },
+    {
+        "name": "tls_cert_path",
+        "default": null,
+        "comment": "Path to the TLS certificate file (PEM format)."
+    },
+    {
+        "name": "tls_key_path",
+        "default": null,
+        "comment": "Path to the TLS private key file (PEM format)."
     }
 ]
