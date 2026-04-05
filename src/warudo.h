@@ -299,6 +299,11 @@ typedef struct warudo {
     char *tls_cert_path;
     char *tls_key_path;
 
+    // TLS state (opaque, managed by tls.c).
+    void *tls_state;
+    // Per-connection SSL context (opaque, managed by tls.c).
+    void *tls_ssl;
+
     // Network
     int server_fd;
     int client_fd;
@@ -444,6 +449,11 @@ WRD_API wrd_code wrd_end_time(warudo *config, const char *message);
 
 // TLS
 WRD_API wrd_code wrd_init_tls(warudo *config);
+WRD_API wrd_code wrd_tls_handshake(warudo *config);
+WRD_API wrd_code wrd_tls_finish_request(warudo *config);
+WRD_API wrd_code wrd_tls_close(warudo *config);
+WRD_API int wrd_tls_read(void *ctx, unsigned char *buf, size_t len);
+WRD_API int wrd_tls_write(void *ctx, const unsigned char *buf, size_t len);
 
 // Version
 WRD_API int wrd_version(warudo *config);

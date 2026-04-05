@@ -83,6 +83,15 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
         return WRD_DB_INIT_ERROR;
     }
 
+    // Initialize TLS before forking workers so config is shared.
+    ret = wrd_init_tls(config);
+
+    if(ret != WRD_OK) {
+        wrd_server_close(config);
+
+        return ret;
+    }
+
     // Start all the workers.
     ret = wrd_worker_init(config);
 
@@ -237,6 +246,7 @@ WRD_API wrd_code wrd_server_close(warudo *config) {
         unlink(config->pid_file);
     }
 
+    wrd_tls_close(config);
     wrd_config_close(config);
     wrd_worker_close(config);
     wrd_net_close(config);

@@ -100,3 +100,5 @@ warudo.pid
 __pycache__/
 
 .claude/*
+
+*.pem

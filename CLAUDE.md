@@ -46,6 +46,18 @@ Non-config code in `src/warudo.h` (HTTP types, error codes, function declaration
 
 `tools/generate-tests.py` generates `TESTS.md` test coverage tracking.
 
+## TLS / HTTPS
+
+HTTPS support uses mbedTLS (4.x) with PSA Crypto for RNG. Key source files:
+
+- `src/tls.c` — TLS lifecycle: init (`wrd_init_tls`), per-connection handshake (`wrd_tls_handshake`), read/write wrappers, and cleanup (`wrd_tls_close`, `wrd_tls_finish_request`).
+- TLS state is stored as opaque pointers in the `warudo` struct: `tls_state` (server-wide config, certs, keys) and `tls_ssl` (per-connection SSL context).
+- `src/net.c` — read/send functions transparently dispatch to TLS or plain sockets based on whether `tls_ssl` is set.
+- `src/worker.c` — worker loop performs TLS handshake after accept when TLS is enabled; `SIGPIPE` is ignored so broken connections return errors instead of killing workers.
+- `src/server.c` — TLS is initialized before forking workers and cleaned up on server close.
+
+Config keys: `tls_enabled`, `tls_cert_path`, `tls_key_path`. Set these in `warudo.conf` or via `WRD_TLS_ENABLED`, `WRD_TLS_CERT_PATH`, `WRD_TLS_KEY_PATH` env vars.
+
 ## Configuration
 
 Config file is JSON5 (`warudo.conf`). Every setting can be overridden via environment variable with `WRD_` prefix. See `warudo.conf.default` for all options.

@@ -117,6 +117,11 @@ WRD_API wrd_code wrd_net_accept(warudo *config) {
 WRD_API wrd_code wrd_net_finish_request(warudo *config) {
     CHECK_CONFIG
 
+    // Close TLS session before closing the socket.
+    if(config->tls_ssl) {
+        wrd_tls_finish_request(config);
+    }
+
     if(config->client_fd > 0) {
         if(close(config->client_fd) < 0) {
             return WRD_CLOSE_ERROR;
@@ -129,7 +134,15 @@ WRD_API wrd_code wrd_net_finish_request(warudo *config) {
 WRD_API wrd_code wrd_net_read(warudo *config) {
     CHECK_CONFIG
 
-    ssize_t res = read(config->client_fd, config->net_input_buffer.buffer, config->net_input_buffer.size);
+    ssize_t res;
+
+    if(config->tls_ssl) {
+        res = wrd_tls_read(config, (unsigned char *)config->net_input_buffer.buffer,
+            config->net_input_buffer.size);
+    } else {
+        res = read(config->client_fd, config->net_input_buffer.buffer,
+            config->net_input_buffer.size);
+    }
 
     if(res <= 0) {
         config->net_input_buffer.position = 0;
@@ -146,12 +159,19 @@ WRD_API wrd_code wrd_net_send(warudo *config, wrd_buffer *buffer) {
     CHECK_CONFIG
 
     if(buffer->position) {
-        ssize_t sent = send(config->client_fd, buffer->buffer, buffer->position, 0);
+        ssize_t sent;
+
+        if(config->tls_ssl) {
+            sent = wrd_tls_write(config, (const unsigned char *)buffer->buffer,
+                buffer->position);
+        } else {
+            sent = send(config->client_fd, buffer->buffer, buffer->position, 0);
+        }
 
         memset(buffer->buffer, 0, buffer->size);
         buffer->position = 0;
 
-        return sent == -1 ? WRD_ERROR : WRD_OK;
+        return sent <= 0 ? WRD_ERROR : WRD_OK;
     }
 
     return WRD_OK;

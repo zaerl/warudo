@@ -141,7 +141,19 @@ static int wrd_should_keep_alive(warudo *config) {
 WRD_API wrd_code wrd_worker_loop(warudo *config) {
     CHECK_CONFIG
 
+    // Ignore SIGPIPE so broken connections return errors instead of killing
+    // the worker process. Essential for TLS where mbedtls writes to sockets.
+    signal(SIGPIPE, SIG_IGN);
+
     while(wrd_net_accept(config) == WRD_OK) {
+        // Perform TLS handshake if TLS is enabled.
+        if(config->tls_enabled && config->tls_state) {
+            if(wrd_tls_handshake(config) != WRD_OK) {
+                wrd_net_finish_request(config);
+                continue;
+            }
+        }
+
         int keep_alive = 1;
         int request_count = 0;
 
