@@ -74,6 +74,8 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
     wrd_log_info(config, u8"Tls Enabled: %d [%c]\n", config->tls_enabled, wrd_get_config_status(config, WRD_TLS_ENABLED));
     wrd_log_info(config, u8"Tls Cert Path: %s [%c]\n", config->tls_cert_path, wrd_get_config_status(config, WRD_TLS_CERT_PATH));
     wrd_log_info(config, u8"Tls Key Path: %s [%c]\n", config->tls_key_path, wrd_get_config_status(config, WRD_TLS_KEY_PATH));
+    wrd_log_info(config, u8"Tls Port: %d [%c]\n", config->tls_port, wrd_get_config_status(config, WRD_TLS_PORT));
+    wrd_log_info(config, u8"Hsts Max Age: %d [%c]\n", config->hsts_max_age, wrd_get_config_status(config, WRD_HSTS_MAX_AGE));
 
     ret = wrd_db_init(config->db_path, config);
 

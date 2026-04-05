@@ -74,6 +74,8 @@ typedef enum {
     WRD_TLS_ENABLED,
     WRD_TLS_CERT_PATH,
     WRD_TLS_KEY_PATH,
+    WRD_TLS_PORT,
+    WRD_HSTS_MAX_AGE,
 } wrd_config_name;
 
 // Database
@@ -108,6 +110,8 @@ typedef enum {
 #define WRD_DEFAULT_TLS_ENABLED 0
 #define WRD_DEFAULT_TLS_CERT_PATH NULL
 #define WRD_DEFAULT_TLS_KEY_PATH NULL
+#define WRD_DEFAULT_TLS_PORT 443
+#define WRD_DEFAULT_HSTS_MAX_AGE 0
 
 // End Configurations.
 
@@ -274,7 +278,7 @@ typedef struct warudo {
 
     // Configurations.
 
-    char config_status[18];
+    char config_status[20];
 
     // Database
     char *db_path;
@@ -298,16 +302,22 @@ typedef struct warudo {
     int tls_enabled;
     char *tls_cert_path;
     char *tls_key_path;
+    int tls_port;
+    int hsts_max_age;
+
+    // End warudo configurations.
+
+    // Network
+    int server_fd;
+    int server_tls_fd;
+    int client_fd;
+    int is_tls_connection;
+    struct sockaddr_in address;
 
     // TLS state (opaque, managed by tls.c).
     void *tls_state;
     // Per-connection SSL context (opaque, managed by tls.c).
     void *tls_ssl;
-
-    // Network
-    int server_fd;
-    int client_fd;
-    struct sockaddr_in address;
 
     // Worker
     int is_worker;
@@ -338,7 +348,7 @@ typedef struct warudo {
     unsigned long long int timing_count;
     unsigned long long int timing_end_count;
 
-    // Status.
+    // Status
     wrd_status status;
 
     // Query string
@@ -380,8 +390,8 @@ WRD_API wrd_code wrd_get_env_int(int *result, const char *name);
 WRD_API wrd_code wrd_get_env_string(char **result, const char *name);
 
 // Filesystem
-WRD_API wrd_code wrd_read_file(const char *file_path, void **file_buffer,
-    long *file_size, long max_size);
+WRD_API wrd_code wrd_read_file(const char *file_path, void **file_buffer, long *file_size,
+    long max_size);
 WRD_API const char *wrd_mime_type(const char *path);
 WRD_API wrd_code wrd_route_static(warudo *config);
 
@@ -405,6 +415,7 @@ WRD_API wrd_code wrd_http_puts(warudo *config, const char *str);
 WRD_API wrd_code wrd_http_printf(warudo *config, const char *format, ...);
 WRD_API wrd_code wrd_http_parse_query_headers(warudo *config);
 WRD_API wrd_code wrd_http_get_header(warudo *config, const char *name, char **value);
+WRD_API wrd_code wrd_http_redirect_https(warudo *config);
 WRD_API wrd_code wrd_http_flush(warudo *config);
 
 // Log
@@ -415,6 +426,8 @@ WRD_API wrd_code wrd_net_init(warudo *config, int backlog);
 WRD_API wrd_code wrd_net_close(warudo *config);
 WRD_API wrd_code wrd_net_accept(warudo *config);
 WRD_API wrd_code wrd_net_finish_request(warudo *config);
+WRD_API wrd_code wrd_net_poll(warudo *config);
+WRD_API int wrd_net_peek_byte(warudo *config);
 WRD_API wrd_code wrd_net_printf(warudo *config, wrd_buffer *buffer, const char *format, ...);
 WRD_API wrd_code wrd_net_read(warudo *config);
 WRD_API wrd_code wrd_net_send(warudo *config, wrd_buffer *buffer);
@@ -450,6 +463,7 @@ WRD_API wrd_code wrd_end_time(warudo *config, const char *message);
 // TLS
 WRD_API wrd_code wrd_init_tls(warudo *config);
 WRD_API wrd_code wrd_tls_handshake(warudo *config);
+WRD_API int wrd_tls_pending(warudo *config);
 WRD_API wrd_code wrd_tls_finish_request(warudo *config);
 WRD_API wrd_code wrd_tls_close(warudo *config);
 WRD_API int wrd_tls_read(void *ctx, unsigned char *buf, size_t len);

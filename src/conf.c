@@ -20,7 +20,7 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     // Configurations.
 
     // Initialize to defaults.
-    memset(config->config_status, WRD_DEFAULT_CONFIG, 18);
+    memset(config->config_status, WRD_DEFAULT_CONFIG, 20);
 
     // Database
     config->db_path = WRD_DEFAULT_DB_PATH;
@@ -44,6 +44,8 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     config->tls_enabled = WRD_DEFAULT_TLS_ENABLED;
     config->tls_cert_path = WRD_DEFAULT_TLS_CERT_PATH;
     config->tls_key_path = WRD_DEFAULT_TLS_KEY_PATH;
+    config->tls_port = WRD_DEFAULT_TLS_PORT;
+    config->hsts_max_age = WRD_DEFAULT_HSTS_MAX_AGE;
 
     return WRD_OK;
 }
@@ -86,6 +88,8 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
     LOAD_ENV_CONFIG_INT(WRD_TLS_ENABLED, tls_enabled)
     LOAD_ENV_CONFIG_STRING(WRD_TLS_CERT_PATH, tls_cert_path)
     LOAD_ENV_CONFIG_STRING(WRD_TLS_KEY_PATH, tls_key_path)
+    LOAD_ENV_CONFIG_INT(WRD_TLS_PORT, tls_port)
+    LOAD_ENV_CONFIG_INT(WRD_HSTS_MAX_AGE, hsts_max_age)
 
     return WRD_OK;
 }
@@ -307,6 +311,8 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
     LOAD_DB_CONFIG_INT(WRD_TLS_ENABLED, tls_enabled)
     LOAD_DB_CONFIG_STR(WRD_TLS_CERT_PATH, tls_cert_path)
     LOAD_DB_CONFIG_STR(WRD_TLS_KEY_PATH, tls_key_path)
+    LOAD_DB_CONFIG_INT(WRD_TLS_PORT, tls_port)
+    LOAD_DB_CONFIG_INT(WRD_HSTS_MAX_AGE, hsts_max_age)
 
     wrd_load_config_env(config);
     config->status = WRD_LOADED;

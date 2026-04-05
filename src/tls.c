@@ -190,6 +190,17 @@ WRD_API int wrd_tls_write(void *ctx, const unsigned char *buf, size_t len) {
     return mbedtls_ssl_write(&conn->ssl, buf, len);
 }
 
+// Check if TLS has buffered decrypted data from a previous read.
+WRD_API int wrd_tls_pending(warudo *config) {
+    wrd_tls_conn *conn = config->tls_ssl;
+
+    if(!conn) {
+        return 0;
+    }
+
+    return mbedtls_ssl_get_bytes_avail(&conn->ssl) > 0;
+}
+
 // Close TLS session for the current connection.
 WRD_API wrd_code wrd_tls_finish_request(warudo *config) {
     CHECK_CONFIG

@@ -40,4 +40,8 @@ variable.
     tls_cert_path: null,
     // Path to the TLS private key file (PEM format).
     tls_key_path: null,
+    // Port for HTTPS when TLS is enabled. The socket_port serves HTTP redirects.
+    tls_port: 443,
+    // HSTS max-age in seconds (0 = disabled). When > 0, adds Strict-Transport-Security header to HTTPS responses and redirects HTTP to HTTPS.
+    hsts_max_age: 0,
 }

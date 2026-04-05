@@ -152,7 +152,7 @@ files: File = {
         "text": "\n".join(defines) + "\n",
         "additionals": [
             {
-                "end": "\n    // Network",
+                "end": "\n    // End warudo configurations.",
                 "text": "\n" + "\n".join(ut.add_indent(structs)) + "\n",
             },
         ],

@@ -44,7 +44,15 @@ WRD_API wrd_code wrd_http_additional(warudo *config) {
     strftime(date_string, sizeof(date_string), u8"Date: %a, %d %b %Y %H:%M:%S GMT\r\n", timeinfo);
     wrd_http_buffer_puts(config, &config->net_headers_buffer, u8"Cache-Control: no-cache\r\n");
     wrd_http_buffer_puts(config, &config->net_headers_buffer, date_string);
-    wrd_http_buffer_printf(config, &config->net_headers_buffer, u8"Server: %s %s\r\n", WRD_NAME, WRD_VERSION);
+    wrd_http_buffer_printf(config, &config->net_headers_buffer, u8"Server: %s %s\r\n", WRD_NAME,
+        WRD_VERSION);
+
+    // Add HSTS header on HTTPS responses when enabled.
+    if(config->is_tls_connection && config->hsts_max_age > 0) {
+        wrd_http_buffer_printf(config, &config->net_headers_buffer,
+            u8"Strict-Transport-Security: max-age=%d; includeSubDomains\r\n",
+            config->hsts_max_age);
+    }
 
     return WRD_OK;
 }
@@ -381,6 +389,54 @@ WRD_API wrd_code wrd_http_get_header(warudo *config, const char *name, char **va
     *value = NULL;
 
     return WRD_HTTP_NOT_FOUND;
+}
+
+WRD_API wrd_code wrd_http_redirect_https(warudo *config) {
+    WRD_CHECK_CONNECTION(config)
+
+    // Build the HTTPS redirect URL from the Host header and request path.
+    char *host = NULL;
+    wrd_http_get_header(config, "Host", &host);
+
+    wrd_http_status(config, "301 Moved Permanently");
+    wrd_http_additional(config);
+    wrd_http_content_type(config, "text/plain");
+
+    if(host) {
+        // Strip port from Host header if present.
+        char host_only[WRD_MAX_HEADER_VALUE];
+        strncpy(host_only, host, sizeof(host_only) - 1);
+        host_only[sizeof(host_only) - 1] = '\0';
+
+        char *colon = strchr(host_only, ':');
+
+        if(colon) {
+            *colon = '\0';
+        }
+
+        if(config->tls_port == 443) {
+            wrd_http_buffer_printf(config, &config->net_headers_buffer,
+                "Location: https://%s%s\r\n", host_only, config->request_path);
+        } else {
+            wrd_http_buffer_printf(config, &config->net_headers_buffer,
+                "Location: https://%s:%d%s\r\n", host_only, config->tls_port,
+                config->request_path);
+        }
+    } else {
+        wrd_http_buffer_printf(config, &config->net_headers_buffer,
+            "Location: https://localhost%s\r\n", config->request_path);
+    }
+
+    if(config->hsts_max_age > 0) {
+        wrd_http_buffer_printf(config, &config->net_headers_buffer,
+            "Strict-Transport-Security: max-age=%d; includeSubDomains\r\n",
+            config->hsts_max_age);
+    }
+
+    wrd_http_buffer_puts(config, &config->net_headers_buffer, "Connection: close\r\n");
+    wrd_http_puts(config, "Redirecting to HTTPS.");
+
+    return WRD_OK;
 }
 
 WRD_API wrd_code wrd_http_flush(warudo *config) {

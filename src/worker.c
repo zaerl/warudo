@@ -12,8 +12,6 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include "warudo.h"
-
 /*
 #ifdef __linux__
 #include <sys/epoll.h>
@@ -21,6 +19,8 @@
 #include <sys/event.h>
 #endif
 */
+
+#include "warudo.h"
 
 WRD_API wrd_code wrd_worker_init(warudo *config) {
     // Start the workers.
@@ -114,8 +114,8 @@ WRD_API wrd_code wrd_worker_close(warudo *config) {
     return WRD_OK;
 }
 
-// Determine if the connection should be kept alive based on HTTP version
-// and Connection header. HTTP/1.1 defaults to keep-alive, HTTP/1.0 does not.
+// Determine if the connection should be kept alive based on HTTP version and Connection header.
+// HTTP/1.1 defaults to keep-alive, HTTP/1.0 does not.
 static int wrd_should_keep_alive(warudo *config) {
     if(config->keep_alive_timeout <= 0) {
         return 0;
@@ -141,23 +141,54 @@ static int wrd_should_keep_alive(warudo *config) {
 WRD_API wrd_code wrd_worker_loop(warudo *config) {
     CHECK_CONFIG
 
-    // Ignore SIGPIPE so broken connections return errors instead of killing
-    // the worker process. Essential for TLS where mbedtls writes to sockets.
+    // Ignore SIGPIPE so broken connections return errors instead of killing the worker process.
+    // Essential for TLS where mbedtls writes to sockets.
     signal(SIGPIPE, SIG_IGN);
 
     while(wrd_net_accept(config) == WRD_OK) {
-        // Perform TLS handshake if TLS is enabled.
-        if(config->tls_enabled && config->tls_state) {
-            if(wrd_tls_handshake(config) != WRD_OK) {
+        // Perform TLS handshake for HTTPS connections. Peek at the first byte:
+        // 0x16 = TLS ClientHello, anything else is plain HTTP on the wrong port, redirect to HTTPS.
+        if(config->is_tls_connection && config->tls_state) {
+            int first_byte = wrd_net_peek_byte(config);
+
+            if(first_byte >= 0 && first_byte != 0x16) {
+                wrd_net_read(config);
+                wrd_http_parse_query_headers(config);
+                wrd_http_redirect_https(config);
+                wrd_http_flush(config);
                 wrd_net_finish_request(config);
+
                 continue;
             }
+
+            if(wrd_tls_handshake(config) != WRD_OK) {
+                wrd_net_finish_request(config);
+
+                continue;
+            }
+        }
+
+        // Plain HTTP connection when HSTS is active: redirect to HTTPS.
+        if(config->tls_enabled && !config->is_tls_connection) {
+            wrd_net_read(config);
+            wrd_http_parse_query_headers(config);
+            wrd_http_redirect_https(config);
+            wrd_http_flush(config);
+            wrd_net_finish_request(config);
+
+            continue;
         }
 
         int keep_alive = 1;
         int request_count = 0;
 
         while(keep_alive) {
+            // Wait for client data or new incoming connections. If a new connection arrives on a
+            // server socket, break keep-alive so the worker can accept it instead of blocking here.
+            if(wrd_net_poll(config) != WRD_OK) {
+                break;
+            }
+
             if(wrd_net_read(config) != WRD_OK) {
                 break;
             }
@@ -172,7 +203,7 @@ WRD_API wrd_code wrd_worker_loop(warudo *config) {
 
             ++config->requests_count;
             ++request_count;
-            wrd_log_info(config, u8"Accepted request %llu\n", config->requests_count);
+            wrd_log_info(config, u8"Accepted request %llu (worker %d)\n", config->requests_count, getpid());
 
             keep_alive = wrd_should_keep_alive(config)
                 && request_count < config->keep_alive_max;
