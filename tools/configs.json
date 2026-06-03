@@ -41,7 +41,7 @@
         "default": 1
     },
     {
-        "name": "socket_port",
+        "name": "port",
         "default": 6251
     },
     {
@@ -93,7 +93,7 @@
     {
         "name": "tls_port",
         "default": 443,
-        "comment": "Port for HTTPS when TLS is enabled. The socket_port serves HTTP redirects."
+        "comment": "Port for HTTPS when TLS is enabled. The port serves HTTP redirects."
     },
     {
         "name": "hsts_max_age",

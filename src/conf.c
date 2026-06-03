@@ -32,7 +32,7 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     config->net_buffer_size = WRD_DEFAULT_NET_BUFFER_SIZE;
     config->net_headers_buffer_size = WRD_DEFAULT_NET_HEADERS_BUFFER_SIZE;
     config->net_input_buffer_size = WRD_DEFAULT_NET_INPUT_BUFFER_SIZE;
-    config->socket_port = WRD_DEFAULT_SOCKET_PORT;
+    config->port = WRD_DEFAULT_PORT;
     config->timing = WRD_DEFAULT_TIMING;
     // Server
     config->pid_file = WRD_DEFAULT_PID_FILE;
@@ -76,7 +76,7 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
     LOAD_ENV_CONFIG_INT(WRD_NET_BUFFER_SIZE, net_buffer_size)
     LOAD_ENV_CONFIG_INT(WRD_NET_HEADERS_BUFFER_SIZE, net_headers_buffer_size)
     LOAD_ENV_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
-    LOAD_ENV_CONFIG_INT(WRD_SOCKET_PORT, socket_port)
+    LOAD_ENV_CONFIG_INT(WRD_PORT, port)
     LOAD_ENV_CONFIG_INT(WRD_TIMING, timing)
     // Server
     LOAD_ENV_CONFIG_STRING(WRD_PID_FILE, pid_file)
@@ -301,7 +301,7 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
     LOAD_DB_CONFIG_INT(WRD_NET_BUFFER_SIZE, net_buffer_size)
     LOAD_DB_CONFIG_INT(WRD_NET_HEADERS_BUFFER_SIZE, net_headers_buffer_size)
     LOAD_DB_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
-    LOAD_DB_CONFIG_INT(WRD_SOCKET_PORT, socket_port)
+    LOAD_DB_CONFIG_INT(WRD_PORT, port)
     LOAD_DB_CONFIG_INT(WRD_TIMING, timing)
     LOAD_DB_CONFIG_STR(WRD_PID_FILE, pid_file)
     LOAD_DB_CONFIG_STR(WRD_WORKER_PROCESSES, worker_processes)

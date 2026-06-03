@@ -29,7 +29,7 @@ Build output goes to `build/`. Binary: `build/src/warudo`. Test binary: `build/t
 
 - C17 standard, compiled with `-Wall -Wextra -pedantic`
 - All public symbols prefixed with `wrd_` (functions) or `WRD_` (macros/enums)
-- Config values use `wrd_config_name` enum, env vars use `WRD_` prefix (e.g., `WRD_SOCKET_PORT`)
+- Config values use `wrd_config_name` enum, env vars use `WRD_` prefix (e.g., `WRD_PORT`)
 - Functions are declared in `warudo.h` (or module-specific headers like `mojibake.h`)
 - Config and test boilerplate is code-generated — see below
 
@@ -40,7 +40,7 @@ Build output goes to `build/`. Binary: `build/src/warudo`. Test binary: `build/t
 ### `src/warudo.h` — two generated regions
 
 1. **Enums and defines**: between `// Configurations.` and `// End Configurations.` — generates `wrd_config_name` enum, `wrd_log_level` enum, and all `#define WRD_DEFAULT_*` values.
-2. **Struct fields**: between the second `// Configurations.` (inside the `warudo` struct) and `// End warudo configurations.` — generates `config_status[]`, and all config fields (`db_path`, `socket_port`, `tls_enabled`, etc.).
+2. **Struct fields**: between the second `// Configurations.` (inside the `warudo` struct) and `// End warudo configurations.` — generates `config_status[]`, and all config fields (`db_path`, `port`, `tls_enabled`, etc.).
 
 Everything **outside** these markers (HTTP types, error codes, function declarations, and struct fields below `// End warudo configurations.` like `server_fd`, `tls_state`, `tls_ssl`, etc.) is **not generated** and is safe to edit manually.
 
@@ -75,7 +75,7 @@ HTTPS support uses mbedTLS (4.x) with PSA Crypto for RNG. Key source files:
 - `src/worker.c` — worker loop performs TLS handshake after accept for HTTPS connections; plain HTTP connections are redirected to HTTPS when HSTS is active. `SIGPIPE` is ignored so broken connections return errors instead of killing workers.
 - `src/server.c` — TLS is initialized before forking workers and cleaned up on server close.
 
-Config keys: `tls_enabled`, `tls_cert_path`, `tls_key_path`, `tls_port`, `hsts_max_age`. Set these in `warudo.conf` or via `WRD_TLS_ENABLED`, `WRD_TLS_CERT_PATH`, `WRD_TLS_KEY_PATH`, `WRD_TLS_PORT`, `WRD_HSTS_MAX_AGE` env vars. When `tls_enabled` is on and `hsts_max_age > 0`, the server listens on both `socket_port` (HTTP, sends 301 redirects) and `tls_port` (HTTPS).
+Config keys: `tls_enabled`, `tls_cert_path`, `tls_key_path`, `tls_port`, `hsts_max_age`. Set these in `warudo.conf` or via `WRD_TLS_ENABLED`, `WRD_TLS_CERT_PATH`, `WRD_TLS_KEY_PATH`, `WRD_TLS_PORT`, `WRD_HSTS_MAX_AGE` env vars. When `tls_enabled` is on and `hsts_max_age > 0`, the server listens on both `port` (HTTP, sends 301 redirects) and `tls_port` (HTTPS).
 
 ## Configuration
 

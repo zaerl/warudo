@@ -27,8 +27,8 @@ Warudo by default reads a file called `warudo.conf` in the same folder of the
 binary. This behavior can be changed passing the `WRD_CONFIG_PATH` environment
 variable.
 
-Every config can be passed as environment variable. For example `socket_port`
-can be passed as `WRD_SOCKET_PORT` variable.
+Every config can be passed as environment variable. For example `port`
+can be passed as `WRD_PORT` variable.
 
 ```sh
 WRD_CORS="*" WRD_LOG_LEVEL=3 ./warudo

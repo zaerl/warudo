@@ -64,7 +64,7 @@ typedef enum {
     WRD_NET_BUFFER_SIZE,
     WRD_NET_HEADERS_BUFFER_SIZE,
     WRD_NET_INPUT_BUFFER_SIZE,
-    WRD_SOCKET_PORT,
+    WRD_PORT,
     WRD_TIMING,
     WRD_PID_FILE,
     WRD_WORKER_PROCESSES,
@@ -96,7 +96,7 @@ typedef enum {
 #define WRD_DEFAULT_NET_BUFFER_SIZE 1
 #define WRD_DEFAULT_NET_HEADERS_BUFFER_SIZE 4096
 #define WRD_DEFAULT_NET_INPUT_BUFFER_SIZE 1
-#define WRD_DEFAULT_SOCKET_PORT 6251
+#define WRD_DEFAULT_PORT 6251
 #define WRD_DEFAULT_TIMING 1
 
 // Server
@@ -290,7 +290,7 @@ typedef struct warudo {
     int net_buffer_size;
     int net_headers_buffer_size;
     int net_input_buffer_size;
-    int socket_port;
+    int port;
     int timing;
     // Server
     char *pid_file;

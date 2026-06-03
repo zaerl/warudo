@@ -5,7 +5,7 @@ The configuration file is an UTF-8 text file that contains configurations saved
 in the RFC 8259 JSON syntax and also the JSON5 estensions.
 
 All configuration can also be passed as an environment variable to the
-executable. For example `socket_port` can be passed as the `WRD_SOCKET_PORT`
+executable. For example `port` can be passed as the `WRD_PORT`
 variable.
 */
 
@@ -21,27 +21,17 @@ variable.
     net_buffer_size: 1,
     net_headers_buffer_size: 4096,
     net_input_buffer_size: 1,
-    socket_port: 6251,
+    port: 6251,
+    tls_port: 443,
     timing: 1,
     // Server
-    // In this file is saved the PID of the master process.
     pid_file: "/var/run/warudo.pid",
     worker_processes: "auto",
-    // Keep-alive timeout in seconds (0 = disabled).
     keep_alive_timeout: 30,
-    // Maximum number of requests per keep-alive connection.
     keep_alive_max: 100,
-    // Document root for static file serving (null = disabled).
     document_root: null,
-    // TLS
-    // Enable TLS/HTTPS (0 = disabled, 1 = enabled).
     tls_enabled: 0,
-    // Path to the TLS certificate file (PEM format).
     tls_cert_path: null,
-    // Path to the TLS private key file (PEM format).
     tls_key_path: null,
-    // Port for HTTPS when TLS is enabled. The socket_port serves HTTP redirects.
-    tls_port: 443,
-    // HSTS max-age in seconds (0 = disabled). When > 0, adds Strict-Transport-Security header to HTTPS responses and redirects HTTP to HTTPS.
     hsts_max_age: 0,
 }

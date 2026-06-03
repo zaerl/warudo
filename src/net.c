@@ -68,12 +68,12 @@ WRD_API wrd_code wrd_net_init(warudo *config, int backlog) {
     memset(config->net_input_buffer.buffer, 0, config->net_input_buffer.size);
 
     // When TLS is enabled with HSTS, bind two sockets: server_fd for HTTP (redirects) or
-    // server_tls_fd for HTTPS. Otherwise, bind a single socket on socket_port.
+    // server_tls_fd for HTTPS. Otherwise, bind a single socket on port.
     if(config->tls_enabled && config->hsts_max_age > 0) {
-        if(config->socket_port == config->tls_port) {
+        if(config->port == config->tls_port) {
             wrd_log_error(config,
-                "socket_port and tls_port cannot be the same (%d)%s\n",
-                config->socket_port, "");
+                "port and tls_port cannot be the same (%d)%s\n",
+                config->port, "");
 
             return WRD_INVALID_CONFIG;
         }
@@ -84,7 +84,7 @@ WRD_API wrd_code wrd_net_init(warudo *config, int backlog) {
         }
 
         struct sockaddr_in http_address;
-        config->server_fd = wrd_create_socket(config->socket_port, &http_address, backlog);
+        config->server_fd = wrd_create_socket(config->port, &http_address, backlog);
 
         if(config->server_fd == -1) {
             close(config->server_tls_fd);
@@ -93,7 +93,7 @@ WRD_API wrd_code wrd_net_init(warudo *config, int backlog) {
             return WRD_SOCKET_ERROR;
         }
     } else {
-        int port = config->tls_enabled ? config->tls_port : config->socket_port;
+        int port = config->tls_enabled ? config->tls_port : config->port;
         config->server_fd = wrd_create_socket(port, &config->address, backlog);
 
         if(config->server_fd == -1) {
