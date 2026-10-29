@@ -49,6 +49,6 @@ start_line = "// Start tests declarations."
 generate_file("tests/test.h", start_line, "\n\n", ";\n".join(functs) + ";")
 generate_file("tests/test.c", start_line, "\n\n", "\n".join(run_macro))
 
-start_line = "attractor/attractor.c\n   "
+start_line = "set(TEST_SOURCES\n   "
 replacement = ".c\n    ".join(names) + ".c\n"
 generate_file("tests/CMakeLists.txt", start_line, ")\n", replacement)
