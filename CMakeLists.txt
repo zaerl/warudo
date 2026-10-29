@@ -10,6 +10,11 @@ project(
 if(APPLE)
     link_directories("/opt/homebrew/lib")
     include_directories("/opt/homebrew/include")
+
+    # Homebrew OpenSSL is keg-only, point FindOpenSSL at it.
+    if(NOT OPENSSL_ROOT_DIR AND EXISTS "/opt/homebrew/opt/openssl")
+        set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl")
+    endif()
 endif()
 
 if(NOT CMAKE_BUILD_TYPE)
