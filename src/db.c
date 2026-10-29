@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 
 #include "warudo.h"
 
@@ -399,6 +400,34 @@ WRD_API wrd_code wrd_add_entries(int entry_type, warudo *config) {
     return count ? WRD_OK : WRD_EMPTY_CONTENT_ERROR;
 }
 
+WRD_API const char *wrd_db_order_by(const char *value) {
+    if(value == NULL) {
+        return "id";
+    }
+
+    const char *columns[] = { "id", "created", "modified" };
+
+    for(size_t i = 0; i < sizeof(columns) / sizeof(columns[0]); ++i) {
+        if(strcmp(value, columns[i]) == 0) {
+            return columns[i];
+        }
+    }
+
+    return NULL;
+}
+
+WRD_API const char *wrd_db_sort(const char *value) {
+    if(value == NULL || strcasecmp(value, "ASC") == 0) {
+        return "ASC";
+    }
+
+    if(strcasecmp(value, "DESC") == 0) {
+        return "DESC";
+    }
+
+    return NULL;
+}
+
 WRD_API wrd_code wrd_get_entries(int entry_type, warudo *config) {
     CHECK_CONFIG
 
@@ -412,8 +441,15 @@ WRD_API wrd_code wrd_get_entries(int entry_type, warudo *config) {
     int limit_index = 0;
     int has_search = !config->query.id && config->query.key != NULL && config->query.value != NULL;
     const char *table_name = entry_type == WRD_ENTRY_TYPE_DATA ? "entries" : "dashboards";
-    const char *order_by = config->query.orderby ? config->query.orderby : "id";
-    const char *sort = config->query.sort ? config->query.sort : "ASC";
+    const char *order_by = wrd_db_order_by(config->query.orderby);
+    const char *sort = wrd_db_sort(config->query.sort);
+
+    // Identifiers can't be bound, so only whitelisted constants reach the query.
+    if(order_by == NULL || sort == NULL) {
+        wrd_http_bad_request(config, u8"Invalid orderby or sort.");
+
+        return WRD_ERROR;
+    }
 
     /*
      * Has search

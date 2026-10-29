@@ -377,6 +377,8 @@ WRD_API wrd_code wrd_db_init(const char *filename, warudo *config);
 WRD_API wrd_code wrd_db_close(warudo *config);
 WRD_API wrd_code wrd_db_add_header(warudo *config, const char *name, const char *value);
 unsigned long long wrd_last_insert_rowid(warudo *config);
+WRD_API const char *wrd_db_order_by(const char *value);
+WRD_API const char *wrd_db_sort(const char *value);
 WRD_API wrd_code wrd_parse_json(warudo *config);
 WRD_API wrd_code wrd_add_index(const char *filename, warudo *config);
 WRD_API wrd_code wrd_add_entry(int entry_type, warudo *config);
