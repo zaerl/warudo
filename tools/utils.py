@@ -1,4 +1,3 @@
-import json
 import sys
 
 
@@ -48,45 +47,3 @@ def generate_content(
         "start_pos": start_pos,
         "text": new_file,
     }
-
-
-# Function to get a value from a list safely.
-def safe_get(lst: list | None, index: int, default=None) -> any:
-    if isinstance(lst, list) and 0 <= index < len(lst):
-        return lst[index]
-
-    return default
-
-
-# Transform a value to a configuration file value.
-def value_to_conf(value: str | int | None) -> str | int:
-    if value is None:
-        return "null"
-
-    if isinstance(value, int):
-        return value
-
-    return '"' + value.replace('"', '\\"') + '"'
-
-
-# Add indentation to a list of values.
-def add_indent(values: str, indentation=1) -> list[str]:
-    indentation = " " * indentation * 4
-
-    return [f"{indentation}{value}" for value in values]
-
-
-# Transform a value to a C file value.
-def value_to_c(value: str | int | None, is_int=False) -> str | int:
-    if value is None:
-        return "NULL"
-
-    if is_int:
-        return value
-
-    return '"' + str(value).replace('"', '\\"') + '"'
-
-
-def get_data_from_json_file(path: str) -> list | dict:
-    with open(path, "r") as f:
-        return json.load(f)
