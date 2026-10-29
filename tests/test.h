@@ -6,7 +6,7 @@
 #include <string.h>
 
 #include "../src/warudo.h"
-#include "./attractor/attractor.h"
+#include "attractor.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +22,7 @@ extern "C" {
 #define WRD_MOCK_FILE(CONTENT) \
     FREE_MOCK_FILE \
     tmp_mock_file = wrd_mock_file(CONTENT); \
-    if(!tmp_mock_file) ATT_ASSERT(0, 1, "wrd_mock_file() failed")
+    if(!tmp_mock_file) ATT_ASSERT(0, 1, "wrd_mock_file() failed");
 
 #define FREE_MOCK_FILE \
     if(tmp_mock_file) { \

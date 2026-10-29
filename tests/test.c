@@ -9,6 +9,9 @@
 
 #include "test.h"
 
+#define ATT_IMPLEMENTATION
+#include "attractor.h"
+
 int show_version(void) {
     printf("%s v%s\n", WRD_NAME, WRD_VERSION);
 

@@ -10,14 +10,14 @@ char *wrd_mock_file(const char *content) {
     int fd = mkstemp(template);
 
     if(fd == -1) {
-        ATT_ASSERT(0, 1, "mkstemp() failed")
+        ATT_ASSERT(0, 1, "mkstemp() failed");
 
         return NULL;
     }
 
     if(content) {
         if(write(fd, content, strlen(content)) == -1) {
-            ATT_ASSERT(0, 1, "fputs() failed")
+            ATT_ASSERT(0, 1, "fputs() failed");
 
             return NULL;
         }

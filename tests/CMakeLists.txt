@@ -1,5 +1,4 @@
 set(TEST_SOURCES
-    attractor/attractor.c
     auth.c
     code.c
     conf.c
