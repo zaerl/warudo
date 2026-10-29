@@ -12,7 +12,7 @@ make start          # build + run with debug settings
 make clean          # remove build directory
 ```
 
-Requires: CMake 3.14+, C17 compiler (Clang), Python 3.
+Requires: CMake 3.14+, C17 compiler (Clang), Python 3, OpenSSL 3.0+ development headers.
 
 Build output goes to `build/`. Binary: `build/src/warudo`. Test binary: `build/tests/warudo-test`.
 
@@ -67,10 +67,10 @@ Startup log lines between `// Configurations.` and `ret = wrd_db_init(...)`.
 
 ## TLS / HTTPS
 
-HTTPS support uses mbedTLS (4.x) with PSA Crypto for RNG. Key source files:
+HTTPS support uses OpenSSL 3.0+ (`libssl`). Key source files:
 
 - `src/tls.c` — TLS lifecycle: init (`wrd_init_tls`), per-connection handshake (`wrd_tls_handshake`), read/write wrappers, and cleanup (`wrd_tls_close`, `wrd_tls_finish_request`).
-- TLS state is stored as opaque pointers in the `warudo` struct: `tls_state` (server-wide config, certs, keys) and `tls_ssl` (per-connection SSL context).
+- TLS state is stored as opaque pointers in the `warudo` struct: `tls_state` (server-wide `SSL_CTX` with cert and key) and `tls_ssl` (per-connection `SSL`).
 - `src/net.c` — socket creation, `select()`-based multiplexing for dual HTTP/HTTPS ports, and read/send functions that transparently dispatch to TLS or plain sockets based on whether `tls_ssl` is set.
 - `src/worker.c` — worker loop performs TLS handshake after accept for HTTPS connections; plain HTTP connections are redirected to HTTPS when HSTS is active. `SIGPIPE` is ignored so broken connections return errors instead of killing workers.
 - `src/server.c` — TLS is initialized before forking workers and cleaned up on server close.

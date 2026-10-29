@@ -21,18 +21,16 @@ set(SOURCES
     worker.c
 )
 
-find_package(MbedTLS REQUIRED)
+find_package(OpenSSL 3.0 REQUIRED)
 add_library(warudo_lib STATIC ${SOURCES})
 target_link_libraries(warudo_lib
     PUBLIC
-        MbedTLS::mbedtls
-        MbedTLS::tfpsacrypto
-        MbedTLS::mbedx509
+        OpenSSL::SSL
+        OpenSSL::Crypto
 )
 
 # warudo
 add_executable(warudo main.c)
-# target_include_directories(warudo PRIVATE ${MbedTLS_INCLUDE_DIRS})
 target_link_libraries(warudo
     PRIVATE
         warudo_lib

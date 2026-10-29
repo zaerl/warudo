@@ -142,7 +142,7 @@ WRD_API wrd_code wrd_worker_loop(warudo *config) {
     CHECK_CONFIG
 
     // Ignore SIGPIPE so broken connections return errors instead of killing the worker process.
-    // Essential for TLS where mbedtls writes to sockets.
+    // Essential for TLS where the TLS library writes to sockets.
     signal(SIGPIPE, SIG_IGN);
 
     while(wrd_net_accept(config) == WRD_OK) {
