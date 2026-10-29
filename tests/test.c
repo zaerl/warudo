@@ -91,6 +91,7 @@ int main(int argc, char * const argv[]) {
         }
 
     // Start tests declarations.
+    RUN_TEST(app)
     RUN_TEST(auth)
     RUN_TEST(code)
     RUN_TEST(conf)
@@ -104,8 +105,7 @@ int main(int argc, char * const argv[]) {
     RUN_TEST(net)
     RUN_TEST(output)
     RUN_TEST(query)
-    RUN_TEST(route_app)
-    RUN_TEST(route_home)
+    RUN_TEST(route)
     RUN_TEST(server)
     RUN_TEST(timing)
     RUN_TEST(tls)

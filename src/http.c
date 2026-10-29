@@ -4,6 +4,7 @@
  * This file is distributed under the MIT License. See LICENSE for details.
  */
 
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -84,24 +85,6 @@ WRD_API wrd_code wrd_http_ok(warudo *config) {
     WRD_CHECK_CONNECTION(config)
 
     return wrd_http_header(config, "200 OK", "application/json");
-}
-
-WRD_API wrd_code wrd_http_created(warudo *config, unsigned long long int id) {
-    WRD_CHECK_CONNECTION(config)
-
-    wrd_http_header(config, "201 Created", "application/json");
-    wrd_http_printf(config, u8"{\"status\":\"success\",\"id\":%lld}", id);
-
-    return WRD_OK;
-}
-
-WRD_API wrd_code wrd_http_multi_created(warudo *config, unsigned long int count) {
-    WRD_CHECK_CONNECTION(config)
-
-    wrd_http_header(config, "201 Created", "application/json");
-    wrd_http_printf(config, u8"{\"status\":\"success\",\"count\":%lld}", count);
-
-    return WRD_OK;
 }
 
 WRD_API wrd_code wrd_http_not_allowed(warudo *config, const char *allowed) {
@@ -210,7 +193,6 @@ WRD_API wrd_code wrd_http_parse_query_headers(warudo *config) {
     config->request_query_string[0] = '\0';
     config->request_headers_count = 0;
     config->request_body_offset = 0;
-    config->page = WRD_PAGE_NOT_FOUND;
     config->http_version_major = 0;
     config->http_version_minor = 0;
 
@@ -355,17 +337,6 @@ WRD_API wrd_code wrd_http_parse_query_headers(warudo *config) {
 
         ++config->request_headers_count;
         pos = header_end + 2;
-    }
-
-    // Determine page from path.
-    if(strcmp(config->request_path, "/") == 0) {
-        config->page = WRD_PAGE_ROOT;
-    } else if(strcmp(config->request_path, "/app/entries") == 0) {
-        config->page = WRD_PAGE_APP;
-    } else if(strcmp(config->request_path, "/app/keys") == 0) {
-        config->page = WRD_PAGE_APP_KEYS;
-    } else if(strcmp(config->request_path, "/app/dashboards") == 0) {
-        config->page = WRD_PAGE_APP_VIEWS;
     }
 
     return WRD_OK;

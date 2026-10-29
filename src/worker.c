@@ -199,7 +199,6 @@ WRD_API wrd_code wrd_worker_loop(warudo *config) {
             }
 
             wrd_http_parse_query_headers(config);
-            wrd_parse_query_string(config, config->request_query_string);
 
             ++config->requests_count;
             ++request_count;
@@ -208,23 +207,7 @@ WRD_API wrd_code wrd_worker_loop(warudo *config) {
             keep_alive = wrd_should_keep_alive(config)
                 && request_count < config->keep_alive_max;
 
-            switch(config->page) {
-                case WRD_PAGE_ROOT:
-                    wrd_route_home(config);
-                    break;
-                case WRD_PAGE_APP:
-                    wrd_route_app(WRD_ENTRY_TYPE_DATA, config);
-                    break;
-                case WRD_PAGE_APP_KEYS:
-                    wrd_route_app_keys(config);
-                    break;
-                case WRD_PAGE_APP_VIEWS:
-                    wrd_route_app(WRD_ENTRY_TYPE_VIEW, config);
-                    break;
-                default:
-                    wrd_route_static(config);
-                    break;
-            }
+            wrd_route_dispatch(config);
 
             // Add Connection header after route handler has written status/headers.
             if(keep_alive) {

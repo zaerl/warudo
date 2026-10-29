@@ -8,10 +8,13 @@
 #include <string.h>
 
 #include "warudo.h"
+#include "sqlite3/sqlite3.h"
 
 // Init configurations with default values.
 WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
-    config->columns_count = 0;
+    config->app = NULL;
+    config->app_data = NULL;
+    config->routes_count = 0;
     config->requests_count = 0;
     config->timing_count = 0;
     config->timing_end_count = 0;

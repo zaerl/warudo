@@ -10,58 +10,6 @@
 
 #include "warudo.h"
 
-WRD_API wrd_code wrd_parse_query_string(warudo *config, char *query_string) {
-    CHECK_CONFIG
-
-    // Reset to defaults.
-    config->query.id = 0;
-    config->query.offset = 0;
-    config->query.limit = WRD_DEFAULT_QUERY_LIMIT;
-    config->query.multi = WRD_DEFAULT_QUERY_MULTI;
-    config->query.key = NULL;
-    config->query.value = NULL;
-    config->query.orderby = NULL;
-    config->query.sort = NULL;
-
-    if(query_string == NULL || query_string[0] == '\0') {
-        return WRD_OK;
-    }
-
-    char *saveptr;
-    char *parameter = strtok_r(query_string, "&", &saveptr);
-
-    while(parameter != NULL) {
-        char *delimiter = strchr(parameter, '=');
-
-        if(delimiter != NULL) {
-            int name_len = delimiter - parameter;
-            char *value = delimiter + 1;
-
-            if(name_len == 5 && strncmp(parameter, "limit", 5) == 0) {
-                config->query.limit = (unsigned int)strtol(value, NULL, 10);
-            } else if(name_len == 6 && strncmp(parameter, "offset", 6) == 0) {
-                config->query.offset = strtoull(value, NULL, 10);
-            } else if(name_len == 2 && strncmp(parameter, "id", 2) == 0) {
-                config->query.id = strtoull(value, NULL, 10);
-            } else if(name_len == 5 && strncmp(parameter, "multi", 5) == 0) {
-                config->query.multi = (unsigned int)strtol(value, NULL, 10);
-            } else if(name_len == 3 && strncmp(parameter, "key", 3) == 0) {
-                config->query.key = strdup(value);
-            } else if(name_len == 5 && strncmp(parameter, "value", 5) == 0) {
-                config->query.value = strdup(value);
-            } else if(name_len == 7 && strncmp(parameter, "orderby", 7) == 0) {
-                config->query.orderby = strdup(value);
-            } else if(name_len == 4 && strncmp(parameter, "sort", 4) == 0) {
-                config->query.sort = strdup(value);
-            }
-        }
-
-        parameter = strtok_r(NULL, "&", &saveptr);
-    }
-
-    return WRD_OK;
-}
-
 WRD_API char *wrd_url_decode(const char *input) {
     if(input == NULL) {
         return NULL;

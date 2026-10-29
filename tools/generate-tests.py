@@ -4,6 +4,7 @@ from utils import generate_file
 
 # Use glob to find all .c files.
 c_files = glob.glob("src/*.c")
+c_files += glob.glob("src/app/*.c")
 c_files += glob.glob("cli/*.c")
 
 # The main.c file don't need to be tested.
@@ -18,9 +19,10 @@ names: list[str] = []
 run_macro: list[str] = []
 
 for file in c_files:
-    base_name = os.path.basename(file)
-    name = os.path.splitext(base_name)[0]
-    c_name = name.replace("-", "_")
+    # Path relative to the source root, e.g. "http" or "app/db".
+    root = "cli" if file.startswith("cli/") else "src"
+    name = os.path.splitext(os.path.relpath(file, root))[0]
+    c_name = os.path.basename(name).replace("-", "_")
     func = f"void *test_{c_name}(void *arg)"
 
     # Code to generate the test function.

@@ -30,7 +30,6 @@ void *test_http(void *arg) {
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse simple GET");
     ATT_ASSERT(config.request_method, WRD_REQUEST_GET, "Method is GET");
     ATT_ASSERT(strcmp(config.request_path, "/"), 0, "Path is /");
-    ATT_ASSERT(config.page, WRD_PAGE_ROOT, "Page is root");
     ATT_ASSERT(config.http_version_major, 1, "HTTP major version");
     ATT_ASSERT(config.http_version_minor, 1, "HTTP minor version");
     ATT_ASSERT(config.request_headers_count, 1, "One header parsed");
@@ -40,7 +39,6 @@ void *test_http(void *arg) {
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse POST");
     ATT_ASSERT(config.request_method, WRD_REQUEST_POST, "Method is POST");
     ATT_ASSERT(strcmp(config.request_path, "/app/entries"), 0, "Path is /app/entries");
-    ATT_ASSERT(config.page, WRD_PAGE_APP, "Page is app");
     ATT_ASSERT(config.request_headers_count, 3, "Three headers parsed");
 
     // Test: GET with query string.
@@ -48,7 +46,6 @@ void *test_http(void *arg) {
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse GET with query string");
     ATT_ASSERT(strcmp(config.request_path, "/app/entries"), 0, "Path without query string");
     ATT_ASSERT(strcmp(config.request_query_string, "limit=5&offset=10"), 0, "Query string parsed");
-    ATT_ASSERT(config.page, WRD_PAGE_APP, "Page is app with query");
 
     // Test: HEAD request.
     mock_request(&config, "HEAD / HTTP/1.1\r\nHost: localhost\r\n\r\n");
@@ -112,17 +109,14 @@ void *test_http(void *arg) {
     // Test: /app/keys route.
     mock_request(&config, "GET /app/keys HTTP/1.1\r\n\r\n");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse /app/keys");
-    ATT_ASSERT(config.page, WRD_PAGE_APP_KEYS, "Page is app keys");
 
     // Test: /app/dashboards route.
     mock_request(&config, "GET /app/dashboards HTTP/1.1\r\n\r\n");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse /app/dashboards");
-    ATT_ASSERT(config.page, WRD_PAGE_APP_VIEWS, "Page is app views");
 
     // Test: unknown path.
     mock_request(&config, "GET /unknown HTTP/1.1\r\n\r\n");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse unknown path");
-    ATT_ASSERT(config.page, WRD_PAGE_NOT_FOUND, "Unknown path is not found");
 
     // Test: malformed request (no space).
     mock_request(&config, "GETHTTP/1.1\r\n\r\n");

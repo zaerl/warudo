@@ -3,7 +3,6 @@ set(SOURCES
     code.c
     conf.c
     data.c
-    db.c
     env.c
     fs.c
     hpack.c
@@ -12,8 +11,7 @@ set(SOURCES
     net.c
     output.c
     query.c
-    route-app.c
-    route-home.c
+    route.c
     server.c
     timing.c
     tls.c
@@ -29,10 +27,19 @@ target_link_libraries(warudo_lib
         OpenSSL::Crypto
 )
 
+# Example entries application
+set(APP_SOURCES
+    app/app.c
+    app/db.c
+)
+
+add_library(warudo_app STATIC ${APP_SOURCES})
+target_link_libraries(warudo_app PUBLIC warudo_lib)
+
 # warudo
 add_executable(warudo main.c)
 target_link_libraries(warudo
     PRIVATE
-        warudo_lib
+        warudo_app
         warudo_sqlite
 )

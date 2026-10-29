@@ -1,4 +1,5 @@
-#include "test.h"
+#include "../test.h"
+#include "../../src/app/app.h"
 
 void *test_db(void *arg) {
     ASSERT_CODE(wrd_db_close(NULL), WRD_ERROR, "wrd_db_close NULL")

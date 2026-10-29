@@ -1,9 +1,10 @@
 set(TEST_SOURCES
+    app/app.c
+    app/db.c
     auth.c
     code.c
     conf.c
     data.c
-    db.c
     env.c
     fs.c
     hpack.c
@@ -12,8 +13,7 @@ set(TEST_SOURCES
     net.c
     output.c
     query.c
-    route-app.c
-    route-home.c
+    route.c
     server.c
     test.c
     test-utils.c
@@ -24,4 +24,4 @@ set(TEST_SOURCES
 )
 
 add_executable(warudo-test ${TEST_SOURCES})
-target_link_libraries(warudo-test PRIVATE warudo_lib warudo_sqlite)
+target_link_libraries(warudo-test PRIVATE warudo_app warudo_sqlite)

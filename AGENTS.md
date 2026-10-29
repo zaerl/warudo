@@ -18,7 +18,8 @@ Build output goes to `build/`. Binary: `build/src/warudo`. Test binary: `build/t
 
 ## Project structure
 
-- `src/` - server source (C files + `warudo.h` main header)
+- `src/` - server core (C files + `warudo.h` main header), built as `warudo_lib`
+- `src/app/` - example JSON entries application (`app.h`), built as `warudo_app` on top of the core
 - `src/sqlite3/` - bundled SQLite/HCTree
 - `tests/` - tests using [Attractor](https://github.com/zaerl/attractor) framework, mirrors `src/` file structure
 - `tools/` - Python code generators (`generate-config.py`, `generate-tests.py`, `code-coverage.py`)
@@ -76,6 +77,16 @@ HTTPS support uses OpenSSL 3.0+ (`libssl`). Key source files:
 - `src/server.c` — TLS is initialized before forking workers and cleaned up on server close.
 
 Config keys: `tls_enabled`, `tls_cert_path`, `tls_key_path`, `tls_port`, `hsts_max_age`. Set these in `warudo.conf` or via `WRD_TLS_ENABLED`, `WRD_TLS_CERT_PATH`, `WRD_TLS_KEY_PATH`, `WRD_TLS_PORT`, `WRD_HSTS_MAX_AGE` env vars. When `tls_enabled` is on and `hsts_max_age > 0`, the server listens on both `port` (HTTP, sends 301 redirects) and `tls_port` (HTTPS).
+
+## Applications and routing
+
+The core knows nothing about the application. An app is a `wrd_app` (`init`/`close` hooks) passed to `wrd_server_init(config, &app)`:
+
+- `init` runs once after the configuration is loaded and before workers fork. It allocates its state in `config->app_data` and registers routes with `wrd_route_add(config, "/path", handler)`.
+- `close` runs first in `wrd_server_close`, while the configuration is still loaded.
+- `src/route.c` dispatches each request by exact path match; unmatched paths fall back to `wrd_route_static`. Handlers check the HTTP method and parse the raw `config->request_query_string` themselves.
+
+`src/main.c` wires in the example app (`wrd_entries_app` from `src/app/app.c`). Tests for `src/app/*.c` live in `tests/app/`.
 
 ## Configuration
 

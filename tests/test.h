@@ -40,6 +40,7 @@ void wrd_assert_code(int result, int expected, const char *description);
 char *wrd_mock_file(const char *content);
 
 // Start tests declarations.
+void *test_app(void *arg);
 void *test_auth(void *arg);
 void *test_code(void *arg);
 void *test_conf(void *arg);
@@ -53,8 +54,7 @@ void *test_log(void *arg);
 void *test_net(void *arg);
 void *test_output(void *arg);
 void *test_query(void *arg);
-void *test_route_app(void *arg);
-void *test_route_home(void *arg);
+void *test_route(void *arg);
 void *test_server(void *arg);
 void *test_timing(void *arg);
 void *test_tls(void *arg);

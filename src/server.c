@@ -22,7 +22,7 @@ static void wrd_signal_handler(int sig) {
     wrd_shutdown = 1;
 }
 
-WRD_API wrd_code wrd_server_init(warudo *config) {
+WRD_API wrd_code wrd_server_init(warudo *config, const wrd_app *app) {
     if(!config) {
         return WRD_ERROR;
     }
@@ -77,12 +77,16 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
     wrd_log_info(config, u8"Tls Port: %d [%c]\n", config->tls_port, wrd_get_config_status(config, WRD_TLS_PORT));
     wrd_log_info(config, u8"Hsts Max Age: %d [%c]\n", config->hsts_max_age, wrd_get_config_status(config, WRD_HSTS_MAX_AGE));
 
-    ret = wrd_db_init(config->db_path, config);
+    config->app = app;
 
-    if(ret != WRD_OK) {
-        wrd_server_close(config);
+    if(app && app->init) {
+        ret = app->init(config);
 
-        return WRD_DB_INIT_ERROR;
+        if(ret != WRD_OK) {
+            wrd_server_close(config);
+
+            return ret;
+        }
     }
 
     // Initialize TLS before forking workers so config is shared.
@@ -114,13 +118,9 @@ WRD_API wrd_code wrd_server_init(warudo *config) {
             return ret;
         }
 
-        config->page = -1;
         config->request_method = WRD_REQUEST_UNKNOWN;
         config->script_name = NULL;
         config->query_string = NULL;
-
-        // Query string
-        wrd_parse_query_string(config, NULL);
 
         wrd_worker_loop(config);
 
@@ -248,11 +248,15 @@ WRD_API wrd_code wrd_server_close(warudo *config) {
         unlink(config->pid_file);
     }
 
+    // Close the application first, while the configuration is still loaded.
+    if(config->app && config->app->close) {
+        config->app->close(config);
+    }
+
     wrd_tls_close(config);
     wrd_config_close(config);
     wrd_worker_close(config);
     wrd_net_close(config);
-    wrd_db_close(config);
 
     if(config->net_headers_buffer.buffer != NULL) {
         free(config->net_headers_buffer.buffer);
