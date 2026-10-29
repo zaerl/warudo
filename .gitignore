@@ -102,3 +102,9 @@ __pycache__/
 .claude/*
 
 *.pem
+
+# OS
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
