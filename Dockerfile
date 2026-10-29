@@ -2,6 +2,7 @@
 FROM alpine:latest AS build
 
 RUN apk update && apk add --no-cache \
+    build-base \
     clang \
     cmake \
     lldb-dev \
@@ -19,7 +20,7 @@ WORKDIR /app
 COPY CMakeLists.txt .
 COPY Makefile .
 COPY src ./src/
-COPY test ./test/
+COPY tests ./tests/
 COPY warudo.conf.default ./warudo.conf
 
 # musl's unistd.h header is located at the system headers root folder,

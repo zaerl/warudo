@@ -40,7 +40,7 @@ docker:
 
 test: BUILD_TYPE = Test
 test: configure build
-	build/test/warudo-test $(ARGS)
+	build/tests/warudo-test $(ARGS)
 
 clean_build:
 	@cmake --build $(BUILD_DIR) --target clean

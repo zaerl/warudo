@@ -14,13 +14,13 @@ make clean          # remove build directory
 
 Requires: CMake 3.14+, C17 compiler (Clang), Python 3.
 
-Build output goes to `build/`. Binary: `build/src/warudo`. Test binary: `build/test/warudo-test`.
+Build output goes to `build/`. Binary: `build/src/warudo`. Test binary: `build/tests/warudo-test`.
 
 ## Project structure
 
 - `src/` - server source (C files + `warudo.h` main header)
 - `src/sqlite3/` - bundled SQLite/HCTree
-- `test/` - tests using [Attractor](https://github.com/zaerl/attractor) framework, mirrors `src/` file structure
+- `tests/` - tests using [Attractor](https://github.com/zaerl/attractor) framework, mirrors `src/` file structure
 - `tools/` - Python code generators (`generate-config.py`, `generate-tests.py`, `code-coverage.py`)
 - `warudo.conf.default` - default config (JSON5 format), copy to `warudo.conf` to customize
 - `TESTS.md` - test coverage tracking

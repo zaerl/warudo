@@ -20,7 +20,7 @@
 ** The content in this amalgamation comes from Fossil check-in
 ** 0902dcd54c474b998f8c047abf047d125208 with changes in files:
 **
-**    
+**
 */
 #ifndef SQLITE_AMALGAMATION
 #define SQLITE_CORE 1
@@ -171740,7 +171740,7 @@ static int whereLoopAddBtreeIndex(
               /* Detect when two or more columns of an index match the same
               ** column of a vector IN operater, and avoid adding the column
               ** to the WhereLoop more than once.  See tag-20250707-01
-              ** in test/rowvalue.test */
+              ** in tests/rowvalue.test */
               bRedundant = 1;
             }
           }
@@ -174634,7 +174634,7 @@ static int wherePathSolver(WhereInfo *pWInfo, LogEst nRowEst){
 **       |-- SEARCH t2                       `-- SEARCH t1
 **       `-- SORT USING B-TREE
 **
-** See test cases in test/whereN.test for the real-world query that
+** See test cases in tests/whereN.test for the real-world query that
 ** originally provoked this heuristic.
 */
 static SQLITE_NOINLINE void whereInterstageHeuristic(WhereInfo *pWInfo){

@@ -28,7 +28,7 @@ for file in c_files:
     names.append(name)
     run_macro.append(f"    RUN_TEST({c_name})")
 
-    dest_filename = f"test/{name}.c"
+    dest_filename = f"tests/{name}.c"
 
     if not os.path.exists(dest_filename):
         new_file = f'#include "test.h"\n\n{func} {{\n    return NULL;\n}}\n'
@@ -46,9 +46,9 @@ names.sort()
 run_macro.sort()
 
 start_line = "// Start tests declarations."
-generate_file("test/test.h", start_line, "\n\n", ";\n".join(functs) + ";")
-generate_file("test/test.c", start_line, "\n\n", "\n".join(run_macro))
+generate_file("tests/test.h", start_line, "\n\n", ";\n".join(functs) + ";")
+generate_file("tests/test.c", start_line, "\n\n", "\n".join(run_macro))
 
 start_line = "attractor/attractor.c\n   "
 replacement = ".c\n    ".join(names) + ".c\n"
-generate_file("test/CMakeLists.txt", start_line, ")\n", replacement)
+generate_file("tests/CMakeLists.txt", start_line, ")\n", replacement)

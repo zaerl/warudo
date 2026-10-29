@@ -56,7 +56,7 @@ def analyze_output(output: str) -> Coverage:
             if match:
                 found_str = match.group(2)
                 if verbose:
-                    replace = f"\x1B[32m{found_str}\033[0m"
+                    replace = f"\x1b[32m{found_str}\033[0m"
                     print(line.replace(found_str, replace, 1))
 
                 coverage[found_str] = 0
@@ -89,7 +89,7 @@ def analyze_test(output: str, coverage: Coverage) -> Coverage:
 output = run_process("clang-query -f tools/src-query.txt ./src/*.h")
 coverage = analyze_output(output)
 
-output = run_process("clang-query -f tools/test-query.txt ./test/*.c")
+output = run_process("clang-query -f tools/test-query.txt ./tests/*.c")
 coverage = analyze_test(output, coverage)
 
 total = 0
