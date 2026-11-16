@@ -1,5 +1,5 @@
 # Warudo
-Warudo is a lightweight HTTPS web server written in C17 with no run-time
+Warudo is a lightweight HTTPS web server written in C++20 with no run-time
 dependencies and a client that processes JSON data.
 
 ## Installation
@@ -13,7 +13,7 @@ Use the prebuilt binaries if you want to use this. But if you want to compile
 Warudo you will need some tools.
 
 1. [CMake](https://cmake.org).
-2. [Clang](https://clang.llvm.org) or another C17-capable compiler.
+2. [Clang](https://clang.llvm.org) or another C++20-capable compiler.
 3. [Python](https://www.python.org/).
 
 After installing the required tools run:

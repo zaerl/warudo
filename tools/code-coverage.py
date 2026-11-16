@@ -89,7 +89,7 @@ def analyze_test(output: str, coverage: Coverage) -> Coverage:
 output = run_process("clang-query -f tools/src-query.txt ./src/*.h")
 coverage = analyze_output(output)
 
-output = run_process("clang-query -f tools/test-query.txt ./tests/*.c")
+output = run_process("clang-query -f tools/test-query.txt ./tests/*.cpp")
 coverage = analyze_test(output, coverage)
 
 total = 0

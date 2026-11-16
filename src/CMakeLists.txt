@@ -1,22 +1,22 @@
 set(SOURCES
-    auth.c
-    code.c
-    conf.c
-    data.c
-    env.c
-    fs.c
-    hpack.c
-    http.c
-    log.c
-    net.c
-    output.c
-    query.c
-    route.c
-    server.c
-    timing.c
-    tls.c
-    version.c
-    worker.c
+    auth.cpp
+    code.cpp
+    conf.cpp
+    data.cpp
+    env.cpp
+    fs.cpp
+    hpack.cpp
+    http.cpp
+    log.cpp
+    net.cpp
+    output.cpp
+    query.cpp
+    route.cpp
+    server.cpp
+    timing.cpp
+    tls.cpp
+    version.cpp
+    worker.cpp
 )
 
 find_package(OpenSSL 3.0 REQUIRED)
@@ -29,15 +29,15 @@ target_link_libraries(warudo_lib
 
 # Example entries application
 set(APP_SOURCES
-    app/app.c
-    app/db.c
+    app/app.cpp
+    app/db.cpp
 )
 
 add_library(warudo_app STATIC ${APP_SOURCES})
 target_link_libraries(warudo_app PUBLIC warudo_lib)
 
 # warudo
-add_executable(warudo main.c)
+add_executable(warudo main.cpp)
 target_link_libraries(warudo
     PRIVATE
         warudo_app

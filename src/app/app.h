@@ -7,10 +7,6 @@
 #ifndef WARUDO_APP_H
 #define WARUDO_APP_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "../warudo.h"
 #include "../sqlite3/sqlite3.h"
 
@@ -83,9 +79,5 @@ WRD_API wrd_code wrd_formdata_callback(const char *input, long int length, warud
 WRD_API wrd_code wrd_add_entries(int entry_type, warudo *config);
 WRD_API wrd_code wrd_get_entries(int entry_type, warudo *config);
 WRD_API wrd_code wrd_get_keys(warudo *config);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // WARUDO_APP_H

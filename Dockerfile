@@ -13,8 +13,9 @@ RUN apk update && apk add --no-cache \
     python3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Clang as the default C compiler
+# Set Clang as the default C and C++ compiler
 ENV CC=clang
+ENV CXX=clang++
 
 WORKDIR /app
 COPY CMakeLists.txt .

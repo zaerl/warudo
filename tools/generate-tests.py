@@ -2,17 +2,17 @@ import glob
 import os
 from utils import generate_file
 
-# Use glob to find all .c files.
-c_files = glob.glob("src/*.c")
-c_files += glob.glob("src/app/*.c")
-c_files += glob.glob("cli/*.c")
+# Use glob to find all .cpp files.
+c_files = glob.glob("src/*.cpp")
+c_files += glob.glob("src/app/*.cpp")
+c_files += glob.glob("cli/*.cpp")
 
-# The main.c file don't need to be tested.
-if "src/main.c" in c_files:
-    c_files.remove("src/main.c")
+# The main.cpp file don't need to be tested.
+if "src/main.cpp" in c_files:
+    c_files.remove("src/main.cpp")
 
-if "cli/main.c" in c_files:
-    c_files.remove("cli/main.c")
+if "cli/main.cpp" in c_files:
+    c_files.remove("cli/main.cpp")
 
 functs: list[str] = []
 names: list[str] = []
@@ -30,7 +30,7 @@ for file in c_files:
     names.append(name)
     run_macro.append(f"    RUN_TEST({c_name})")
 
-    dest_filename = f"tests/{name}.c"
+    dest_filename = f"tests/{name}.cpp"
 
     if not os.path.exists(dest_filename):
         new_file = f'#include "test.h"\n\n{func} {{\n    return NULL;\n}}\n'
@@ -49,8 +49,8 @@ run_macro.sort()
 
 start_line = "// Start tests declarations."
 generate_file("tests/test.h", start_line, "\n\n", ";\n".join(functs) + ";")
-generate_file("tests/test.c", start_line, "\n\n", "\n".join(run_macro))
+generate_file("tests/test.cpp", start_line, "\n\n", "\n".join(run_macro))
 
 start_line = "set(TEST_SOURCES\n   "
-replacement = ".c\n    ".join(names) + ".c\n"
+replacement = ".cpp\n    ".join(names) + ".cpp\n"
 generate_file("tests/CMakeLists.txt", start_line, ")\n", replacement)
