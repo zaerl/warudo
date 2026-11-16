@@ -13,12 +13,11 @@ RUN apk update && apk add --no-cache \
     python3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Set Clang as the default C and C++ compiler
-ENV CC=clang
+# Set Clang as the default C++ compiler
 ENV CXX=clang++
 
 WORKDIR /app
-COPY CMakeLists.txt .
+COPY CMakeLists.txt CMakePresets.json ./
 COPY Makefile .
 COPY src ./src/
 COPY tests ./tests/
@@ -35,5 +34,5 @@ RUN make build
 # FROM alpine:latest
 
 # WORKDIR /app
-# COPY --from=build /app/build/src/warudo /app/warudo.conf ./
-# ENTRYPOINT ["./build/src/warudo"]
+# COPY --from=build /app/build/release/src/warudo /app/warudo.conf ./
+# ENTRYPOINT ["./warudo"]

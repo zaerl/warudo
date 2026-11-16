@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux, Clang
+            os: ubuntu-24.04
+            cc: clang
+            cxx: clang++
+            preset: ci
+          - name: Linux, GCC
+            os: ubuntu-24.04
+            cc: gcc
+            cxx: g++
+            preset: ci
+          - name: Linux, Clang, sanitizers
+            os: ubuntu-24.04
+            cc: clang
+            cxx: clang++
+            preset: sanitize
+          - name: macOS, Apple Clang
+            os: macos-15
+            cc: clang
+            cxx: clang++
+            preset: ci
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libssl-dev
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }} --parallel
+
+      - name: Test
+        run: ctest --preset ${{ matrix.preset }}

@@ -27,16 +27,6 @@ WRD_API const char *wrd_error_description(wrd_code code, int extended) {
         // Error codes
         case WRD_ERROR:
             return extended ? "Generic error" : "ERROR";
-        case WRD_ADD_ERROR:
-            return extended ? "Error while adding a new entry" : "ADD_ERROR";
-        case WRD_DB_CLOSE_ERROR:
-            return extended ? "Error while closing the database" : "DB_CLOSE_ERROR";
-        case WRD_DB_ERROR:
-            return extended ? "Error while accessing the database" : "DB_ERROR";
-        case WRD_DB_INIT_ERROR:
-            return extended ? "Error while initializing the database" : "DB_INIT_ERROR";
-        case WRD_DB_OPEN_ERROR:
-            return extended ? "Error while opening the database" : "DB_OPEN_ERROR";
         case WRD_EMPTY_CONTENT_ERROR:
             return extended ? "Empty content" : "EMPTY_CONTENT_ERROR";
         case WRD_EMPTY_QUERY_STRING_ERROR:

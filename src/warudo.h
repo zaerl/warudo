@@ -45,11 +45,9 @@
 // Configurations.
 // Configuration names.
 typedef enum {
-    WRD_DB_PATH,
     WRD_LOG_LEVEL,
     WRD_ACCESS_ORIGIN,
     WRD_LISTEN_BACKLOG,
-    WRD_MAX_COLUMNS,
     WRD_NET_BUFFER_SIZE,
     WRD_NET_HEADERS_BUFFER_SIZE,
     WRD_NET_INPUT_BUFFER_SIZE,
@@ -67,8 +65,7 @@ typedef enum {
     WRD_HSTS_MAX_AGE,
 } wrd_config_name;
 
-// Database
-#define WRD_DEFAULT_DB_PATH "file:warudo.db?hctree=1"
+// Log
 typedef enum {
     WRD_LOG_LEVEL_NO_LOG,
     WRD_LOG_LEVEL_INFO,
@@ -81,7 +78,6 @@ typedef enum {
 // Net
 #define WRD_DEFAULT_ACCESS_ORIGIN NULL
 #define WRD_DEFAULT_LISTEN_BACKLOG 1024
-#define WRD_DEFAULT_MAX_COLUMNS 64
 #define WRD_DEFAULT_NET_BUFFER_SIZE 1
 #define WRD_DEFAULT_NET_HEADERS_BUFFER_SIZE 4096
 #define WRD_DEFAULT_NET_INPUT_BUFFER_SIZE 1
@@ -151,11 +147,6 @@ typedef enum {
 
     // Error codes
     WRD_ERROR = -1,
-    WRD_ADD_ERROR = -2,
-    WRD_DB_CLOSE_ERROR = -3,
-    WRD_DB_ERROR = -4,
-    WRD_DB_INIT_ERROR = -5,
-    WRD_DB_OPEN_ERROR = -6,
     WRD_EMPTY_CONTENT_ERROR = -7,
     WRD_EMPTY_QUERY_STRING_ERROR = -8,
     WRD_INIT_REQUEST_ERROR = -9,
@@ -214,27 +205,17 @@ typedef struct wrd_route {
     wrd_route_handler handler;
 } wrd_route;
 
-// An application plugged into the server. Both hooks are optional.
-typedef struct wrd_app {
-    // Called once after the configuration is loaded, before workers fork. Register routes here.
-    wrd_code (*init)(warudo *config);
-    // Called when the server closes.
-    wrd_code (*close)(warudo *config);
-} wrd_app;
-
 // Main Warudo confuguration.
 typedef struct warudo {
     // Configurations.
 
-    char config_status[20];
+    char config_status[18];
 
-    // Database
-    char *db_path;
+    // Log
     wrd_log_level log_level;
     // Net
     char *access_origin;
     int listen_backlog;
-    int max_columns;
     int net_buffer_size;
     int net_headers_buffer_size;
     int net_input_buffer_size;
@@ -277,9 +258,7 @@ typedef struct warudo {
     wrd_buffer net_buffer;
     wrd_buffer net_input_buffer;
 
-    // Application.
-    const wrd_app *app;
-    void *app_data;
+    // Routes.
     wrd_route routes[WRD_MAX_ROUTES];
     unsigned int routes_count;
 
@@ -385,7 +364,7 @@ WRD_API wrd_route_handler wrd_route_find(warudo *config, const char *path);
 WRD_API wrd_code wrd_route_dispatch(warudo *config);
 
 // Server
-WRD_API wrd_code wrd_server_init(warudo *config, const wrd_app *app);
+WRD_API wrd_code wrd_server_init(warudo *config);
 WRD_API wrd_code wrd_server_save_pid(warudo *config);
 WRD_API wrd_code wrd_server_loop(warudo *config);
 WRD_API wrd_code wrd_server_close(warudo *config);

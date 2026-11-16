@@ -1,6 +1,6 @@
 # Warudo
-Warudo is a lightweight HTTPS web server written in C++20 with no run-time
-dependencies and a client that processes JSON data.
+Warudo is a lightweight HTTPS web server written in C++20. Its only external
+dependency is OpenSSL.
 
 ## Installation
 Warudo is a standalone application and doesn't rely on external libraries. The
@@ -12,7 +12,7 @@ copy it somewhere in the filesystem.
 Use the prebuilt binaries if you want to use this. But if you want to compile
 Warudo you will need some tools.
 
-1. [CMake](https://cmake.org).
+1. [CMake](https://cmake.org) 3.21 or newer.
 2. [Clang](https://clang.llvm.org) or another C++20-capable compiler.
 3. [Python](https://www.python.org/).
 
@@ -21,6 +21,10 @@ After installing the required tools run:
 ```sh
 make
 ```
+
+The binary is written to `build/release/src/warudo`. The build uses
+[CMake presets](CMakePresets.json), so `cmake --preset release` followed by
+`cmake --build --preset release` works too.
 
 ## Usage
 Warudo by default reads a file called `warudo.conf` in the same folder of the
@@ -67,4 +71,3 @@ Warudo is built using the work of extraordinary individuals and teams.
 
 1. CMake is distributed under the [OSI-approved BSD 3-clause License](https://gitlab.kitware.com/cmake/cmake/raw/master/Copyright.txt).
 2. Python is distributed under the [PSFL](https://docs.python.org/3/license.html).
-3. SQLite is in the [public domain](https://sqlite.org/copyright.html).

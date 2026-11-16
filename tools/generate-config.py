@@ -58,7 +58,7 @@ structs: list[str] = []
 # C file.
 init_configs: list[str] = []
 free_configs: list[str] = []
-db_loads: list[str] = []
+file_loads: list[str] = []
 env_loads: list[str] = []
 
 # Server file.
@@ -136,10 +136,10 @@ for value in cfg_map:
     config_name = " ".join(s.capitalize() for s in entry_name.split("_"))
 
     if is_int:
-        db_loads.append(f"LOAD_DB_CONFIG_INT({define_name}, {entry_name})")
+        file_loads.append(f"LOAD_FILE_CONFIG_INT({define_name}, {entry_name})")
         log_format = "%d"
     else:
-        db_loads.append(f"LOAD_DB_CONFIG_STR({define_name}, {entry_name})")
+        file_loads.append(f"LOAD_FILE_CONFIG_STR({define_name}, {entry_name})")
         free_configs.append(f"FREE_CONFIG_STRING({define_name}, {entry_name})")
         log_format = "%s"
 
@@ -186,8 +186,8 @@ files: dict[str, dict] = {
                 "text": "\n" + "\n".join(add_indent(free_configs)) + "\n",
             },
             {
-                "end": "\n    wrd_load_config_env",
-                "text": "\n" + "\n".join(add_indent(db_loads)) + "\n",
+                "end": "\n    return WRD_OK;",
+                "text": "\n" + "\n".join(add_indent(file_loads)) + "\n",
             },
         ],
     },
@@ -201,7 +201,7 @@ files: dict[str, dict] = {
     "server": {
         "file": "src/server.cpp",
         "start": "// Configurations.",
-        "end": "config->app = app;",
+        "end": "// Initialize TLS before forking workers",
         "text": "\n".join(add_indent(logs)) + "\n\n    ",
         "additionals": [],
     },

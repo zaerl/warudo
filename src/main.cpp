@@ -7,14 +7,13 @@
 #include <stdlib.h>
 
 #include "warudo.h"
-#include "app/app.h"
 
 int main(void) {
     warudo *config = NULL;
     wrd_code ret;
 
     config = static_cast<warudo *>(malloc(sizeof(warudo)));
-    ret = wrd_server_init(config, &wrd_entries_app);
+    ret = wrd_server_init(config);
 
     if(ret != WRD_OK) {
         wrd_log_error(config, "Failed to initialize. Code %s\n", wrd_error_description(ret, 0));

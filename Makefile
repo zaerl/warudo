@@ -1,16 +1,21 @@
 BUILD_DIR ?= build
-BUILD_TYPE ?= Release
-HCTREE_ARCHIVE ?= hctree.tar.gz
-HCTREE_BUILD ?= hctree-build
-HCTREE_URL ?= https://www.sqlite.org/hctree/tarball/hctree.tar.gz?r=hctree
+PRESET ?= release
 
-all: configure build
+# Homebrew LLVM is keg-only: fall back to it when the tools are not in the PATH.
+LLVM_DIRS = $(LLVM_BIN) /opt/homebrew/opt/llvm/bin /usr/local/opt/llvm/bin
+find_llvm_tool = $(firstword $(shell command -v $(1)) $(wildcard $(addsuffix /$(1),$(LLVM_DIRS))) $(1))
+CLANG_FORMAT ?= $(call find_llvm_tool,clang-format)
+CLANG_TIDY ?= $(call find_llvm_tool,clang-tidy)
+CXX_FILES = $(wildcard src/*.cpp src/*.h tests/*.cpp) tests/test.h
 
+all: build
+
+# Presets are defined in CMakePresets.json. Each one builds in $(BUILD_DIR)/<preset>.
 configure:
-	@cmake -S . -B $(BUILD_DIR) -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
+	@cmake --preset $(PRESET)
 
 build: configure
-	@cmake --build $(BUILD_DIR)
+	@cmake --build --preset $(PRESET)
 
 rebuild: clean_build all
 
@@ -23,29 +28,37 @@ generate_tests:
 code_coverage:
 	python3 tools/code-coverage.py
 
-start: configure build
-	WRD_CORS="*" WRD_LOG_LEVEL=3 WRD_CONF_PATH=warudo.conf build/src/warudo
-
-update_hctree:
-	@mkdir -p $(HCTREE_BUILD)/build
-	curl -L $(HCTREE_URL) | tar -xz -C $(HCTREE_BUILD)
-	cd $(HCTREE_BUILD)/build && ../hctree/configure
-	cd $(HCTREE_BUILD)/build && make sqlite3.c
-	cp $(HCTREE_BUILD)/build/sqlite3.h src/sqlite3/sqlite3.h
-	cp $(HCTREE_BUILD)/build/sqlite3.c src/sqlite3/sqlite3.c
-	rm -rf $(HCTREE_BUILD)
+start: build
+	WRD_CORS="*" WRD_LOG_LEVEL=3 WRD_CONF_PATH=warudo.conf $(BUILD_DIR)/$(PRESET)/src/warudo
 
 docker:
 	docker build --no-cache -t warudo:latest .
 
-test: BUILD_TYPE = Test
-test: configure build
-	build/tests/warudo-test $(ARGS)
+test: PRESET = test
+test: build
+	$(BUILD_DIR)/$(PRESET)/tests/warudo-test $(ARGS)
+
+# Tests with AddressSanitizer and UndefinedBehaviorSanitizer.
+sanitize: PRESET = sanitize
+sanitize: build
+	$(BUILD_DIR)/$(PRESET)/tests/warudo-test $(ARGS)
+
+format:
+	$(CLANG_FORMAT) -i $(CXX_FILES)
+
+format_check:
+	$(CLANG_FORMAT) --dry-run --Werror $(CXX_FILES)
+
+# Uses the compilation database of the test preset.
+tidy: PRESET = test
+tidy: configure
+	$(CLANG_TIDY) -p $(BUILD_DIR)/$(PRESET) $(filter %.cpp,$(CXX_FILES))
 
 clean_build:
-	@cmake --build $(BUILD_DIR) --target clean
+	@cmake --build --preset $(PRESET) --target clean
 
 clean:
-	rm -rf $(BUILD_DIR) $(HCTREE_BUILD)
+	rm -rf $(BUILD_DIR)
 
-.PHONY: all configure build clean rebuild
+.PHONY: all configure build rebuild start test sanitize format format_check tidy clean_build clean \
+	generate_config generate_tests code_coverage docker

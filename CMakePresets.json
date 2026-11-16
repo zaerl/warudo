@@ -1,0 +1,83 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": { "major": 3, "minor": 21, "patch": 0 },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}"
+        },
+        {
+            "name": "release",
+            "displayName": "Release",
+            "description": "Optimized server build, no tests",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "WARUDO_BUILD_TESTS": "OFF"
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug",
+            "description": "Debug server build, no tests",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "WARUDO_BUILD_TESTS": "OFF"
+            }
+        },
+        {
+            "name": "test",
+            "displayName": "Test",
+            "description": "Debug build with the test suite (defines WRD_TEST)",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "WARUDO_BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "sanitize",
+            "displayName": "Sanitize",
+            "description": "Test build with AddressSanitizer and UndefinedBehaviorSanitizer",
+            "inherits": "test",
+            "cacheVariables": {
+                "WARUDO_SANITIZE": "address,undefined"
+            }
+        },
+        {
+            "name": "ci",
+            "displayName": "CI",
+            "description": "Test build with warnings as errors",
+            "inherits": "test",
+            "cacheVariables": {
+                "WARUDO_WARNINGS_AS_ERRORS": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        { "name": "release", "configurePreset": "release" },
+        { "name": "debug", "configurePreset": "debug" },
+        { "name": "test", "configurePreset": "test" },
+        { "name": "sanitize", "configurePreset": "sanitize" },
+        { "name": "ci", "configurePreset": "ci" }
+    ],
+    "testPresets": [
+        {
+            "name": "test",
+            "configurePreset": "test",
+            "output": { "outputOnFailure": true }
+        },
+        {
+            "name": "sanitize",
+            "configurePreset": "sanitize",
+            "output": { "outputOnFailure": true }
+        },
+        {
+            "name": "ci",
+            "configurePreset": "ci",
+            "output": { "outputOnFailure": true }
+        }
+    ]
+}

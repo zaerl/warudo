@@ -1,54 +1,65 @@
-cmake_minimum_required(VERSION 3.14...3.31)
+cmake_minimum_required(VERSION 3.21...3.31)
 
 project(
     Warudo
     VERSION 0.1.0
     DESCRIPTION "Warudo"
-    LANGUAGES C CXX
+    LANGUAGES CXX
 )
 
-if(APPLE)
-    link_directories("/opt/homebrew/lib")
-    include_directories("/opt/homebrew/include")
+# Options.
+option(WARUDO_BUILD_TESTS "Build the Warudo test suite" ${PROJECT_IS_TOP_LEVEL})
+option(WARUDO_WARNINGS_AS_ERRORS "Treat compiler warnings as errors" OFF)
+set(WARUDO_SANITIZE "" CACHE STRING "Sanitizers to enable, e.g. \"address,undefined\"")
 
-    # Homebrew OpenSSL is keg-only, point FindOpenSSL at it.
-    if(NOT OPENSSL_ROOT_DIR AND EXISTS "/opt/homebrew/opt/openssl")
-        set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl")
-    endif()
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
 endif()
 
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+# Used by clang-tidy and editors.
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Homebrew OpenSSL is keg-only, point FindOpenSSL at it.
+if(APPLE AND NOT OPENSSL_ROOT_DIR AND EXISTS "/opt/homebrew/opt/openssl")
+    set(OPENSSL_ROOT_DIR "/opt/homebrew/opt/openssl")
 endif()
 
-# Warudo is C++20. C is only used for the bundled SQLite amalgamation.
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_C_STANDARD 17)
-set(CMAKE_C_STANDARD_REQUIRED ON)
+# Build settings shared by every Warudo target.
+add_library(warudo_options INTERFACE)
+add_library(warudo::options ALIAS warudo_options)
+target_compile_features(warudo_options INTERFACE cxx_std_20)
+target_compile_options(warudo_options
+    INTERFACE
+        -Wall
+        -Wextra
+        -pedantic
+        -Wno-unused-parameter
+        # Configuration strings are still `char *` fields defaulting to string literals.
+        # Remove once they become std::string.
+        -Wno-write-strings
+        $<$<BOOL:${WARUDO_WARNINGS_AS_ERRORS}>:-Werror>
+)
 
-# Compiler flags
-set(CMAKE_C_FLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter")
-# -Wno-write-strings: configuration strings are still `char *` fields defaulting to
-# string literals. Remove once they become std::string.
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -pedantic -Wno-unused-parameter -Wno-write-strings")
+if(WARUDO_WARNINGS_AS_ERRORS)
+    # hpack.cpp still uses sprintf(), which the macOS SDK marks as deprecated.
+    target_compile_options(warudo_options INTERFACE -Wno-error=deprecated-declarations)
+endif()
 
-# Debug flags
-set(CMAKE_C_FLAGS_DEBUG "-g -O0")
-set(CMAKE_C_FLAGS_RELEASE "-O3")
-set(CMAKE_C_FLAGS_TEST "-g -O0 -DWRD_TEST")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-set(CMAKE_CXX_FLAGS_TEST "-g -O0 -DWRD_TEST")
+if(WARUDO_SANITIZE)
+    target_compile_options(warudo_options
+        INTERFACE -fsanitize=${WARUDO_SANITIZE} -fno-omit-frame-pointer)
+    target_link_options(warudo_options INTERFACE -fsanitize=${WARUDO_SANITIZE})
+endif()
 
-set(CMAKE_CONFIGURATION_TYPES "Debug;Release;Test" CACHE STRING "Configurations" FORCE)
+if(WARUDO_BUILD_TESTS)
+    target_compile_definitions(warudo_options INTERFACE WRD_TEST)
+endif()
 
-# Warudo library
+# Warudo library and server
 add_subdirectory(src)
 
-# SQLite library
-add_subdirectory(src/sqlite3)
-
 # Tests
-add_subdirectory(tests)
+if(WARUDO_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

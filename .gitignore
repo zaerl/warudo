@@ -91,9 +91,6 @@ coverage
 
 warudo/*
 
-# HC-tree
-hctree-build/
-
 warudo.conf
 warudo.pid
 

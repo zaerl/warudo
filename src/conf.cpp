@@ -7,13 +7,17 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <limits>
+#include <new>
+#include <optional>
+#include <string>
+#include <string_view>
+
+#include "json5.h"
 #include "warudo.h"
-#include "sqlite3/sqlite3.h"
 
 // Init configurations with default values.
 WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
-    config->app = NULL;
-    config->app_data = NULL;
     config->routes_count = 0;
     config->requests_count = 0;
     config->timing_count = 0;
@@ -23,15 +27,13 @@ WRD_API wrd_code wrd_config_init_defaults(warudo *config) {
     // Configurations.
 
     // Initialize to defaults.
-    memset(config->config_status, WRD_DEFAULT_CONFIG, 20);
+    memset(config->config_status, WRD_DEFAULT_CONFIG, 18);
 
-    // Database
-    config->db_path = WRD_DEFAULT_DB_PATH;
+    // Log
     config->log_level = WRD_DEFAULT_LOG_LEVEL;
     // Net
     config->access_origin = WRD_DEFAULT_ACCESS_ORIGIN;
     config->listen_backlog = WRD_DEFAULT_LISTEN_BACKLOG;
-    config->max_columns = WRD_DEFAULT_MAX_COLUMNS;
     config->net_buffer_size = WRD_DEFAULT_NET_BUFFER_SIZE;
     config->net_headers_buffer_size = WRD_DEFAULT_NET_HEADERS_BUFFER_SIZE;
     config->net_input_buffer_size = WRD_DEFAULT_NET_INPUT_BUFFER_SIZE;
@@ -69,13 +71,11 @@ WRD_API wrd_code wrd_load_config_env(warudo *config) {
 
     // Configurations.
 
-    // Database
-    LOAD_ENV_CONFIG_STRING(WRD_DB_PATH, db_path)
+    // Log
     LOAD_ENV_CONFIG_INT(WRD_LOG_LEVEL, log_level)
     // Net
     LOAD_ENV_CONFIG_STRING(WRD_ACCESS_ORIGIN, access_origin)
     LOAD_ENV_CONFIG_INT(WRD_LISTEN_BACKLOG, listen_backlog)
-    LOAD_ENV_CONFIG_INT(WRD_MAX_COLUMNS, max_columns)
     LOAD_ENV_CONFIG_INT(WRD_NET_BUFFER_SIZE, net_buffer_size)
     LOAD_ENV_CONFIG_INT(WRD_NET_HEADERS_BUFFER_SIZE, net_headers_buffer_size)
     LOAD_ENV_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
@@ -112,8 +112,7 @@ WRD_API wrd_code wrd_config_close(warudo *config) {
 
     // Configurations.
 
-    // Database
-    FREE_CONFIG_STRING(WRD_DB_PATH, db_path)
+    // Log
     // Net
     FREE_CONFIG_STRING(WRD_ACCESS_ORIGIN, access_origin)
     // Server
@@ -127,60 +126,120 @@ WRD_API wrd_code wrd_config_close(warudo *config) {
     return WRD_OK;
 }
 
-WRD_API wrd_config_status wrd_load_string(sqlite3_stmt *stmt, const char *name, char **output) {
-    wrd_config_status ret = WRD_DEFAULT_CONFIG;
-    const char *res = NULL;
-    int length = 0;
+// Load a string configuration from the configuration file. Numbers and booleans are converted to
+// their text, so that mixed configurations like `worker_processes: 4` are accepted.
+static wrd_config_status wrd_load_string(const wrd::json5::value &root, const char *name,
+    char **output) {
+    const wrd::json5::value *found = root.find(name);
+    std::string text;
 
-    if(sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC) != SQLITE_OK) {
-        goto error;
+    if(!found) {
+        return WRD_DEFAULT_CONFIG;
     }
 
-    if(sqlite3_step(stmt) != SQLITE_ROW) {
-        goto error;
+    if(const std::string *string = found->get_if<std::string>()) {
+        text = *string;
+    } else if(const std::int64_t *integer = found->get_if<std::int64_t>()) {
+        text = std::to_string(*integer);
+    } else if(const bool *boolean = found->get_if<bool>()) {
+        text = *boolean ? "1" : "0";
     }
 
-    res = (const char*)sqlite3_column_text(stmt, 0);
+    // The configurations are C strings: stop at an embedded NUL.
+    text.resize(strlen(text.c_str()));
 
-    if(!res) {
-        goto error;
+    if(text.empty()) {
+        return WRD_DEFAULT_CONFIG;
     }
 
-    length = sqlite3_column_bytes(stmt, 0);
+    char *copy = strdup(text.c_str());
 
-    if(length) {
-        *output = strndup(res, length);
-        ret = WRD_LOADED_CONFIG;
+    if(!copy) {
+        return WRD_DEFAULT_CONFIG;
     }
 
-error:
+    *output = copy;
 
-    sqlite3_reset(stmt);
-
-    return ret;
+    return WRD_LOADED_CONFIG;
 }
 
-WRD_API wrd_config_status wrd_load_integer(sqlite3_stmt *stmt, const char *name, int *output) {
-    wrd_config_status ret = WRD_DEFAULT_CONFIG;
+// Load an integer configuration from the configuration file. Booleans are accepted as 0 and 1.
+static wrd_config_status wrd_load_integer(const wrd::json5::value &root, const char *name,
+    int *output) {
+    const wrd::json5::value *found = root.find(name);
 
-    if(sqlite3_bind_text(stmt, 1, name, -1, SQLITE_STATIC) != SQLITE_OK) {
-        goto error;
+    if(!found) {
+        return WRD_DEFAULT_CONFIG;
     }
 
-    if(sqlite3_step(stmt) != SQLITE_ROW) {
-        goto error;
+    if(const std::int64_t *integer = found->get_if<std::int64_t>()) {
+        if(*integer < std::numeric_limits<int>::min() ||
+            *integer > std::numeric_limits<int>::max()) {
+            return WRD_DEFAULT_CONFIG;
+        }
+
+        *output = static_cast<int>(*integer);
+
+        return WRD_LOADED_CONFIG;
     }
 
-    if(sqlite3_column_type(stmt, 0) == SQLITE_INTEGER) {
-        *output = sqlite3_column_int(stmt, 0);
-        ret = WRD_LOADED_CONFIG;
+    if(const bool *boolean = found->get_if<bool>()) {
+        *output = *boolean ? 1 : 0;
+
+        return WRD_LOADED_CONFIG;
     }
 
-error:
+    return WRD_DEFAULT_CONFIG;
+}
 
-    sqlite3_reset(stmt);
+// Parse the configuration file and set the configurations found in it.
+static wrd_code wrd_load_config_file(warudo *config, std::string_view text) {
+    wrd::json5::error error;
+    std::optional<wrd::json5::value> root = wrd::json5::parse(text, &error);
 
-    return ret;
+    if(!root) {
+        // A file with only white space and comments has no configurations.
+        return error.code == wrd::json5::errc::empty ? WRD_OK : WRD_INVALID_CONFIG;
+    }
+
+    if(!root->is<wrd::json5::object>()) {
+        return WRD_INVALID_CONFIG;
+    }
+
+    // Status of the new configurations.
+    wrd_config_status status = WRD_DEFAULT_CONFIG;
+
+    // Used to shorten the declarations.
+    #define LOAD_FILE_CONFIG_INT(NAME, FIELD) \
+        status = wrd_load_integer(*root, #FIELD, (int*)&config->FIELD); \
+        wrd_set_config_status(config, NAME, status);
+
+    #define LOAD_FILE_CONFIG_STR(NAME, FIELD) \
+        status = wrd_load_string(*root, #FIELD, &config->FIELD); \
+        wrd_set_config_status(config, NAME, status);
+
+    // Configurations.
+
+    LOAD_FILE_CONFIG_INT(WRD_LOG_LEVEL, log_level)
+    LOAD_FILE_CONFIG_STR(WRD_ACCESS_ORIGIN, access_origin)
+    LOAD_FILE_CONFIG_INT(WRD_LISTEN_BACKLOG, listen_backlog)
+    LOAD_FILE_CONFIG_INT(WRD_NET_BUFFER_SIZE, net_buffer_size)
+    LOAD_FILE_CONFIG_INT(WRD_NET_HEADERS_BUFFER_SIZE, net_headers_buffer_size)
+    LOAD_FILE_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
+    LOAD_FILE_CONFIG_INT(WRD_PORT, port)
+    LOAD_FILE_CONFIG_INT(WRD_TIMING, timing)
+    LOAD_FILE_CONFIG_STR(WRD_PID_FILE, pid_file)
+    LOAD_FILE_CONFIG_STR(WRD_WORKER_PROCESSES, worker_processes)
+    LOAD_FILE_CONFIG_INT(WRD_KEEP_ALIVE_TIMEOUT, keep_alive_timeout)
+    LOAD_FILE_CONFIG_INT(WRD_KEEP_ALIVE_MAX, keep_alive_max)
+    LOAD_FILE_CONFIG_STR(WRD_DOCUMENT_ROOT, document_root)
+    LOAD_FILE_CONFIG_INT(WRD_TLS_ENABLED, tls_enabled)
+    LOAD_FILE_CONFIG_STR(WRD_TLS_CERT_PATH, tls_cert_path)
+    LOAD_FILE_CONFIG_STR(WRD_TLS_KEY_PATH, tls_key_path)
+    LOAD_FILE_CONFIG_INT(WRD_TLS_PORT, tls_port)
+    LOAD_FILE_CONFIG_INT(WRD_HSTS_MAX_AGE, hsts_max_age)
+
+    return WRD_OK;
 }
 
 // Init config from a configuration file.
@@ -197,17 +256,9 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
         wrd_config_init_defaults(config);
     }
 
-    sqlite3 *db = NULL;
     void *file_buffer = NULL;
     long file_size = 0;
-    int rc = 0;
     wrd_code ret = WRD_OK;
-    sqlite3_stmt *stmt = NULL;
-    // Status of the new configurations.
-    wrd_config_status status = WRD_DEFAULT_CONFIG;
-    const char *create_table = "CREATE TABLE json_data (data BLOB);";
-    const char *load_json = "INSERT INTO json_data (data) VALUES (jsonb(?1));";
-    const char *select_json = "SELECT data ->> ('$.' || ?1) FROM json_data;";
 
     if(file_path == NULL) {
         config->status = WRD_LOADED;
@@ -218,125 +269,34 @@ WRD_API wrd_code wrd_config_init(warudo *config, const char *file_path) {
     ret = wrd_read_file(file_path, &file_buffer, &file_size, WRD_MAX_CONFIG_SIZE);
 
     if(ret != WRD_OK) {
-        goto error;
+        return ret;
     }
 
     if(file_size == 0) {
-        config->status = WRD_LOADED;
         // Empty file, return.
-        ret = WRD_DEFAULT;
-        goto error;
+        free(file_buffer);
+        config->status = WRD_LOADED;
+
+        return WRD_DEFAULT;
     }
 
-    // Initialize SQLite.
-    rc = sqlite3_initialize();
-
-    if(rc != SQLITE_OK) {
-        ret = WRD_DB_INIT_ERROR;
-        goto error;
+    try {
+        ret = wrd_load_config_file(config,
+            std::string_view(static_cast<const char *>(file_buffer), file_size));
+    } catch(const std::bad_alloc &) {
+        ret = WRD_MEMORY_ERROR;
     }
 
-    // Set default error.
-    ret = WRD_DB_OPEN_ERROR;
+    free(file_buffer);
 
-    // Open in-memory database.
-    rc = sqlite3_open(":memory:", &db);
-
-    if(rc != SQLITE_OK) {
-        ret = WRD_DB_OPEN_ERROR;
-        goto error;
+    if(ret != WRD_OK) {
+        return ret;
     }
-
-    // Set an error by default.
-    ret = WRD_DB_ERROR;
-
-    // Create a table to store the JSON data.
-    rc = sqlite3_exec(db, create_table, NULL, NULL, NULL);
-
-    if(rc != SQLITE_OK) {
-        goto error;
-    }
-
-    rc = sqlite3_prepare_v2(db, load_json, -1, &stmt, NULL);
-
-    if(rc != SQLITE_OK) {
-        goto error;
-    }
-
-    // Bind the JSON data to the statement.
-    rc = sqlite3_bind_blob(stmt, 1, file_buffer, file_size, SQLITE_STATIC);
-
-    if(rc != SQLITE_OK) {
-        goto error;
-    }
-
-    // Execute the statement
-    rc = sqlite3_step(stmt);
-
-    if(rc != SQLITE_DONE) {
-        goto error;
-    }
-
-    sqlite3_finalize(stmt);
-    stmt = NULL;
-
-    rc = sqlite3_prepare_v2(db, select_json, -1, &stmt, 0);
-
-    if(rc != SQLITE_OK) {
-        goto error;
-    }
-
-    // Used to shorten the declarations.
-    #define LOAD_DB_CONFIG_INT(NAME, FIELD) \
-        status = wrd_load_integer(stmt, #FIELD, (int*)&config->FIELD); \
-        wrd_set_config_status(config, NAME, status);
-
-    #define LOAD_DB_CONFIG_STR(NAME, FIELD) \
-        status = wrd_load_string(stmt, #FIELD, &config->FIELD); \
-        wrd_set_config_status(config, NAME, status);
-
-    // Configurations.
-
-    LOAD_DB_CONFIG_STR(WRD_DB_PATH, db_path)
-    LOAD_DB_CONFIG_INT(WRD_LOG_LEVEL, log_level)
-    LOAD_DB_CONFIG_STR(WRD_ACCESS_ORIGIN, access_origin)
-    LOAD_DB_CONFIG_INT(WRD_LISTEN_BACKLOG, listen_backlog)
-    LOAD_DB_CONFIG_INT(WRD_MAX_COLUMNS, max_columns)
-    LOAD_DB_CONFIG_INT(WRD_NET_BUFFER_SIZE, net_buffer_size)
-    LOAD_DB_CONFIG_INT(WRD_NET_HEADERS_BUFFER_SIZE, net_headers_buffer_size)
-    LOAD_DB_CONFIG_INT(WRD_NET_INPUT_BUFFER_SIZE, net_input_buffer_size)
-    LOAD_DB_CONFIG_INT(WRD_PORT, port)
-    LOAD_DB_CONFIG_INT(WRD_TIMING, timing)
-    LOAD_DB_CONFIG_STR(WRD_PID_FILE, pid_file)
-    LOAD_DB_CONFIG_STR(WRD_WORKER_PROCESSES, worker_processes)
-    LOAD_DB_CONFIG_INT(WRD_KEEP_ALIVE_TIMEOUT, keep_alive_timeout)
-    LOAD_DB_CONFIG_INT(WRD_KEEP_ALIVE_MAX, keep_alive_max)
-    LOAD_DB_CONFIG_STR(WRD_DOCUMENT_ROOT, document_root)
-    LOAD_DB_CONFIG_INT(WRD_TLS_ENABLED, tls_enabled)
-    LOAD_DB_CONFIG_STR(WRD_TLS_CERT_PATH, tls_cert_path)
-    LOAD_DB_CONFIG_STR(WRD_TLS_KEY_PATH, tls_key_path)
-    LOAD_DB_CONFIG_INT(WRD_TLS_PORT, tls_port)
-    LOAD_DB_CONFIG_INT(WRD_HSTS_MAX_AGE, hsts_max_age)
 
     wrd_load_config_env(config);
     config->status = WRD_LOADED;
 
-    ret = WRD_OK;
-
-error:
-    if(stmt) {
-        sqlite3_finalize(stmt);
-    }
-
-    if(db) {
-        sqlite3_close(db);
-    }
-
-    if(file_buffer) {
-        free(file_buffer);
-    }
-
-    return ret;
+    return WRD_OK;
 }
 
 // Get the status of a configuration.

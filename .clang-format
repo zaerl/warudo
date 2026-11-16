@@ -1,0 +1,41 @@
+# Warudo code style. Run `make format` to apply it, `make format_check` to verify it.
+BasedOnStyle: LLVM
+Language: Cpp
+Standard: c++20
+
+ColumnLimit: 100
+IndentWidth: 4
+ContinuationIndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# if(x) {, for(...) {, while(...) {
+SpaceBeforeParens: Never
+PointerAlignment: Right
+DerivePointerAlignment: false
+
+AlignAfterOpenBracket: DontAlign
+AlignOperands: DontAlign
+AlignTrailingComments: false
+AlignEscapedNewlines: DontAlign
+AlignConsecutiveMacros: false
+
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+
+BinPackArguments: true
+BinPackParameters: true
+BreakBeforeBraces: Attach
+IndentCaseLabels: true
+IndentPPDirectives: None
+InsertBraces: true
+InsertNewlineAtEOF: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+ReflowComments: false
+SortIncludes: Never
+SpacesBeforeTrailingComments: 1

@@ -41,16 +41,16 @@ ATT_TEST(http) {
     ATT_ASSERT(config.request_headers_count, 1, "One header parsed");
 
     // Test: POST request.
-    mock_request(&config, "POST /app/entries HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\r\n{\"key\":\"val\"}");
+    mock_request(&config, "POST /api/entries HTTP/1.1\r\nHost: localhost\r\nContent-Type: application/json\r\nContent-Length: 13\r\n\r\n{\"key\":\"val\"}");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse POST");
     ATT_ASSERT(config.request_method, WRD_REQUEST_POST, "Method is POST");
-    ATT_ASSERT(strcmp(config.request_path, "/app/entries"), 0, "Path is /app/entries");
+    ATT_ASSERT(strcmp(config.request_path, "/api/entries"), 0, "Path is /api/entries");
     ATT_ASSERT(config.request_headers_count, 3, "Three headers parsed");
 
     // Test: GET with query string.
-    mock_request(&config, "GET /app/entries?limit=5&offset=10 HTTP/1.1\r\nHost: localhost\r\n\r\n");
+    mock_request(&config, "GET /api/entries?limit=5&offset=10 HTTP/1.1\r\nHost: localhost\r\n\r\n");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse GET with query string");
-    ATT_ASSERT(strcmp(config.request_path, "/app/entries"), 0, "Path without query string");
+    ATT_ASSERT(strcmp(config.request_path, "/api/entries"), 0, "Path without query string");
     ATT_ASSERT(strcmp(config.request_query_string, "limit=5&offset=10"), 0, "Query string parsed");
 
     // Test: HEAD request.
@@ -59,22 +59,22 @@ ATT_TEST(http) {
     ATT_ASSERT(config.request_method, WRD_REQUEST_HEAD, "Method is HEAD");
 
     // Test: PUT request.
-    mock_request(&config, "PUT /app/entries HTTP/1.1\r\n\r\n");
+    mock_request(&config, "PUT /api/entries HTTP/1.1\r\n\r\n");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse PUT");
     ATT_ASSERT(config.request_method, WRD_REQUEST_PUT, "Method is PUT");
 
     // Test: DELETE request.
-    mock_request(&config, "DELETE /app/entries HTTP/1.1\r\n\r\n");
+    mock_request(&config, "DELETE /api/entries HTTP/1.1\r\n\r\n");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse DELETE");
     ATT_ASSERT(config.request_method, WRD_REQUEST_DELETE, "Method is DELETE");
 
     // Test: OPTIONS request.
-    mock_request(&config, "OPTIONS /app/entries HTTP/1.1\r\n\r\n");
+    mock_request(&config, "OPTIONS /api/entries HTTP/1.1\r\n\r\n");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse OPTIONS");
     ATT_ASSERT(config.request_method, WRD_REQUEST_OPTIONS, "Method is OPTIONS");
 
     // Test: unknown method.
-    mock_request(&config, "PATCH /app/entries HTTP/1.1\r\n\r\n");
+    mock_request(&config, "PATCH /api/entries HTTP/1.1\r\n\r\n");
     ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse unknown method");
     ATT_ASSERT(config.request_method, WRD_REQUEST_UNKNOWN, "Unknown method");
 
@@ -112,13 +112,13 @@ ATT_TEST(http) {
     ATT_ASSERT(config.request_body_offset > 0, 1, "Body offset is set");
     ATT_ASSERT(strcmp(config.net_input_buffer.buffer + config.request_body_offset, "hello"), 0, "Body content accessible");
 
-    // Test: /app/keys route.
-    mock_request(&config, "GET /app/keys HTTP/1.1\r\n\r\n");
-    ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse /app/keys");
+    // Test: /api/keys route.
+    mock_request(&config, "GET /api/keys HTTP/1.1\r\n\r\n");
+    ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse /api/keys");
 
-    // Test: /app/dashboards route.
-    mock_request(&config, "GET /app/dashboards HTTP/1.1\r\n\r\n");
-    ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse /app/dashboards");
+    // Test: /api/dashboards route.
+    mock_request(&config, "GET /api/dashboards HTTP/1.1\r\n\r\n");
+    ATT_ASSERT(wrd_http_parse_query_headers(&config), WRD_OK, "Parse /api/dashboards");
 
     // Test: unknown path.
     mock_request(&config, "GET /unknown HTTP/1.1\r\n\r\n");

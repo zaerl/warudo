@@ -1,0 +1,22 @@
+# Warudo static analysis. Run `make tidy`.
+#
+# The code base is still C-style C++: the modernize-*, cppcoreguidelines-* and readability-*
+# groups are left out on purpose and get enabled as each module is modernized.
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-reserved-identifier,
+  -bugprone-signed-bitwise,
+  -bugprone-throwing-static-initialization,
+  cert-err34-c,
+  cert-str34-c,
+  clang-analyzer-*,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+  performance-*,
+  -performance-enum-size,
+  portability-*
+WarningsAsErrors: ''
+HeaderFilterRegex: '(src|tests)/[^/]*\.h$'
+ExcludeHeaderFilterRegex: 'attractor\.h'
+FormatStyle: file

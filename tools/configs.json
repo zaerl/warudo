@@ -1,9 +1,5 @@
 [
-    "Database",
-    {
-        "name": "db_path",
-        "default": "file:warudo.db?hctree=1"
-    },
+    "Log",
     {
         "name": "log_level",
         "default": 0,
@@ -23,10 +19,6 @@
     {
         "name": "listen_backlog",
         "default": 1024
-    },
-    {
-        "name": "max_columns",
-        "default": 64
     },
     {
         "name": "net_buffer_size",

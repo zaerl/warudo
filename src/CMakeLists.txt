@@ -7,6 +7,7 @@ set(SOURCES
     fs.cpp
     hpack.cpp
     http.cpp
+    json5.cpp
     log.cpp
     net.cpp
     output.cpp
@@ -21,25 +22,17 @@ set(SOURCES
 
 find_package(OpenSSL 3.0 REQUIRED)
 add_library(warudo_lib STATIC ${SOURCES})
+add_library(warudo::core ALIAS warudo_lib)
+set_target_properties(warudo_lib PROPERTIES CXX_EXTENSIONS OFF)
+target_include_directories(warudo_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(warudo_lib
     PUBLIC
+        warudo::options
         OpenSSL::SSL
         OpenSSL::Crypto
 )
 
-# Example entries application
-set(APP_SOURCES
-    app/app.cpp
-    app/db.cpp
-)
-
-add_library(warudo_app STATIC ${APP_SOURCES})
-target_link_libraries(warudo_app PUBLIC warudo_lib)
-
 # warudo
 add_executable(warudo main.cpp)
-target_link_libraries(warudo
-    PRIVATE
-        warudo_app
-        warudo_sqlite
-)
+set_target_properties(warudo PROPERTIES CXX_EXTENSIONS OFF)
+target_link_libraries(warudo PRIVATE warudo::core)

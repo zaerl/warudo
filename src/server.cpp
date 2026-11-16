@@ -22,7 +22,7 @@ static void wrd_signal_handler(int sig) {
     wrd_shutdown = 1;
 }
 
-WRD_API wrd_code wrd_server_init(warudo *config, const wrd_app *app) {
+WRD_API wrd_code wrd_server_init(warudo *config) {
     if(!config) {
         return WRD_ERROR;
     }
@@ -56,11 +56,9 @@ WRD_API wrd_code wrd_server_init(warudo *config, const wrd_app *app) {
     wrd_log_info(config, "Starting Warudo %s\n", WRD_VERSION);
 
     // Configurations.
-    wrd_log_info(config, "Db Path: %s [%c]\n", config->db_path, wrd_get_config_status(config, WRD_DB_PATH));
     wrd_log_info(config, "Log Level: %d [%c]\n", config->log_level, wrd_get_config_status(config, WRD_LOG_LEVEL));
     wrd_log_info(config, "Access Origin: %s [%c]\n", config->access_origin, wrd_get_config_status(config, WRD_ACCESS_ORIGIN));
     wrd_log_info(config, "Listen Backlog: %d [%c]\n", config->listen_backlog, wrd_get_config_status(config, WRD_LISTEN_BACKLOG));
-    wrd_log_info(config, "Max Columns: %d [%c]\n", config->max_columns, wrd_get_config_status(config, WRD_MAX_COLUMNS));
     wrd_log_info(config, "Net Buffer Size: %d [%c]\n", config->net_buffer_size, wrd_get_config_status(config, WRD_NET_BUFFER_SIZE));
     wrd_log_info(config, "Net Headers Buffer Size: %d [%c]\n", config->net_headers_buffer_size, wrd_get_config_status(config, WRD_NET_HEADERS_BUFFER_SIZE));
     wrd_log_info(config, "Net Input Buffer Size: %d [%c]\n", config->net_input_buffer_size, wrd_get_config_status(config, WRD_NET_INPUT_BUFFER_SIZE));
@@ -76,18 +74,6 @@ WRD_API wrd_code wrd_server_init(warudo *config, const wrd_app *app) {
     wrd_log_info(config, "Tls Key Path: %s [%c]\n", config->tls_key_path, wrd_get_config_status(config, WRD_TLS_KEY_PATH));
     wrd_log_info(config, "Tls Port: %d [%c]\n", config->tls_port, wrd_get_config_status(config, WRD_TLS_PORT));
     wrd_log_info(config, "Hsts Max Age: %d [%c]\n", config->hsts_max_age, wrd_get_config_status(config, WRD_HSTS_MAX_AGE));
-
-    config->app = app;
-
-    if(app && app->init) {
-        ret = app->init(config);
-
-        if(ret != WRD_OK) {
-            wrd_server_close(config);
-
-            return ret;
-        }
-    }
 
     // Initialize TLS before forking workers so config is shared.
     ret = wrd_init_tls(config);
@@ -246,11 +232,6 @@ WRD_API wrd_code wrd_server_close(warudo *config) {
     // Remove PID file on shutdown.
     if(config->pid_file && !config->is_worker) {
         unlink(config->pid_file);
-    }
-
-    // Close the application first, while the configuration is still loaded.
-    if(config->app && config->app->close) {
-        config->app->close(config);
     }
 
     wrd_tls_close(config);
