@@ -8,10 +8,6 @@
 #ifndef WARUDO_H
 #define WARUDO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #if defined(_WIN32) || defined(_WIN64)
 #error "Windows is not supported"
 #endif
@@ -29,11 +25,11 @@ extern "C" {
 #endif
 #endif
 
-#define WRD_NAME u8"Warudo"
+#define WRD_NAME "Warudo"
 #define WRD_VERSION_MAJOR 0
 #define WRD_VERSION_MINOR 1
 #define WRD_VERSION_RELEASE 0
-#define WRD_VERSION u8"0.1.0"
+#define WRD_VERSION "0.1.0"
 #define WRD_VERSION_NUMBER 1000
 
 #define WRD_DEFAULT_CONF_PATH "warudo.conf"
@@ -266,9 +262,9 @@ typedef struct warudo {
     int is_tls_connection;
     struct sockaddr_in address;
 
-    // TLS state (opaque, managed by tls.c).
+    // TLS state (opaque, managed by tls.cpp).
     void *tls_state;
-    // Per-connection SSL context (opaque, managed by tls.c).
+    // Per-connection SSL context (opaque, managed by tls.cpp).
     void *tls_ssl;
 
     // Worker
@@ -373,7 +369,7 @@ WRD_API wrd_code wrd_net_send(warudo *config, wrd_buffer *buffer);
 // Output
 WRD_API char *wrd_escape_html(const char *input);
 
-typedef int (*wrd_parse_formdata_callback)(const char*, long int, warudo*);
+typedef wrd_code (*wrd_parse_formdata_callback)(const char*, long int, warudo*);
 
 WRD_API char *wrd_url_decode(const char *input);
 WRD_API int wrd_is_valid_boundary(const char *boundary);
@@ -415,9 +411,5 @@ WRD_API wrd_code wrd_worker_init(warudo *config);
 WRD_API wrd_code wrd_get_workers(warudo *config, long *workers);
 WRD_API wrd_code wrd_worker_close(warudo *config);
 WRD_API wrd_code wrd_worker_loop(warudo *config);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // WARUDO_H

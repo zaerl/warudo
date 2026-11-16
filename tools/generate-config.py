@@ -144,7 +144,7 @@ for value in cfg_map:
         log_format = "%s"
 
     logs.append(
-        f'wrd_log_info(config, u8"{config_name}: {log_format} [%c]\\n", '
+        f'wrd_log_info(config, "{config_name}: {log_format} [%c]\\n", '
         f"config->{entry_name}, wrd_get_config_status(config, "
         f"{define_name}));"
     )
@@ -172,7 +172,7 @@ files: dict[str, dict] = {
         ],
     },
     "c": {
-        "file": "src/conf.c",
+        "file": "src/conf.cpp",
         "start": "// Configurations.",
         "end": "\n    return WRD_OK;",
         "text": "\n" + "\n".join(add_indent(init_configs)) + "\n",
@@ -199,9 +199,9 @@ files: dict[str, dict] = {
         "additionals": [],
     },
     "server": {
-        "file": "src/server.c",
+        "file": "src/server.cpp",
         "start": "// Configurations.",
-        "end": "ret = wrd_db_init(config->db_path, config);",
+        "end": "config->app = app;",
         "text": "\n".join(add_indent(logs)) + "\n\n    ",
         "additionals": [],
     },
