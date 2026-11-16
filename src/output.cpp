@@ -26,23 +26,23 @@ WRD_API char *wrd_escape_html(const char *input) {
     for(size_t i = 0; i < input_length; ++i) {
         switch(input[i]) {
             case '&':
-                strncpy(&escaped[j], "&amp;", 5);
+                memcpy(&escaped[j], "&amp;", 5);
                 j += 5;
                 break;
             case '<':
-                strncpy(&escaped[j], "&lt;", 4);
+                memcpy(&escaped[j], "&lt;", 4);
                 j += 4;
                 break;
             case '>':
-                strncpy(&escaped[j], "&gt;", 4);
+                memcpy(&escaped[j], "&gt;", 4);
                 j += 4;
                 break;
             case '"':
-                strncpy(&escaped[j], "&quot;", 6);
+                memcpy(&escaped[j], "&quot;", 6);
                 j += 6;
                 break;
             case '\'':
-                strncpy(&escaped[j], "&apos;", 6);
+                memcpy(&escaped[j], "&apos;", 6);
                 j += 6;
                 break;
             default:

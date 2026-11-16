@@ -21,6 +21,8 @@ COPY CMakeLists.txt CMakePresets.json ./
 COPY Makefile .
 COPY src ./src/
 COPY tests ./tests/
+# The tests load warudo.conf.default, the server reads warudo.conf.
+COPY warudo.conf.default ./
 COPY warudo.conf.default ./warudo.conf
 
 # musl's unistd.h header is located at the system headers root folder,

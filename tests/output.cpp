@@ -7,8 +7,8 @@
 #include "test.h"
 
 ATT_TEST(output) {
-    ATT_ASSERT(wrd_escape_html(NULL), NULL, "NULL");
-    ATT_ASSERT(wrd_escape_html(""), "", "Empty");
-    ATT_ASSERT(wrd_escape_html("a-z"), "a-z", "Escape a-z");
-    ATT_ASSERT(wrd_escape_html("<>&\""), "&lt;&gt;&amp;&quot;", "Special characters");
+    ATT_ASSERT(WRD_OWNED(wrd_escape_html(NULL)), nullptr, "NULL");
+    ATT_ASSERT(WRD_OWNED(wrd_escape_html("")), "", "Empty");
+    ATT_ASSERT(WRD_OWNED(wrd_escape_html("a-z")), "a-z", "Escape a-z");
+    ATT_ASSERT(WRD_OWNED(wrd_escape_html("<>&\"")), "&lt;&gt;&amp;&quot;", "Special characters");
 }

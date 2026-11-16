@@ -3,9 +3,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#include <memory>
 
 #include "../src/warudo.h"
 #include "attractor.h"
+
+// Frees a malloc()ed string returned by Warudo at the end of the assertion that uses it.
+struct wrd_test_free {
+    void operator()(void *pointer) const {
+        free(pointer);
+    }
+};
+
+using wrd_test_string = std::unique_ptr<char, wrd_test_free>;
+
+#define WRD_OWNED(EXPRESSION) wrd_test_string(EXPRESSION).get()
 
 #define MOCK_CONFIG warudo config = {}; wrd_config_init(&config, NULL);
 #define MOCK_CONFIG_S char *tmp_mock_file = NULL;

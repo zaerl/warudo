@@ -37,7 +37,7 @@ ATT_TEST(conf) {
 
     WRD_MOCK_FILE("{ net_buffer_size: 100 }")
     ATT_ASSERT(wrd_config_init(&config, tmp_mock_file), WRD_OK, "Add net_buffer_size");
-    ATT_ASSERT(config.access_origin, NULL, "Access_origin NULL");
+    ATT_ASSERT(config.access_origin, nullptr, "Access_origin NULL");
     ATT_ASSERT(config.net_buffer_size, 100, "Valid net_buffer_size");
 
     WRD_MOCK_FILE("{ net_buffer_size: '30' }")
@@ -87,8 +87,8 @@ ATT_TEST(conf) {
     WRD_MOCK_FILE("{ worker_processes: 4, document_root: '', access_origin: null, pid_file: 'a\\u00E8\\\nb' }")
     ATT_ASSERT(wrd_config_init(&config, tmp_mock_file), WRD_OK, "String forms");
     ATT_ASSERT(config.worker_processes, "4", "Number as string");
-    ATT_ASSERT(config.document_root, NULL, "Empty string keeps the default");
-    ATT_ASSERT(config.access_origin, NULL, "null keeps the default");
+    ATT_ASSERT(config.document_root, nullptr, "Empty string keeps the default");
+    ATT_ASSERT(config.access_origin, nullptr, "null keeps the default");
     ATT_ASSERT(config.pid_file, "a\xC3\xA8" "b", "Escapes and line continuation");
 
     // The last duplicated key wins.
@@ -101,5 +101,6 @@ ATT_TEST(conf) {
     ATT_ASSERT(config.port, WRD_DEFAULT_PORT, "Default file port");
     ATT_ASSERT(wrd_get_config_status(&config, WRD_PORT), WRD_LOADED_CONFIG, "Default file port status");
 
+    wrd_config_close(&config);
     FREE_MOCK_FILE
 }

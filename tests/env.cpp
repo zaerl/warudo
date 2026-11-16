@@ -23,4 +23,6 @@ ATT_TEST(env) {
     code = wrd_get_env_string(&test_str, "PWD");
     ATT_ASSERT(code, WRD_OK, "Env 5");
     ATT_ASSERT(test_str, getenv("PWD"), "Default PWD");
+
+    free(test_str);
 }
